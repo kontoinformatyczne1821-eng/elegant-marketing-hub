@@ -1122,7 +1122,6 @@ export default function Landing() {
   const { scrollY, scrollYProgress } = useScroll();
   const { scrollYProgress: cinemaProgress } = useScroll({ target: cinemaRef, offset: ["start end", "end start"] });
   const cinemaY = useTransform(cinemaProgress, [0, 1], ["-14%", "14%"]);
-  const cinemaText = useTransform(cinemaProgress, [0, 0.5], ["-40px", "0px"]);
   const progress = useTransform(scrollYProgress, [0,1], [0,1]);
   /* pasek boczny pokazuje się po kliknięciu Q w nagłówku */
   const [navOpen, setNavOpen] = useState(false);
