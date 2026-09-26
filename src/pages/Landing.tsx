@@ -307,26 +307,55 @@ function spiralAt(off: number) {
   };
 }
 
-/* Szklany przycisk strzałki karuzeli planów. Klik = wciśnięcie szkła,
-   błysk przebiegający przez obręcz, fala rozchodząca się od środka
-   i strzałka wysuwająca się w kierunku podróży. */
-function PlanArrow({
+/* Szklany przycisk strzałki (plany: poziomy, proces: pionowy). Klik =
+   wciśnięcie szkła, błysk przebiegający przez obręcz, fala od środka
+   i strzałka wysuwająca się w kierunku podróży. tone="light" — wariant
+   na jasnym tle sekcji PROCES. */
+const GLASS_SKIN = {
+  dark: {
+    bg: "linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0.03) 55%), rgba(10,10,13,0.36)",
+    border: "1px solid rgba(255,255,255,0.16)",
+    shadow:
+      "inset 0 1px 1px rgba(255,255,255,0.30), inset 0 -1px 1px rgba(255,255,255,0.06), 0 10px 30px rgba(0,0,0,0.35)",
+    ring: "border-white/50",
+    arrow: "text-white/70",
+    glow: "drop-shadow(0 0 8px rgba(255,255,255,0.45))",
+  },
+  light: {
+    bg: "linear-gradient(160deg, rgba(255,255,255,0.88), rgba(255,255,255,0.42) 55%), rgba(247,247,245,0.38)",
+    border: "1px solid rgba(10,10,10,0.12)",
+    shadow:
+      "inset 0 1px 1px rgba(255,255,255,0.92), inset 0 -1px 1px rgba(10,10,10,0.05), 0 10px 30px rgba(0,0,10,0.10)",
+    ring: "border-black/25",
+    arrow: "text-black/60",
+    glow: "drop-shadow(0 0 8px rgba(10,10,10,0.16))",
+  },
+} as const;
+
+function GlassArrow({
   dir,
   onClick,
   label,
   className = "",
+  axis = "x",
+  tone = "dark",
 }: {
   dir: 1 | -1;
   onClick: () => void;
   label: string;
   className?: string;
+  axis?: "x" | "y";
+  tone?: "dark" | "light";
 }) {
   const [pressing, setPressing] = useState(false);
   const [burst, setBurst] = useState(0);
+  const skin = GLASS_SKIN[tone];
   const fire = () => {
     onClick();
     setBurst((b) => b + 1);
   };
+  const Icon =
+    axis === "y" ? (dir === 1 ? ArrowDown : ArrowUp) : dir === 1 ? ArrowRight : ArrowLeft;
   return (
     <motion.button
       type="button"
@@ -335,16 +364,14 @@ function PlanArrow({
       onPointerDown={() => setPressing(true)}
       onPointerUp={() => setPressing(false)}
       onPointerLeave={() => setPressing(false)}
-      className={`hidden lg:grid z-30 h-12 w-12 place-items-center rounded-full overflow-hidden cursor-pointer ${className}`}
+      className={`z-30 h-12 w-12 place-items-center rounded-full overflow-hidden cursor-pointer ${className}`}
       style={{
         pointerEvents: "auto",
-        background:
-          "linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0.03) 55%), rgba(10,10,13,0.36)",
-        boxShadow:
-          "inset 0 1px 1px rgba(255,255,255,0.30), inset 0 -1px 1px rgba(255,255,255,0.06), 0 10px 30px rgba(0,0,0,0.35)",
+        background: skin.bg,
+        border: skin.border,
+        boxShadow: skin.shadow,
         backdropFilter: "blur(18px) saturate(1.5)",
         WebkitBackdropFilter: "blur(18px) saturate(1.5)",
-        border: "1px solid rgba(255,255,255,0.16)",
       }}
       animate={{ scale: pressing ? 0.88 : 1 }}
       transition={{ type: "spring", stiffness: 480, damping: 24 }}
@@ -354,7 +381,7 @@ function PlanArrow({
         <motion.span
           key={burst}
           aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-full border border-white/50"
+          className={`pointer-events-none absolute inset-0 rounded-full border ${skin.ring}`}
           initial={{ opacity: 0.85, scale: 0.35 }}
           animate={{ opacity: 0, scale: 1.65 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -378,12 +405,15 @@ function PlanArrow({
       {/* strzałka wysuwa się w kierunku podróży */}
       <motion.span
         aria-hidden
-        className="relative z-10 grid place-items-center text-white/70"
-        animate={{ x: pressing ? dir * 5 : 0 }}
+        className={`relative z-10 grid place-items-center ${skin.arrow}`}
+        animate={{
+          x: axis === "x" ? (pressing ? dir * 5 : 0) : 0,
+          y: axis === "y" ? (pressing ? dir * 5 : 0) : 0,
+        }}
         transition={{ type: "spring", stiffness: 520, damping: 18 }}
-        style={{ filter: "drop-shadow(0 0 8px rgba(255,255,255,0.45))" }}
+        style={{ filter: skin.glow }}
       >
-        {dir === 1 ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
+        <Icon className="h-4 w-4" />
       </motion.span>
     </motion.button>
   );
@@ -419,17 +449,17 @@ function PlanShowcase({
     <>
       <div ref={stageRef} className="relative mt-14 flex flex-col lg:block lg:h-[660px]">
         {/* szklane strzałki obok wybranego planu — animowane kliknięciem */}
-        <PlanArrow
+        <GlassArrow
           dir={-1}
           onClick={() => turn(-1)}
           label="Poprzedni plan"
-          className="absolute top-1/2 -translate-y-1/2 left-[24px]"
+          className="hidden lg:grid absolute top-1/2 -translate-y-1/2 left-[24px]"
         />
-        <PlanArrow
+        <GlassArrow
           dir={1}
           onClick={() => turn(1)}
           label="Następny plan"
-          className="absolute top-1/2 -translate-y-1/2 right-[24px]"
+          className="hidden lg:grid absolute top-1/2 -translate-y-1/2 right-[24px]"
         />
         {/* guide rings + floor light (desktop only) */}
         <div
@@ -730,20 +760,22 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
         <EditableText ek="qraft.process.desc" def="Otwarty proces. Cotygodniowe dowody. Bez teatru." className="mt-4 block font-[Inter] font-light text-[15px] leading-7 text-black/60" isEditing={isEditing} as="p" />
 
         <div className="mt-10 flex items-center gap-3">
-          <button
+          <GlassArrow
+            dir={-1}
+            axis="y"
+            tone="light"
             onClick={() => step(active - 1, -1)}
-            aria-label="Poprzedni etap"
-            className="h-12 w-12 grid place-items-center rounded-full border border-black/15 text-black/55 transition-colors duration-300 hover:text-black hover:border-black/45"
-          >
-            <ArrowUp className="h-4 w-4" />
-          </button>
-          <button
+            label="Poprzedni etap"
+            className="grid"
+          />
+          <GlassArrow
+            dir={1}
+            axis="y"
+            tone="light"
             onClick={() => step(active + 1, 1)}
-            aria-label="Następny etap"
-            className="h-12 w-12 grid place-items-center rounded-full border border-black/15 text-black/55 transition-colors duration-300 hover:text-black hover:border-black/45"
-          >
-            <ArrowDown className="h-4 w-4" />
-          </button>
+            label="Następny etap"
+            className="grid"
+          />
           <div className="ml-1 flex items-baseline gap-2 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-black/30">
             ETAP
             <PopNumber text={`0${active + 1}`} className="text-black/70" />
