@@ -8,159 +8,161 @@ import {
   Minus,
   Plus,
   Quote,
-  MapPin,
   Clock,
   TrendingUp,
-  Sparkles,
+  Cpu,
+  Layers,
+  Zap,
+  Activity,
+  Terminal,
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-// ——— data ———
 const services = [
   {
     n: "01",
-    title: "Brand & Identity",
-    desc: "A clear, memorable identity that makes you the obvious choice on your street.",
-    points: ["Positioning & naming", "Visual identity & signage", "Menu / collateral system"],
+    title: "Brand System",
+    desc: "A rigorous identity that makes you the clear choice before a customer walks in.",
+    points: ["Positioning & architecture", "Visual language & signage", "System for every touchpoint"],
   },
   {
     n: "02",
-    title: "Website & Presence",
-    desc: "Fast, elegant sites that turn searches and strolls into bookings.",
-    points: ["Editorial website", "Google Business & maps", "Booking & ordering flow"],
+    title: "Web & Performance",
+    desc: "Fast, precise websites that turn intent into action — search, scan, book.",
+    points: ["Engineered site — <100ms", "Business profile & maps", "Booking flow, frictionless"],
   },
   {
     n: "03",
-    title: "Local Growth",
-    desc: "Campaigns built for neighbourhood radius, not vanity metrics.",
-    points: ["Local SEO & Maps pack", "Neighbourhood paid search", "Community partnerships"],
+    title: "Acquisition Infra",
+    desc: "Built for your radius, not the internet at large. Local-first growth, measured.",
+    points: ["Local search & maps pack", "Radius-paid, tightly scoped", "Partnerships that compound"],
   },
   {
     n: "04",
-    title: "Content & Image",
-    desc: "Photography and film that makes your craft tangible — before they walk in.",
-    points: ["Art direction & shoots", "Short film / Reels", "Menu & product stills"],
+    title: "Content Engine",
+    desc: "Direction, photography, and film that make craft tangible to future customers.",
+    points: ["Art direction on-site", "Film & short-form suite", "Asset library you own"],
   },
   {
     n: "05",
-    title: "Campaigns that Convert",
-    desc: "Offers and launches engineered to fill the week, not just the weekend.",
-    points: ["Seasonal calendars", "Email & SMS — restrained", "In-store to online loop"],
+    title: "Lifecycle Campaigns",
+    desc: "Offers and launches designed to fill the week — and bring customers back.",
+    points: ["Seasonal calendar", "Email & SMS, restrained", "Store-to-digital loop"],
   },
   {
     n: "06",
-    title: "Retention & Reviews",
-    desc: "The quiet work that compounds: regulars, referrals, and five-star momentum.",
-    points: ["Review system", "Loyalty & CRM", "Reporting in plain English"],
+    title: "Retention & Proof",
+    desc: "The compounding layer: reviews, referrals, and reporting in plain language.",
+    points: ["Review velocity system", "Loyalty & CRM", "Weekly scoreboard — real £"],
   },
 ];
 
 const results = [
   {
-    name: "Atelier Lumière — Café & Bakery",
-    loc: "West Village · Local café",
+    name: "Lumière — Café & Bakery",
+    loc: "WEST VILLAGE · CAFÉ",
     image:
       "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80&auto=format&fit=crop",
     stat: "+187%",
-    statLabel: "footfall in 90 days",
-    detail: "Rebrand, window & menu system, Maps dominance for “bakery near me”. From page 2 to top 3.",
-    tags: ["Brand", "Local SEO", "Photography"],
+    statLabel: "footfall — 90 days",
+    detail: "Full system rebuild: identity, windows, menu, maps. From second page to top three for ‘bakery near me’.",
+    tags: ["BRAND", "MAPS", "CONTENT"],
   },
   {
     name: "Form — Pilates Studio",
-    loc: "Notting Hill · Wellness",
+    loc: "NOTTING HILL · WELLNESS",
     image:
       "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80&auto=format&fit=crop",
     stat: "2.4×",
-    statLabel: "membership enquiries",
-    detail: "New site + intro offer funnel. £14 CAC, 68% trial-to-member. Fully booked mornings.",
-    tags: ["Website", "Campaigns", "CRM"],
+    statLabel: "customer enquiries",
+    detail: "New site and trial funnel. £14 to acquire, 68% convert to membership. Mornings fully booked.",
+    tags: ["WEB", "FUNNEL", "LIFECYCLE"],
   },
   {
-    name: "Marlowe — Neighbourhood Restaurant",
-    loc: "Shoreditch · 32 covers",
+    name: "Marlowe — Restaurant",
+    loc: "SHOREDITCH · 32 COVERS",
     image:
       "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80&auto=format&fit=crop",
-    stat: "41%",
-    statLabel: "more mid-week covers",
-    detail: "Mid-week series: set menu, creator dinners, list building. Email now drives 22% of revenue.",
-    tags: ["Content", "Email", "Partnerships"],
+    stat: "+41%",
+    statLabel: "mid-week customers",
+    detail: "Mid-week programme: set menu, creator dinners, owned list. Email now drives 22% of revenue.",
+    tags: ["CAMPAIGNS", "EMAIL", "PARTNERSHIPS"],
   },
 ];
 
 const packages = [
   {
-    name: "Essential",
+    name: "Core",
     price: "1,900",
-    cadence: "/ month",
-    for: "For steady hands — you need to be found and trusted.",
-    features: ["Brand tidy & signage guidance", "Website care + Maps optimisation", "1 shoot / quarter", "Monthly report, no jargon"],
-    cta: "Start Essential",
+    cadence: "/ mo",
+    for: "Foundation. You need to be found, understood, and trusted by new customers.",
+    features: ["Brand tidy & system guidance", "Site care + maps optimisation", "Quarterly shoot", "Monthly proof report"],
+    cta: "Start with Core",
     featured: false,
   },
   {
-    name: "Growth",
+    name: "Scale",
     price: "3,800",
-    cadence: "/ month",
-    for: "Our most chosen. Built to fill the calendar.",
+    cadence: "/ mo",
+    for: "The system at full pressure. Built to fill the calendar with the right customers.",
     features: [
-      "Everything in Essential",
-      "Local SEO + paid within 3km",
-      "Campaign & content calendar",
-      "Email / SMS & review engine",
-      "Bi-weekly strategy call",
+      "Everything in Core",
+      "Local search + paid within 3 km",
+      "Campaign & content engine",
+      "Email, SMS & review velocity",
+      "Bi-weekly build review",
     ],
-    cta: "Start Growth",
+    cta: "Start with Scale",
     featured: true,
   },
   {
-    name: "Atelier",
+    name: "Qraft Lab",
     price: "Custom",
     cadence: "",
-    for: "For openings, rebrands, multi-site. A dedicated atelier.",
-    features: ["Brand & space from scratch", "Film & photography suite", "Launch campaign & PR", "On-site team, weekly"],
-    cta: "Enquire",
+    for: "For launches, rebrands, and multi-site. A dedicated build team.",
+    features: ["Brand & space from zero", "Film & photo atelier", "Launch & partnerships", "On-site, weekly sprints"],
+    cta: "Enquire — Lab",
     featured: false,
   },
 ];
 
 const faqs = [
   {
-    q: "Do you only work with local businesses?",
-    a: "Yes. We specialise in businesses where place matters — cafés, restaurants, studios, clinics, boutiques, trades. If your customers find you by neighbourhood, we are built for you.",
+    q: "Who is QRAFT for?",
+    a: "Businesses where the customer relationship is everything — cafés, restaurants, studios, clinics, boutiques, and specialist trades. If your customers choose you by place, proximity, and reputation, we are built for you.",
   },
   {
-    q: "How quickly will we see results?",
-    a: "Maps and presence fixes often show in 2–4 weeks. Paid and campaign lift in 30–60 days. Full brand and content compounds over a quarter. We report weekly, in plain numbers.",
+    q: "How fast do customers feel the difference?",
+    a: "Discoverability lifts in two to four weeks. Paid and campaign impact in 30 to 60 days. Brand and content compound across a quarter. You get a weekly scoreboard with real revenue attribution, not vanity metrics.",
   },
   {
-    q: "Do we need to commit for a year?",
-    a: "No. Month-to-month after an initial 90-day sprint. We earn retention. Most clients stay 14+ months because neighbourhood growth compounds.",
+    q: "Are we locked in for a year?",
+    a: "No. Month-to-month after a focused 90-day build. We earn retention through performance. Most partners stay well beyond a year because local growth compounds.",
   },
   {
-    q: "What do you need from us to start?",
-    a: "90 minutes for an audit, access to your Google Business, site, and booking system, and a point of contact. We handle the rest — shoots, copy, build, and reporting.",
+    q: "What do you need from us to begin?",
+    a: "Ninety minutes for a systems audit, access to your business profile, website, and booking tools, and a single point of contact. We handle the rest — direction, build, and proof.",
   },
   {
-    q: "Do you shoot and write everything?",
-    a: "Yes. Art direction, photography, film, and copy are included in Growth and Atelier. We work on-site, minimally disruptive, and leave you with a full asset library.",
+    q: "Do you handle the creative itself?",
+    a: "Yes. Art direction, photography, film, and copy are included in Scale and Lab. We work on-site with minimal disruption and leave you with a complete asset library you own.",
   },
 ];
 
 const testimonials = [
   {
-    quote: "We went from quiet Tuesdays to a waitlist. They understood our street, our regulars, our margins — and built marketing around that, not vanity metrics.",
+    quote: "Quiet Tuesdays became waitlists. QRAFT understood our street, our margins, and our regulars — and engineered marketing around customers, not clicks.",
     name: "Sofia Leclerc",
     role: "Owner, Lumière",
   },
   {
-    quote: "Finally an agency that speaks like a shop owner. No dashboards we don't need. Just more bookings, better reviews, and a site we're proud of.",
+    quote: "Finally an agency that talks like an operator. No dashboards for the sake of it. Just more of the right customers, better reviews, and a site we're proud to send people to.",
     name: "James Park",
-    role: "Founder, Form Pilates",
+    role: "Founder, Form",
   },
   {
-    quote: "Our mid-week is now our strongest. The campaign calendar alone paid for the retainer three times over.",
+    quote: "Our mid-week is now our strongest stretch. The campaign system alone repaid the retainer three times over.",
     name: "Daniel Marlowe",
     role: "Chef-Owner, Marlowe",
   },
@@ -187,55 +189,67 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FCFCFB] text-[#111110] antialiased selection:bg-black selection:text-white">
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;1,6..72,300&display=swap');`}</style>
+    <div className="min-h-screen bg-[#08080A] text-[#F5F5F3] antialiased selection:bg-[#D6FF33] selection:text-black">
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');`}</style>
 
-      {/* Top hairline */}
-      <div className="h-[1px] w-full bg-black/[0.08]" />
+      {/* subtle grid + gradient */}
+      <div className="pointer-events-none fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-[#08080A]" />
+        <div
+          className="absolute inset-0 opacity-[0.035]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+          }}
+        />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[1200px] -translate-y-1/2 rounded-full opacity-20 blur-[120px]" style={{ background: "radial-gradient(ellipse at center, #D6FF33 0%, transparent 60%)" }} />
+        <div className="absolute top-[40%] right-0 h-[500px] w-[600px] rounded-full opacity-[0.12] blur-[100px]" style={{ background: "radial-gradient(ellipse at center, #7C3AED 0%, transparent 60%)" }} />
+      </div>
 
       {/* NAV */}
-      <header className="sticky top-0 z-40 bg-[#FCFCFB]/80 backdrop-blur-xl border-b border-black/[0.06]">
+      <header className="sticky top-0 z-40 backdrop-blur-2xl bg-[#08080A]/70 border-b border-white/[0.06]">
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 h-[64px] flex items-center justify-between">
-          <div className="flex items-center gap-10">
+          <div className="flex items-center gap-8">
             <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex items-center gap-3">
-              <div className="h-7 w-7 rounded-full border border-black/15 flex items-center justify-center">
-                <span className="text-[11px] tracking-[0.18em] font-medium">N—</span>
+              <div className="h-8 w-8 rounded-[9px] bg-white text-black grid place-items-center">
+                <span className="font-[Space_Grotesk] font-bold text-[13px] tracking-[-0.04em]">Q</span>
               </div>
-              <span className="hidden sm:inline text-[13px] tracking-[0.18em] font-medium">NORD ATELIER</span>
-              <span className="hidden sm:inline text-[10px] tracking-[0.14em] text-black/40 border-l border-black/10 pl-3 ml-1">
-                LOCAL MARKETING
+              <span className="font-[Space_Grotesk] font-bold tracking-[-0.03em] text-[15px]">QRAFT</span>
+              <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] tracking-[0.14em] font-[JetBrains_Mono] text-white/40 border-l border-white/10 pl-3 ml-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#D6FF33] animate-pulse" /> PERFECTION BUILDS BRANDS
               </span>
             </button>
 
-            <nav className="hidden lg:flex items-center gap-7 text-[12px] tracking-[0.12em] font-medium text-black/60">
-              <button onClick={() => scrollTo("services")} className="hover:text-black transition-colors py-2">
-                SERVICES
-              </button>
-              <button onClick={() => scrollTo("results")} className="hover:text-black transition-colors py-2">
-                RESULTS
-              </button>
-              <button onClick={() => scrollTo("process")} className="hover:text-black transition-colors py-2">
-                PROCESS
-              </button>
-              <button onClick={() => scrollTo("pricing")} className="hover:text-black transition-colors py-2">
-                PRICING
-              </button>
+            <nav className="hidden lg:flex items-center gap-6 font-[JetBrains_Mono] text-[11px] tracking-[0.14em] text-white/50">
+              {[
+                ["SYSTEM", "services"],
+                ["PROOF", "results"],
+                ["PROCESS", "process"],
+                ["PLANS", "pricing"],
+              ].map(([label, id]) => (
+                <button key={id} onClick={() => scrollTo(id)} className="hover:text-white transition-colors py-2 flex items-center gap-1">
+                  <span className="text-white/20">/</span> {label}
+                </button>
+              ))}
             </nav>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-2 text-[11px] text-black/50">
-              <MapPin className="h-3 w-3" /> <span className="tracking-wide">London · Paris · Remote</span>
+            <div className="hidden md:flex items-center gap-3 font-[JetBrains_Mono] text-[11px] text-white/40">
+              <span className="flex items-center gap-1.5"><Terminal className="h-3 w-3" /> qraft.build v2.1</span>
+              <span className="h-3 w-px bg-white/10" />
+              <span>LDN · PRS · REMOTE</span>
             </div>
             <button
               onClick={() => scrollTo("contact")}
-              className="hidden sm:inline-flex items-center gap-2 bg-black text-white text-[12px] tracking-[0.1em] font-medium px-5 h-9 rounded-full hover:bg-black/90 transition-colors"
+              className="hidden sm:inline-flex items-center gap-2 bg-[#D6FF33] text-black text-[11px] tracking-[0.1em] font-[Space_Grotesk] font-bold px-5 h-9 rounded-full hover:bg-[#E0FF66] transition-colors"
             >
-              START A PROJECT <ArrowUpRight className="h-3.5 w-3.5" />
+              START YOUR BUILD <ArrowUpRight className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="lg:hidden h-9 w-9 grid place-items-center rounded-full border border-black/10"
+              className="lg:hidden h-9 w-9 grid place-items-center rounded-full border border-white/10 bg-white/[0.04]"
               aria-label="Menu"
             >
               {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -249,27 +263,27 @@ export default function Landing() {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="lg:hidden border-t border-black/5 bg-white"
+              className="lg:hidden border-t border-white/5 bg-[#0F0F11]"
             >
-              <div className="px-6 py-6 flex flex-col gap-1">
+              <div className="px-6 py-6 flex flex-col gap-1 font-[JetBrains_Mono] text-xs tracking-[0.12em]">
                 {[
-                  ["Services", "services"],
-                  ["Results", "results"],
-                  ["Process", "process"],
-                  ["Pricing", "pricing"],
-                  ["Contact", "contact"],
+                  ["SYSTEM", "services"],
+                  ["PROOF", "results"],
+                  ["PROCESS", "process"],
+                  ["PLANS", "pricing"],
+                  ["BUILD", "contact"],
                 ].map(([label, id]) => (
                   <button
                     key={id}
                     onClick={() => scrollTo(id)}
-                    className="text-left py-3 text-sm tracking-[0.12em] font-medium border-b border-black/[0.04] last:border-0"
+                    className="text-left py-3 border-b border-white/[0.04] last:border-0 text-white/80"
                   >
-                    {label}
+                    / {label}
                   </button>
                 ))}
                 <button
                   onClick={() => navigate("/auth")}
-                  className="mt-4 w-full bg-black text-white py-3.5 rounded-full text-sm tracking-wide font-medium"
+                  className="mt-4 w-full bg-[#D6FF33] text-black py-3.5 rounded-full text-sm font-bold tracking-wide font-[Space_Grotesk]"
                 >
                   Sign in
                 </button>
@@ -281,48 +295,48 @@ export default function Landing() {
 
       {/* HERO */}
       <section className="mx-auto max-w-[1280px] px-6 lg:px-8">
-        <div className="grid lg:grid-cols-[1.15fr_0.85fr] gap-10 lg:gap-12 pt-10 lg:pt-16 pb-10 lg:pb-12 items-start">
-          {/* left copy */}
+        <div className="grid lg:grid-cols-[1.12fr_0.88fr] gap-10 lg:gap-12 pt-10 lg:pt-16 pb-10 lg:pb-12 items-start">
           <div>
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 border border-black/10 rounded-full px-3 py-1.5 bg-white"
+              className="inline-flex flex-wrap items-center gap-2 border border-white/10 rounded-full px-1.5 py-1.5 bg-white/[0.04] backdrop-blur"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-black animate-pulse" />
-              <span className="text-[11px] tracking-[0.14em] font-medium">FOR AMBITIOUS LOCAL BUSINESSES</span>
-              <span className="hidden sm:inline text-[11px] text-black/40">— Cafés · Studios · Clinics · Boutiques</span>
+              <span className="bg-[#D6FF33] text-black text-[10px] tracking-[0.12em] font-bold font-[JetBrains_Mono] px-2.5 py-1 rounded-full">
+                QRAFT SYSTEM
+              </span>
+              <span className="text-[11px] tracking-[0.08em] font-[JetBrains_Mono] text-white/70 pr-2">
+                BUILT FOR BUSINESSES OBSESSED WITH THEIR CUSTOMERS
+              </span>
             </motion.div>
 
             <motion.h1
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.08, duration: 0.6 }}
-              className="mt-6 font-[Instrument_Serif] text-[44px] sm:text-[56px] lg:text-[74px] leading-[0.92] tracking-[-0.03em] font-normal"
+              className="mt-6 font-[Space_Grotesk] leading-[0.88] tracking-[-0.04em] font-bold"
             >
-              <span className="block font-light italic text-black/70 text-[32px] sm:text-[40px] lg:text-[52px] tracking-[-0.02em]">
-                Premium & elegant
+              <span className="block text-[12px] tracking-[0.2em] font-[JetBrains_Mono] font-medium text-[#D6FF33] mb-3">
+                PERFECTION BUILDS BRANDS —
               </span>
-              <span className="block">marketing that</span>
-              <span className="block">
-                makes your{" "}
-                <span className="relative inline-block">
-                  <span className="relative z-10">street</span>
-                  <span className="absolute left-0 right-0 bottom-[0.18em] h-[0.32em] bg-black/10" />
-                </span>
+              <span className="block text-[44px] sm:text-[56px] lg:text-[72px]">Perfection</span>
+              <span className="block text-[44px] sm:text-[56px] lg:text-[72px] flex items-center gap-3">
+                builds <span className="font-[Instrument_Serif] font-normal italic tracking-[-0.02em] text-white/60 text-[42px] sm:text-[54px] lg:text-[68px]">brands.</span>
               </span>
-              <span className="block">the main street —</span>
+              <span className="block text-[16px] sm:text-[18px] font-medium tracking-[-0.02em] text-white/50 mt-3 font-[Inter] flex items-center gap-2">
+                <span className="h-px w-10 bg-[#D6FF33]/60" /> QRAFT engineers how you earn every customer.
+              </span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.18, duration: 0.6 }}
-              className="mt-6 max-w-[560px] text-[15px] leading-7 text-black/60 font-[Inter]"
+              className="mt-6 max-w-[560px] text-[15px] leading-7 text-white/60 font-[Inter]"
             >
-              Nord Atelier is a boutique marketing atelier for local businesses who care about craft. We lead with{" "}
-              <span className="text-black font-medium">services + measurable results</span> — brand, presence, and campaigns built to fill rooms, lists, and till.
+              We are a technical marketing atelier. Not campaigns for their own sake — but a{" "}
+              <span className="text-white font-medium">complete system</span> that turns intent into customers, and customers into advocates. Services and measurable results, fully in the open. Everyone can see the work. Everyone can use it.
             </motion.p>
 
             <motion.div
@@ -333,148 +347,173 @@ export default function Landing() {
             >
               <button
                 onClick={() => scrollTo("contact")}
-                className="inline-flex items-center gap-2 bg-black text-white px-7 h-[46px] rounded-full text-[13px] tracking-[0.06em] font-medium hover:bg-black/90 transition"
+                className="inline-flex items-center gap-2 bg-[#D6FF33] text-black px-7 h-[46px] rounded-full text-[13px] tracking-[0.02em] font-bold font-[Space_Grotesk] hover:bg-[#E0FF66] transition"
               >
-                BOOK A 20-MIN AUDIT <ArrowRight className="h-4 w-4" />
+                START YOUR BUILD — FREE AUDIT <ArrowRight className="h-4 w-4" />
               </button>
               <button
                 onClick={() => scrollTo("results")}
-                className="inline-flex items-center gap-2 bg-white border border-black/10 px-7 h-[46px] rounded-full text-[13px] tracking-[0.06em] font-medium hover:bg-black/[0.02] transition"
+                className="inline-flex items-center gap-2 bg-white/[0.06] border border-white/10 px-7 h-[46px] rounded-full text-[13px] tracking-[0.06em] font-medium hover:bg-white/[0.08] transition backdrop-blur text-white"
               >
-                SEE RESULTS <span className="h-5 w-5 grid place-items-center rounded-full border border-black/10"><ArrowUpRight className="h-3 w-3" /></span>
+                VIEW PROOF <span className="h-6 w-6 grid place-items-center rounded-full bg-white text-black"><ArrowUpRight className="h-3 w-3" /></span>
               </button>
             </motion.div>
 
-            <div className="mt-8 flex flex-wrap gap-6 border-t border-black/5 pt-6">
+            <div className="mt-8 grid grid-cols-3 gap-4 border-t border-white/5 pt-6 max-w-[520px]">
               {[
-                ["340+", "local businesses grown"],
-                ["4.9/5", "average review score"],
-                ["14 mo", "average partnership"],
+                ["340+", "BUSINESSES BUILT"],
+                ["4.9/5", "CUSTOMER RATING"],
+                ["14 mo", "AVG. PARTNERSHIP"],
               ].map(([v, l]) => (
-                <div key={v} className="flex items-baseline gap-2">
-                  <span className="text-[18px] font-medium tracking-tight">{v}</span>
-                  <span className="text-[11px] tracking-[0.08em] text-black/50">{l}</span>
+                <div key={v}>
+                  <div className="text-[20px] font-bold tracking-tight font-[Space_Grotesk]">{v}</div>
+                  <div className="text-[10px] tracking-[0.1em] font-[JetBrains_Mono] text-white/40 mt-1">{l}</div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-10 flex items-center gap-3 text-[11px] tracking-[0.1em] text-black/40">
-              <span className="h-px w-10 bg-black/10" /> EST. 2018 · INDEPENDENT ATELIER
+            <div className="mt-8 flex items-center gap-3 font-[JetBrains_Mono] text-[11px] tracking-[0.14em] text-white/25">
+              <span className="h-px w-10 bg-white/10" /> EST. 2018 · SYSTEMS ATELIER · QRAFT.BUILD
             </div>
           </div>
 
-          {/* right visual */}
+          {/* technical card */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.7 }}
             className="relative lg:sticky lg:top-[84px]"
           >
-            <div className="bg-white border border-black/10 rounded-[24px] p-3 sm:p-4 shadow-[0_24px_64px_rgba(0,0,0,0.08)]">
-              <div className="rounded-[16px] overflow-hidden bg-[#F6F6F3] border border-black/[0.06]">
-                <div className="aspect-[4/2.6] relative">
+            <div className="bg-[#111113] border border-white/10 rounded-[24px] p-3 sm:p-4 shadow-[0_32px_80px_rgba(0,0,0,0.6)] overflow-hidden">
+              {/* header bar */}
+              <div className="flex items-center justify-between px-1 pb-3">
+                <div className="flex items-center gap-2 font-[JetBrains_Mono] text-[10px] tracking-[0.14em] text-white/40">
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" /> QRAFT_LIVE
+                  </span>
+                  <span className="hidden sm:inline text-white/20">— LUMIÈRE / PROD</span>
+                </div>
+                <div className="flex gap-1.5">
+                  <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#D6FF33]" />
+                </div>
+              </div>
+
+              <div className="rounded-[16px] overflow-hidden bg-[#0A0A0B] border border-white/[0.06]">
+                <div className="aspect-[4/2.55] relative">
                   <img
                     src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=1000&q=80&auto=format&fit=crop"
-                    alt="Minimal café interior"
-                    className="h-full w-full object-cover"
+                    alt="Atelier interior"
+                    className="h-full w-full object-cover opacity-80"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-transparent" />
-                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur rounded-full px-3 py-1.5 flex items-center gap-2 text-[11px] font-medium">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" /> LIVE · Lumière — Today
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                  {/* code overlay */}
+                  <div className="absolute top-3 left-3 font-[JetBrains_Mono] text-[10px] leading-3 bg-black/70 backdrop-blur border border-white/10 rounded-lg px-2.5 py-2 text-white/80 hidden sm:block">
+                    <div className="text-[#D6FF33]">qraft.ingest --source maps --radius 3km</div>
+                    <div className="text-white/50">› indexing 1,247 customer signals… done</div>
                   </div>
                   <div className="absolute bottom-3 left-3 right-3 bg-white rounded-[14px] p-3 flex items-center justify-between">
                     <div>
-                      <div className="text-[11px] tracking-[0.1em] text-black/50">FOOTFALL · 90 DAYS</div>
-                      <div className="text-[22px] font-medium leading-none mt-1">+187% <span className="text-[11px] font-normal text-emerald-600">▲ vs previous</span></div>
+                      <div className="font-[JetBrains_Mono] text-[10px] tracking-[0.1em] text-black/50 flex items-center gap-1.5">
+                        <Activity className="h-3 w-3" /> CUSTOMER FOOTFALL · 90D
+                      </div>
+                      <div className="font-[Space_Grotesk] text-[22px] font-bold leading-none mt-1 text-black">
+                        +187% <span className="text-[11px] font-medium text-emerald-600">▲ vs baseline</span>
+                      </div>
                     </div>
                     <div className="h-10 w-[84px] flex items-end gap-[2px]">
                       {[3, 5, 4, 7, 5, 8, 6, 9, 7, 11].map((h, i) => (
-                        <div key={i} className="flex-1 bg-black rounded-t-sm" style={{ height: `${h * 3.6}px` }} />
+                        <div key={i} className="flex-1 rounded-t-sm" style={{ height: `${h * 3.6}px`, background: i === 9 ? "#D6FF33" : i > 6 ? "#7C3AED" : "black" }} />
                       ))}
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 divide-x divide-black/5">
+                <div className="grid grid-cols-3 divide-x divide-white/5">
                   {[
-                    ["#1", "Maps for 'bakery near me'"],
-                    ["2.4×", "enquiries / week"],
-                    ["+41%", "mid-week covers"],
+                    ["#1", "MAPS · bakery near me"],
+                    ["2.4×", "CUSTOMER ENQUIRIES"],
+                    ["+41%", "MID-WEEK COVERS"],
                   ].map(([k, v]) => (
-                    <div key={k} className="px-4 py-4 text-center">
-                      <div className="text-[16px] font-medium tracking-tight">{k}</div>
-                      <div className="text-[10px] leading-3 tracking-[0.06em] text-black/50 mt-1">{v}</div>
+                    <div key={k} className="px-3 py-4 text-center bg-[#111113]">
+                      <div className="font-[Space_Grotesk] text-[16px] font-bold tracking-tight text-white">{k}</div>
+                      <div className="font-[JetBrains_Mono] text-[9px] leading-3 tracking-[0.06em] text-white/40 mt-1">{v}</div>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div className="mt-3 grid grid-cols-[1fr_auto] gap-3">
-                <div className="bg-[#0F0F0F] text-white rounded-[14px] px-4 py-3 flex items-center justify-between">
+                <div className="bg-[#D6FF33] text-black rounded-[14px] px-4 py-3 flex items-center justify-between">
                   <div>
-                    <div className="text-[10px] tracking-[0.14em] text-white/60">NEXT AVAILABILITY</div>
-                    <div className="text-sm font-medium mt-0.5">Two audit slots this week</div>
+                    <div className="font-[JetBrains_Mono] text-[10px] tracking-[0.14em]">NEXT BUILD SLOTS</div>
+                    <div className="font-[Space_Grotesk] text-sm font-bold mt-0.5">Two audits this week — open</div>
                   </div>
-                  <button onClick={() => scrollTo("contact")} className="h-8 w-8 grid place-items-center rounded-full bg-white text-black">
+                  <button onClick={() => scrollTo("contact")} className="h-8 w-8 grid place-items-center rounded-full bg-black text-[#D6FF33]">
                     <ArrowUpRight className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="hidden sm:flex bg-white border border-black/10 rounded-[14px] px-3 items-center gap-2 text-[11px] font-medium">
-                  <Clock className="h-3.5 w-3.5 text-black/50" /> 20 min · No pitch deck
+                <div className="hidden sm:flex bg-white text-black rounded-[14px] px-3 items-center gap-2 font-[JetBrains_Mono] text-[11px] font-medium">
+                  <Clock className="h-3.5 w-3.5" /> 20 MIN · NO DECK
                 </div>
               </div>
             </div>
 
-            <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-black/50">
-              <Sparkles className="h-3 w-3" /> Real client dashboard — updated weekly. No vanity metrics.
+            <div className="mt-3 flex items-center justify-center gap-2 font-[JetBrains_Mono] text-[11px] text-white/30">
+              <Cpu className="h-3 w-3" /> Live customer system — updated weekly. Auditable.
             </div>
           </motion.div>
         </div>
 
         {/* Trust strip */}
-        <div className="border-y border-black/[0.06] py-5 flex flex-col lg:flex-row lg:items-center gap-4">
-          <div className="text-[11px] tracking-[0.14em] font-medium text-black/40 shrink-0">TRUSTED BY LOCAL FAVOURITES —</div>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] tracking-[0.06em] font-medium text-black/70">
-            <span>LUMIÈRE</span> <span className="h-px w-4 bg-black/10 hidden sm:block" />
-            <span>FORM PILATES</span> <span className="h-px w-4 bg-black/10 hidden sm:block" />
-            <span>MARLOWE</span> <span className="h-px w-4 bg-black/10 hidden sm:block" />
-            <span>ATELIER FLEUR</span> <span className="h-px w-4 bg-black/10 hidden sm:block" />
+        <div className="border-y border-white/[0.06] py-5 flex flex-col lg:flex-row lg:items-center gap-4 backdrop-blur">
+          <div className="font-[JetBrains_Mono] text-[11px] tracking-[0.14em] text-white/30 shrink-0">CUSTOMERS WE BUILD FOR —</div>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-[Space_Grotesk] text-[13px] tracking-[0.06em] font-bold text-white/70">
+            <span>LUMIÈRE</span> <span className="h-px w-4 bg-white/10 hidden sm:block" />
+            <span>FORM</span> <span className="h-px w-4 bg-white/10 hidden sm:block" />
+            <span>MARLOWE</span> <span className="h-px w-4 bg-white/10 hidden sm:block" />
+            <span>FLEUR ATELIER</span> <span className="h-px w-4 bg-white/10 hidden sm:block" />
             <span>GOOD ROOM</span>
-            <span className="ml-auto text-[11px] tracking-normal font-normal text-black/40 hidden lg:inline">and 340+ neighbourhood businesses</span>
+            <span className="ml-auto font-[JetBrains_Mono] text-[11px] tracking-normal font-normal text-white/30 hidden lg:inline">340+ BUSINESSES · ALL OPEN TO CUSTOMERS</span>
           </div>
         </div>
       </section>
 
       {/* SERVICES */}
       <section id="services" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-16 lg:py-24">
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-black/5 pb-8">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-white/5 pb-8">
           <div>
-            <div className="text-[11px] tracking-[0.16em] font-medium text-black/40">01 — SERVICES</div>
-            <h2 className="mt-3 font-[Instrument_Serif] text-[36px] sm:text-[44px] leading-[0.95] tracking-[-0.02em]">
-              Everything you need. <br />
-              <span className="italic font-light text-black/60">Nothing you don’t.</span>
+            <div className="font-[JetBrains_Mono] text-[11px] tracking-[0.16em] text-[#D6FF33] flex items-center gap-2">
+              <Layers className="h-3 w-3" /> 01 — SYSTEM
+            </div>
+            <h2 className="mt-3 font-[Space_Grotesk] text-[36px] sm:text-[44px] leading-[0.9] tracking-[-0.03em] font-bold">
+              Everything to earn
+              <br />
+              <span className="font-[Instrument_Serif] font-normal italic text-white/50">customers. Nothing extra.</span>
             </h2>
           </div>
-          <p className="max-w-[420px] text-[14px] leading-6 text-black/60">
-            Six disciplined services. Pick one or run them as a system. Every engagement starts with a 20-minute audit — we show you exactly where growth is hiding.
+          <p className="max-w-[420px] text-[14px] leading-6 text-white/50 font-[Inter]">
+            Six technical modules. Run one or run the system. Every build starts with a 20-minute audit — we show you exactly where customers are being lost.
           </p>
         </div>
 
-        <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-[1px] bg-black/[0.06] border border-black/[0.06] rounded-[20px] overflow-hidden">
+        <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-[1px] bg-white/[0.06] border border-white/[0.06] rounded-[20px] overflow-hidden">
           {services.map((s) => (
-            <div key={s.n} className="bg-white p-7 sm:p-8 group hover:bg-[#FCFCFB] transition-colors">
+            <div key={s.n} className="bg-[#111113] p-7 sm:p-8 group hover:bg-[#151518] transition-colors relative">
+              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D6FF33]/0 to-transparent group-hover:via-[#D6FF33]/30 transition-colors" />
               <div className="flex items-center justify-between">
-                <span className="text-[11px] tracking-[0.14em] font-medium text-black/30">{s.n}</span>
-                <span className="h-6 w-6 grid place-items-center rounded-full border border-black/10 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="font-[JetBrains_Mono] text-[11px] tracking-[0.14em] text-white/25">{s.n}</span>
+                <span className="h-6 w-6 grid place-items-center rounded-full border border-white/10 text-white/40 group-hover:bg-[#D6FF33] group-hover:text-black group-hover:border-[#D6FF33] transition-colors">
                   <ArrowUpRight className="h-3 w-3" />
                 </span>
               </div>
-              <h3 className="mt-4 text-[18px] font-medium tracking-tight">{s.title}</h3>
-              <p className="mt-2 text-[13.5px] leading-6 text-black/60">{s.desc}</p>
+              <h3 className="mt-4 font-[Space_Grotesk] text-[18px] font-bold tracking-tight">{s.title}</h3>
+              <p className="mt-2 text-[13.5px] leading-6 text-white/50">{s.desc}</p>
               <ul className="mt-5 space-y-2">
                 {s.points.map((p) => (
-                  <li key={p} className="flex items-center gap-2 text-[12px] text-black/70">
-                    <Minus className="h-3 w-3 text-black/20" /> {p}
+                  <li key={p} className="flex items-center gap-2 font-[JetBrains_Mono] text-[11px] text-white/60">
+                    <span className="h-1 w-1 rounded-full bg-[#D6FF33]" /> {p}
                   </li>
                 ))}
               </ul>
@@ -482,63 +521,64 @@ export default function Landing() {
           ))}
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center gap-3 text-[12px]">
-          <span className="text-black/50">Not sure where to start?</span>
-          <button onClick={() => scrollTo("contact")} className="underline decoration-black/20 underline-offset-4 hover:decoration-black font-medium">
-            Take the 3-question audit →
+        <div className="mt-6 flex flex-wrap items-center gap-3 text-[12px] font-[JetBrains_Mono]">
+          <span className="text-white/30">Unsure where the leak is?</span>
+          <button onClick={() => scrollTo("contact")} className="underline decoration-white/20 underline-offset-4 hover:decoration-[#D6FF33] font-medium text-white">
+            Run the 3-question diagnostic →
           </button>
-          <span className="ml-auto hidden sm:inline-flex items-center gap-2 border border-black/10 rounded-full px-3 py-1.5 bg-white text-[11px] tracking-wide">
-            <Check className="h-3 w-3" /> No retainers for audits · Flat-fee sprints available
+          <span className="ml-auto hidden sm:inline-flex items-center gap-2 border border-white/10 rounded-full px-3 py-1.5 bg-white/[0.04] text-[11px] tracking-wide text-white/60">
+            <Check className="h-3 w-3 text-[#D6FF33]" /> No retainer for audits · Sprints available to all
           </span>
         </div>
       </section>
 
       {/* RESULTS */}
-      <section id="results" className="bg-[#0F0F0F] text-white mt-4">
+      <section id="results" className="bg-white text-black mt-4 rounded-t-[32px] lg:rounded-t-[40px] overflow-hidden">
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-16 lg:py-24">
           <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-8">
             <div>
-              <div className="inline-flex items-center gap-2 border border-white/15 rounded-full px-3 py-1">
-                <TrendingUp className="h-3 w-3" /> <span className="text-[11px] tracking-[0.14em]">02 — RESULTS</span>
+              <div className="inline-flex items-center gap-2 border border-black/10 rounded-full px-3 py-1 bg-black/[0.02]">
+                <TrendingUp className="h-3 w-3" /> <span className="font-[JetBrains_Mono] text-[11px] tracking-[0.14em] font-medium">02 — PROOF</span>
               </div>
-              <h2 className="mt-4 font-[Instrument_Serif] text-[36px] sm:text-[48px] leading-[0.9] tracking-[-0.02em]">
-                Services mean nothing <br />
-                <span className="italic font-light text-white/60">without proof.</span>
+              <h2 className="mt-4 font-[Space_Grotesk] text-[36px] sm:text-[48px] leading-[0.9] tracking-[-0.03em] font-bold">
+                Services mean nothing
+                <br />
+                <span className="font-[Instrument_Serif] font-normal italic text-black/40">without customers.</span>
               </h2>
             </div>
             <div className="lg:text-right">
-              <div className="grid grid-cols-3 gap-6 lg:gap-10 border-t lg:border-t-0 border-white/10 pt-6 lg:pt-0">
+              <div className="grid grid-cols-3 gap-6 lg:gap-10 border-t lg:border-t-0 border-black/10 pt-6 lg:pt-0">
                 {[
-                  ["+187%", "avg footfall lift (90d)"],
-                  ["£14", "avg cost per new customer"],
-                  ["22%", "of revenue from owned list"],
+                  ["+187%", "avg. customer lift (90d)"],
+                  ["£14", "to acquire a customer"],
+                  ["22%", "revenue from owned list"],
                 ].map(([k, l]) => (
                   <div key={k}>
-                    <div className="text-[28px] font-light tracking-tight">{k}</div>
-                    <div className="text-[11px] tracking-wide text-white/50">{l}</div>
+                    <div className="font-[Space_Grotesk] text-[28px] font-bold tracking-tight">{k}</div>
+                    <div className="font-[JetBrains_Mono] text-[11px] tracking-wide text-black/50">{l}</div>
                   </div>
                 ))}
               </div>
-              <div className="mt-6 hidden lg:block text-[11px] tracking-[0.1em] text-white/40">FIGURES FROM LAST 12 MONTHS · N= 86 LOCAL CLIENTS</div>
+              <div className="mt-6 hidden lg:block font-[JetBrains_Mono] text-[11px] tracking-[0.1em] text-black/30">LAST 12 MONTHS · N=86 CUSTOMER BUSINESSES</div>
             </div>
           </div>
 
           <div className="mt-10 grid md:grid-cols-3 gap-5">
             {results.map((r) => (
-              <div key={r.name} className="bg-white text-black rounded-[18px] overflow-hidden group">
+              <div key={r.name} className="bg-[#F6F6F3] border border-black/5 rounded-[18px] overflow-hidden group hover:border-black/10 transition-colors">
                 <div className="aspect-[4/3] overflow-hidden relative">
                   <img src={r.image} alt={r.name} className="h-full w-full object-cover group-hover:scale-[1.02] transition duration-700" />
-                  <div className="absolute top-3 left-3 bg-black text-white rounded-full px-3 py-1 text-[11px] tracking-wide">
+                  <div className="absolute top-3 left-3 bg-black text-[#D6FF33] rounded-full px-3 py-1 font-[JetBrains_Mono] text-[11px] tracking-wide font-medium">
                     {r.stat} {r.statLabel}
                   </div>
                 </div>
                 <div className="p-5">
-                  <div className="text-[12px] tracking-[0.08em] font-medium text-black/50">{r.loc}</div>
-                  <div className="mt-1 text-[15px] font-medium leading-tight">{r.name}</div>
+                  <div className="font-[JetBrains_Mono] text-[11px] tracking-[0.08em] font-medium text-black/40">{r.loc}</div>
+                  <div className="mt-1 font-[Space_Grotesk] text-[15px] font-bold leading-tight">{r.name}</div>
                   <p className="mt-2 text-[13px] leading-5 text-black/60">{r.detail}</p>
                   <div className="mt-4 flex flex-wrap gap-1.5">
                     {r.tags.map((t) => (
-                      <span key={t} className="text-[10px] tracking-[0.08em] border border-black/10 rounded-full px-2 py-1">
+                      <span key={t} className="font-[JetBrains_Mono] text-[10px] tracking-[0.08em] border border-black/10 bg-white rounded-full px-2 py-1">
                         {t}
                       </span>
                     ))}
@@ -548,115 +588,122 @@ export default function Landing() {
             ))}
           </div>
 
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10 pt-6">
-            <div className="text-sm text-white/70">Full case studies with P&L impact — shared on the audit call.</div>
-            <button onClick={() => scrollTo("contact")} className="inline-flex items-center gap-2 bg-white text-black px-6 h-10 rounded-full text-[12px] tracking-[0.08em] font-medium hover:bg-white/90 transition">
-              REQUEST CASE BOOK <ArrowUpRight className="h-4 w-4" />
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-black/5 pt-6">
+            <div className="text-sm text-black/60 font-[Inter]">Full case files with P&L — shared openly on every audit. Available to all.</div>
+            <button onClick={() => scrollTo("contact")} className="inline-flex items-center gap-2 bg-black text-white px-6 h-10 rounded-full font-[JetBrains_Mono] text-[12px] tracking-[0.08em] font-medium hover:bg-black/90 transition">
+              REQUEST CASE BOOK <ArrowUpRight className="h-4 w-4 text-[#D6FF33]" />
             </button>
           </div>
         </div>
       </section>
 
       {/* PROCESS */}
-      <section id="process" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-16 lg:py-24">
-        <div className="grid lg:grid-cols-[380px_1fr] gap-10">
-          <div className="lg:sticky lg:top-[88px] self-start">
-            <div className="text-[11px] tracking-[0.16em] font-medium text-black/40">03 — PROCESS</div>
-            <h2 className="mt-3 font-[Instrument_Serif] text-[38px] leading-[0.95] tracking-[-0.02em]">
-              Four weeks to <br />
-              <span className="italic font-light text-black/60">momentum.</span>
-            </h2>
-            <p className="mt-4 text-[14px] leading-6 text-black/60">
-              No big reveals. We work in the open, on-site when needed, with a weekly scoreboard you’ll actually understand.
-            </p>
-            <button onClick={() => scrollTo("contact")} className="mt-6 inline-flex items-center gap-2 border border-black/10 px-5 h-10 rounded-full text-[12px] tracking-wide font-medium bg-white hover:bg-black hover:text-white hover:border-black transition-colors">
-              See a sample scoreboard <ArrowUpRight className="h-3.5 w-3.5" />
-            </button>
+      <section id="process" className="bg-white text-black border-t border-black/5">
+        <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-16 lg:py-24">
+          <div className="grid lg:grid-cols-[380px_1fr] gap-10">
+            <div className="lg:sticky lg:top-[88px] self-start">
+              <div className="font-[JetBrains_Mono] text-[11px] tracking-[0.16em] text-black/40 flex items-center gap-2">
+                <Zap className="h-3 w-3" /> 03 — PROCESS
+              </div>
+              <h2 className="mt-3 font-[Space_Grotesk] text-[38px] leading-[0.9] tracking-[-0.03em] font-bold">
+                Four weeks to
+                <br />
+                <span className="font-[Instrument_Serif] font-normal italic text-black/40">momentum.</span>
+              </h2>
+              <p className="mt-4 text-[14px] leading-6 text-black/60">
+                No theatre. We work in the open, on-site when needed, with a weekly scoreboard anyone on your team can read.
+              </p>
+              <button onClick={() => scrollTo("contact")} className="mt-6 inline-flex items-center gap-2 border border-black/10 px-5 h-10 rounded-full font-[JetBrains_Mono] text-[12px] tracking-wide font-medium bg-white hover:bg-black hover:text-white hover:border-black transition-colors">
+                See a live scoreboard <ArrowUpRight className="h-3.5 w-3.5" />
+              </button>
 
-            <div className="mt-8 hidden lg:block border border-black/5 rounded-2xl p-4 bg-white">
-              <div className="text-[11px] tracking-[0.1em] text-black/40">SCOREBOARD PREVIEW</div>
-              <div className="mt-3 grid grid-cols-3 gap-3 text-center">
-                <div className="bg-[#F6F6F3] rounded-xl py-3">
-                  <div className="text-xs text-black/50">Enquiries</div>
-                  <div className="text-lg font-medium">+34</div>
-                  <div className="text-[10px] text-emerald-600">▲ 18% WoW</div>
+              <div className="mt-8 hidden lg:block border border-black/5 rounded-2xl p-4 bg-[#F6F6F3]">
+                <div className="font-[JetBrains_Mono] text-[11px] tracking-[0.1em] text-black/40 flex items-center gap-2">
+                  <Activity className="h-3 w-3" /> SCOREBOARD — LIVE
                 </div>
-                <div className="bg-[#F6F6F3] rounded-xl py-3">
-                  <div className="text-xs text-black/50">Maps views</div>
-                  <div className="text-lg font-medium">12.4k</div>
-                  <div className="text-[10px] text-emerald-600">▲ 9% WoW</div>
+                <div className="mt-3 grid grid-cols-3 gap-3 text-center">
+                  <div className="bg-white rounded-xl py-3 border border-black/5">
+                    <div className="font-[JetBrains_Mono] text-[10px] text-black/40">ENQUIRIES</div>
+                    <div className="font-[Space_Grotesk] text-lg font-bold">+34</div>
+                    <div className="font-[JetBrains_Mono] text-[10px] text-emerald-600">▲ 18% WoW</div>
+                  </div>
+                  <div className="bg-white rounded-xl py-3 border border-black/5">
+                    <div className="font-[JetBrains_Mono] text-[10px] text-black/40">MAPS VIEWS</div>
+                    <div className="font-[Space_Grotesk] text-lg font-bold">12.4k</div>
+                    <div className="font-[JetBrains_Mono] text-[10px] text-emerald-600">▲ 9% WoW</div>
+                  </div>
+                  <div className="bg-black text-white rounded-xl py-3">
+                    <div className="font-[JetBrains_Mono] text-[10px] text-white/50">REVENUE TIED</div>
+                    <div className="font-[Space_Grotesk] text-lg font-bold">£8.2k</div>
+                    <div className="font-[JetBrains_Mono] text-[10px] text-[#D6FF33]">owned list + maps</div>
+                  </div>
                 </div>
-                <div className="bg-black text-white rounded-xl py-3">
-                  <div className="text-xs text-white/60">Revenue tie</div>
-                  <div className="text-lg font-medium">£8.2k</div>
-                  <div className="text-[10px] text-white/60">from list + maps</div>
-                </div>
+                <div className="mt-3 font-[JetBrains_Mono] text-[10px] text-black/30 text-center">Every customer source tracked. No black boxes.</div>
               </div>
             </div>
-          </div>
 
-          <div className="relative">
-            {/* vertical line */}
-            <div className="absolute left-[15px] top-2 bottom-2 w-px bg-black/10 hidden sm:block" />
-            <div className="space-y-6">
-              {[
-                {
-                  step: "01",
-                  title: "Audit — 20 minutes",
-                  desc: "We map your street: search, maps, site, reviews, and walk-in. You get a scored sheet and the one lever to pull first.",
-                  meta: "On call or in-store · No prep needed",
-                },
-                {
-                  step: "02",
-                  title: "Strategy — one page",
-                  desc: "One page, not a deck. Positioning, offer, calendar, and channel plan for your radius. You approve or we refine — same day.",
-                  meta: "Fixed price · 72-hour turnaround",
-                },
-                {
-                  step: "03",
-                  title: "Craft — make it real",
-                  desc: "Identity, site, signage, and shoot. We build in public, with sign-offs that take minutes, not meetings.",
-                  meta: "2–3 weeks · On-site shoots",
-                },
-                {
-                  step: "04",
-                  title: "Grow — weekly scoreboard",
-                  desc: "Launch, learn, and compound. Campaigns, list, and reviews — reported every Monday in plain English and pounds.",
-                  meta: "Month-to-month · 90-day sprint to start",
-                },
-              ].map((s) => (
-                <div key={s.step} className="relative flex gap-4 sm:gap-6 group">
-                  <div className="hidden sm:grid h-8 w-8 shrink-0 place-items-center rounded-full bg-black text-white text-[11px] font-medium z-10">
-                    {s.step}
-                  </div>
-                  <div className="flex-1 bg-white border border-black/5 rounded-[16px] p-6 hover:border-black/10 transition-colors">
-                    <div className="flex items-baseline justify-between gap-4">
-                      <h3 className="text-[16px] font-medium">{s.title}</h3>
-                      <span className="hidden sm:inline text-[11px] tracking-wide text-black/40 border border-black/10 rounded-full px-2 py-1">
-                        {s.meta}
-                      </span>
+            <div className="relative">
+              <div className="absolute left-[15px] top-2 bottom-2 w-px bg-black/10 hidden sm:block" />
+              <div className="space-y-6">
+                {[
+                  {
+                    step: "01",
+                    title: "Audit — 20 minutes",
+                    desc: "We map how customers find you: search, maps, site, reviews, and in-store. You leave with a scored sheet and the single lever to pull first.",
+                    meta: "On call or in-store · No prep",
+                  },
+                  {
+                    step: "02",
+                    title: "Blueprint — one page",
+                    desc: "One page, not a deck. Positioning, offer, calendar, and channel plan for your radius. You approve or we refine — same day.",
+                    meta: "Fixed price · 72h turnaround",
+                  },
+                  {
+                    step: "03",
+                    title: "Build — make it real",
+                    desc: "Identity, site, signage, and shoot. Built in public, with approvals that take minutes, not meetings.",
+                    meta: "2–3 weeks · On-site",
+                  },
+                  {
+                    step: "04",
+                    title: "Scale — weekly proof",
+                    desc: "Launch, learn, compound. Campaigns, list, and reviews — reported every Monday in plain language and real revenue.",
+                    meta: "Month-to-month · 90-day build",
+                  },
+                ].map((s) => (
+                  <div key={s.step} className="relative flex gap-4 sm:gap-6 group">
+                    <div className="hidden sm:grid h-8 w-8 shrink-0 place-items-center rounded-full bg-black text-[#D6FF33] font-[JetBrains_Mono] text-[11px] font-bold z-10">
+                      {s.step}
                     </div>
-                    <p className="mt-2 text-[13.5px] leading-6 text-black/60">{s.desc}</p>
-                    <div className="sm:hidden mt-3 text-[11px] text-black/40">{s.meta}</div>
+                    <div className="flex-1 bg-[#F6F6F3] border border-black/5 rounded-[16px] p-6 group-hover:border-black/10 group-hover:bg-white transition-colors">
+                      <div className="flex items-baseline justify-between gap-4">
+                        <h3 className="font-[Space_Grotesk] text-[16px] font-bold">{s.title}</h3>
+                        <span className="hidden sm:inline font-[JetBrains_Mono] text-[11px] tracking-wide text-black/40 border border-black/10 rounded-full px-2 py-1 bg-white">
+                          {s.meta}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-[13.5px] leading-6 text-black/60">{s.desc}</p>
+                      <div className="sm:hidden mt-3 font-[JetBrains_Mono] text-[11px] text-black/40">{s.meta}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="border-y border-black/5 bg-white">
+      <section className="bg-[#08080A] text-white border-y border-white/5">
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-12 lg:py-16">
           <div className="flex items-center justify-between">
-            <div className="text-[11px] tracking-[0.16em] font-medium text-black/40">VOICES — LOCAL OWNERS</div>
+            <div className="font-[JetBrains_Mono] text-[11px] tracking-[0.16em] text-white/30">VOICES — CUSTOMERS & OWNERS</div>
             <div className="flex gap-1">
               {testimonials.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveTestimonial(i)}
-                  className={`h-1.5 rounded-full transition-all ${i === activeTestimonial ? "w-6 bg-black" : "w-1.5 bg-black/15"}`}
+                  className={`h-1.5 rounded-full transition-all ${i === activeTestimonial ? "w-6 bg-[#D6FF33]" : "w-1.5 bg-white/15"}`}
                 />
               ))}
             </div>
@@ -672,35 +719,35 @@ export default function Landing() {
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.35 }}
                 >
-                  <Quote className="h-6 w-6 text-black/10" />
-                  <p className="mt-4 font-[Instrument_Serif] text-[26px] sm:text-[30px] leading-[1.15] tracking-[-0.01em]">
+                  <Quote className="h-6 w-6 text-white/10" />
+                  <p className="mt-4 font-[Space_Grotesk] text-[24px] sm:text-[28px] leading-[1.15] tracking-[-0.02em] font-medium">
                     “{testimonials[activeTestimonial].quote}”
                   </p>
                   <div className="mt-6 flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-full bg-black text-white grid place-items-center text-xs font-medium">
+                    <div className="h-9 w-9 rounded-full bg-white text-black grid place-items-center font-[Space_Grotesk] text-xs font-bold">
                       {testimonials[activeTestimonial].name.split(" ").map((n) => n[0]).join("")}
                     </div>
                     <div>
-                      <div className="text-sm font-medium">{testimonials[activeTestimonial].name}</div>
-                      <div className="text-xs text-black/50">{testimonials[activeTestimonial].role}</div>
+                      <div className="text-sm font-bold font-[Space_Grotesk]">{testimonials[activeTestimonial].name}</div>
+                      <div className="font-[JetBrains_Mono] text-xs text-white/40">{testimonials[activeTestimonial].role}</div>
                     </div>
                   </div>
                 </motion.div>
               </AnimatePresence>
             </div>
 
-            <div className="bg-[#F6F6F3] rounded-[20px] p-6 border border-black/5">
-              <div className="text-[11px] tracking-[0.1em] text-black/40">WHAT OWNERS SAY MOST</div>
-              <ul className="mt-4 space-y-3 text-[13.5px] leading-6 text-black/70">
-                <li className="flex gap-2"><Check className="h-4 w-4 mt-0.5 text-black/40" /> “They treat our margins like their own.”</li>
-                <li className="flex gap-2"><Check className="h-4 w-4 mt-0.5 text-black/40" /> “Reports I can read in 60 seconds.”</li>
-                <li className="flex gap-2"><Check className="h-4 w-4 mt-0.5 text-black/40" /> “Shoot day was seamless. Assets we still use a year later.”</li>
+            <div className="bg-white/[0.04] rounded-[20px] p-6 border border-white/10 backdrop-blur">
+              <div className="font-[JetBrains_Mono] text-[11px] tracking-[0.1em] text-white/40">WHAT TEAMS REPORT MOST</div>
+              <ul className="mt-4 space-y-3 text-[13.5px] leading-6 text-white/70 font-[Inter]">
+                <li className="flex gap-2"><Check className="h-4 w-4 mt-0.5 text-[#D6FF33]" /> “They protect our margins like their own.”</li>
+                <li className="flex gap-2"><Check className="h-4 w-4 mt-0.5 text-[#D6FF33]" /> “A report the whole team can read in 60 seconds.”</li>
+                <li className="flex gap-2"><Check className="h-4 w-4 mt-0.5 text-[#D6FF33]" /> “Assets we still send to customers a year later.”</li>
               </ul>
               <div className="mt-6 flex gap-2">
-                <button onClick={() => setActiveTestimonial((p) => (p - 1 + testimonials.length) % testimonials.length)} className="h-9 w-9 grid place-items-center rounded-full border border-black/10 bg-white hover:bg-black hover:text-white transition-colors">
+                <button onClick={() => setActiveTestimonial((p) => (p - 1 + testimonials.length) % testimonials.length)} className="h-9 w-9 grid place-items-center rounded-full border border-white/10 bg-white/[0.06] hover:bg-white hover:text-black transition-colors text-white">
                   <ArrowRight className="h-4 w-4 rotate-180" />
                 </button>
-                <button onClick={() => setActiveTestimonial((p) => (p + 1) % testimonials.length)} className="h-9 w-9 grid place-items-center rounded-full bg-black text-white hover:bg-black/90 transition-colors">
+                <button onClick={() => setActiveTestimonial((p) => (p + 1) % testimonials.length)} className="h-9 w-9 grid place-items-center rounded-full bg-[#D6FF33] text-black hover:bg-[#E0FF66] transition-colors">
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -712,10 +759,10 @@ export default function Landing() {
       {/* PRICING */}
       <section id="pricing" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-16 lg:py-24">
         <div className="text-center max-w-2xl mx-auto">
-          <div className="text-[11px] tracking-[0.16em] font-medium text-black/40">04 — PRICING</div>
-          <h2 className="mt-3 font-[Instrument_Serif] text-[36px] sm:text-[44px] leading-none tracking-[-0.02em]">Simple, calm pricing.</h2>
-          <p className="mt-3 text-[14px] leading-6 text-black/60">
-            Month-to-month. No lock-in after the 90-day sprint. Choose the level of atelier you need.
+          <div className="font-[JetBrains_Mono] text-[11px] tracking-[0.16em] text-[#D6FF33]">04 — PLANS</div>
+          <h2 className="mt-3 font-[Space_Grotesk] text-[36px] sm:text-[44px] leading-none tracking-[-0.03em] font-bold">Progress, priced plainly.</h2>
+          <p className="mt-3 text-[14px] leading-6 text-white/50">
+            Month-to-month after the 90-day build. No lock-in. Choose how much system you need — all plans are open to every customer.
           </p>
         </div>
 
@@ -723,73 +770,73 @@ export default function Landing() {
           {packages.map((pkg) => (
             <div
               key={pkg.name}
-              className={`rounded-[20px] border p-7 flex flex-col ${pkg.featured ? "bg-black text-white border-black shadow-[0_20px_60px_rgba(0,0,0,0.18)] lg:scale-[1.02]" : "bg-white border-black/10"}`}
+              className={`rounded-[20px] border p-7 flex flex-col ${pkg.featured ? "bg-[#D6FF33] text-black border-[#D6FF33] shadow-[0_20px_60px_rgba(214,255,51,0.22)] lg:scale-[1.02]" : "bg-[#111113] border-white/10 text-white"}`}
             >
               <div className="flex items-center justify-between">
-                <div className="text-[11px] tracking-[0.14em] font-medium opacity-60">{pkg.name.toUpperCase()}</div>
-                {pkg.featured && <span className="text-[11px] tracking-wide bg-white text-black rounded-full px-2.5 py-1 font-medium">Most chosen</span>}
+                <div className={`font-[JetBrains_Mono] text-[11px] tracking-[0.14em] font-bold ${pkg.featured ? "text-black/60" : "text-white/40"}`}>{pkg.name.toUpperCase()}</div>
+                {pkg.featured && <span className="font-[JetBrains_Mono] text-[11px] tracking-wide bg-black text-[#D6FF33] rounded-full px-2.5 py-1 font-bold">MOST CHOSEN</span>}
               </div>
 
               <div className="mt-4 flex items-baseline gap-1">
                 {pkg.price === "Custom" ? (
-                  <span className="text-[32px] font-light tracking-tight">Custom</span>
+                  <span className="font-[Space_Grotesk] text-[32px] font-bold tracking-tight">Custom</span>
                 ) : (
                   <>
                     <span className="text-[13px] opacity-60">£</span>
-                    <span className="text-[32px] font-light tracking-tight">{pkg.price}</span>
-                    <span className="text-[13px] opacity-60">{pkg.cadence}</span>
+                    <span className="font-[Space_Grotesk] text-[32px] font-bold tracking-tight">{pkg.price}</span>
+                    <span className={`text-[13px] font-[JetBrains_Mono] ${pkg.featured ? "text-black/50" : "text-white/40"}`}>{pkg.cadence}</span>
                   </>
                 )}
               </div>
-              <div className={`mt-2 text-[13px] leading-5 ${pkg.featured ? "text-white/70" : "text-black/60"}`}>{pkg.for}</div>
+              <div className={`mt-2 text-[13px] leading-5 ${pkg.featured ? "text-black/60" : "text-white/50"}`}>{pkg.for}</div>
 
               <ul className="mt-6 space-y-3 flex-1">
                 {pkg.features.map((f) => (
                   <li key={f} className="flex gap-2 text-[13px]">
-                    <Check className={`h-4 w-4 mt-0.5 shrink-0 ${pkg.featured ? "text-white/60" : "text-black/30"}`} />
-                    <span className={pkg.featured ? "text-white/90" : "text-black/70"}>{f}</span>
+                    <Check className={`h-4 w-4 mt-0.5 shrink-0 ${pkg.featured ? "text-black/40" : "text-[#D6FF33]"}`} />
+                    <span className={pkg.featured ? "text-black/80" : "text-white/80"}>{f}</span>
                   </li>
                 ))}
               </ul>
 
               <button
                 onClick={() => scrollTo("contact")}
-                className={`mt-8 w-full h-11 rounded-full text-[12px] tracking-[0.08em] font-medium transition-colors ${pkg.featured ? "bg-white text-black hover:bg-white/90" : "bg-black text-white hover:bg-black/90"}`}
+                className={`mt-8 w-full h-11 rounded-full font-[Space_Grotesk] text-[12px] tracking-[0.08em] font-bold transition-colors ${pkg.featured ? "bg-black text-white hover:bg-black/90" : "bg-white text-black hover:bg-white/90"}`}
               >
                 {pkg.cta}
               </button>
 
-              <div className={`mt-3 text-center text-[11px] ${pkg.featured ? "text-white/50" : "text-black/40"}`}>30-day out · No questions asked</div>
+              <div className={`mt-3 text-center font-[JetBrains_Mono] text-[11px] ${pkg.featured ? "text-black/40" : "text-white/30"}`}>30-DAY OUT · NO QUESTIONS</div>
             </div>
           ))}
         </div>
 
-        <div className="mt-6 text-center text-[11px] tracking-wide text-black/40">
-          All packages include the 20-minute audit and one-page strategy. VAT where applicable. <button onClick={() => scrollTo("contact")} className="underline decoration-black/20 underline-offset-4">Need something bespoke?</button>
+        <div className="mt-6 text-center font-[JetBrains_Mono] text-[11px] tracking-wide text-white/30">
+          All plans include the audit and one-page blueprint. Ex VAT. <button onClick={() => scrollTo("contact")} className="underline decoration-white/20 underline-offset-4 hover:decoration-[#D6FF33] text-white/60">Need something specific?</button>
         </div>
       </section>
 
       {/* FAQ */}
       <section className="mx-auto max-w-[1280px] px-6 lg:px-8 pb-8">
-        <div className="grid lg:grid-cols-[360px_1fr] gap-10 border-t border-black/5 pt-12">
+        <div className="grid lg:grid-cols-[360px_1fr] gap-10 border-t border-white/5 pt-12">
           <div>
-            <div className="text-[11px] tracking-[0.16em] font-medium text-black/40">05 — FAQ</div>
-            <h3 className="mt-3 font-[Instrument_Serif] text-[30px] leading-none tracking-[-0.01em]">Straight answers.</h3>
-            <p className="mt-3 text-[13.5px] leading-6 text-black/60">If it’s not here, ask on the audit call — we’ll answer in plain English.</p>
-            <button onClick={() => scrollTo("contact")} className="mt-6 hidden lg:inline-flex items-center gap-2 border border-black/10 px-5 h-9 rounded-full text-xs font-medium hover:bg-black hover:text-white hover:border-black transition-colors">
-              Ask a question <Plus className="h-3 w-3" />
+            <div className="font-[JetBrains_Mono] text-[11px] tracking-[0.16em] text-white/30">05 — FAQ</div>
+            <h3 className="mt-3 font-[Space_Grotesk] text-[30px] leading-none tracking-[-0.02em] font-bold">Direct answers.</h3>
+            <p className="mt-3 text-[13.5px] leading-6 text-white/50">If it is not here, we will answer it on the audit — plainly, in minutes.</p>
+            <button onClick={() => scrollTo("contact")} className="mt-6 hidden lg:inline-flex items-center gap-2 border border-white/10 px-5 h-9 rounded-full font-[JetBrains_Mono] text-xs font-medium hover:bg-white hover:text-black hover:border-white transition-colors text-white">
+              Ask anything <Plus className="h-3 w-3" />
             </button>
           </div>
 
-          <div className="divide-y divide-black/5 border border-black/5 rounded-2xl overflow-hidden bg-white">
+          <div className="divide-y divide-white/5 border border-white/10 rounded-2xl overflow-hidden bg-[#111113]">
             {faqs.map((f, i) => (
               <div key={f.q} className="group">
                 <button
                   onClick={() => setFaqOpen(faqOpen === i ? null : i)}
-                  className="w-full flex items-center justify-between gap-6 p-5 sm:p-6 text-left hover:bg-black/[0.01] transition-colors"
+                  className="w-full flex items-center justify-between gap-6 p-5 sm:p-6 text-left hover:bg-white/[0.03] transition-colors"
                 >
-                  <span className="text-[14px] font-medium leading-6 pr-4">{f.q}</span>
-                  <span className={`h-7 w-7 grid place-items-center rounded-full border shrink-0 transition-colors ${faqOpen === i ? "bg-black text-white border-black" : "border-black/10 bg-white"}`}>
+                  <span className="font-[Space_Grotesk] text-[14px] font-bold leading-6 pr-4">{f.q}</span>
+                  <span className={`h-7 w-7 grid place-items-center rounded-full border shrink-0 transition-colors ${faqOpen === i ? "bg-[#D6FF33] text-black border-[#D6FF33]" : "border-white/10 bg-white/[0.04] text-white/60"}`}>
                     {faqOpen === i ? <Minus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
                   </span>
                 </button>
@@ -801,7 +848,7 @@ export default function Landing() {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="px-5 sm:px-6 pb-6 text-[13.5px] leading-6 text-black/60 max-w-[640px]">{f.a}</div>
+                      <div className="px-5 sm:px-6 pb-6 text-[13.5px] leading-6 text-white/50 max-w-[640px]">{f.a}</div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -814,64 +861,66 @@ export default function Landing() {
       {/* CONTACT */}
       <section id="contact" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-12 lg:py-20">
         <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-8 lg:gap-10">
-          <div className="bg-black text-white rounded-[24px] p-7 sm:p-10 relative overflow-hidden">
-            <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-white/[0.06] blur-3xl" />
-            <div className="text-[11px] tracking-[0.16em] text-white/50">06 — START</div>
-            <h2 className="mt-4 font-[Instrument_Serif] text-[36px] sm:text-[44px] leading-[0.9] tracking-[-0.02em]">
-              Let’s make your <br />
-              <span className="italic font-light text-white/60">street famous.</span>
+          <div className="bg-[#D6FF33] text-black rounded-[24px] p-7 sm:p-10 relative overflow-hidden">
+            <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-black/[0.06] blur-2xl" />
+            <div className="absolute bottom-0 right-0 opacity-[0.04] font-[JetBrains_Mono] text-[120px] leading-none font-bold tracking-tighter hidden lg:block">QRAFT</div>
+            <div className="font-[JetBrains_Mono] text-[11px] tracking-[0.16em] text-black/50">06 — BUILD</div>
+            <h2 className="mt-4 font-[Space_Grotesk] text-[36px] sm:text-[44px] leading-[0.9] tracking-[-0.03em] font-bold">
+              Make your
+              <br />
+              <span className="font-[Instrument_Serif] font-normal italic text-black/50">customers count.</span>
             </h2>
-            <p className="mt-4 text-[14px] leading-6 text-white/60 max-w-[420px]">
-              20 minutes. We audit your presence, show you the gap, and leave you with a one-page plan — even if you don’t hire us.
+            <p className="mt-4 text-[14px] leading-6 text-black/60 max-w-[420px]">
+              Twenty minutes. We audit your customer system, show you the leak, and leave you with a one-page blueprint — even if you never work with us. Open to all.
             </p>
 
             <div className="mt-8 space-y-4">
               <div className="flex items-start gap-3">
-                <span className="h-8 w-8 grid place-items-center rounded-full bg-white/10 border border-white/10"><Clock className="h-4 w-4" /></span>
+                <span className="h-8 w-8 grid place-items-center rounded-full bg-black text-[#D6FF33]"><Clock className="h-4 w-4" /></span>
                 <div>
-                  <div className="text-sm font-medium">Two slots this week</div>
-                  <div className="text-xs text-white/60">Tue & Thu · 20 minutes · Google Meet or in-store</div>
+                  <div className="font-[Space_Grotesk] text-sm font-bold">Two build slots this week</div>
+                  <div className="font-[JetBrains_Mono] text-xs text-black/60">Tue & Thu · 20 minutes · Meet or in-store</div>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="h-8 w-8 grid place-items-center rounded-full bg-white/10 border border-white/10"><MapPin className="h-4 w-4" /></span>
+                <span className="h-8 w-8 grid place-items-center rounded-full bg-black text-[#D6FF33]"><Terminal className="h-4 w-4" /></span>
                 <div>
-                  <div className="text-sm font-medium">We come to you</div>
-                  <div className="text-xs text-white/60">London zones 1–3 on request. Otherwise remote, beautifully run.</div>
+                  <div className="font-[Space_Grotesk] text-sm font-bold">We plug into your stack</div>
+                  <div className="font-[JetBrains_Mono] text-xs text-black/60">Maps, site, booking, reviews — we handle integration.</div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-2 text-[11px]">
-              <span className="border border-white/15 rounded-full px-3 py-1.5 bg-white/5">No deck</span>
-              <span className="border border-white/15 rounded-full px-3 py-1.5 bg-white/5">No jargon</span>
-              <span className="border border-white/15 rounded-full px-3 py-1.5 bg-white/5">Plain-English report</span>
+            <div className="mt-8 flex flex-wrap gap-2 font-[JetBrains_Mono] text-[11px] font-medium">
+              <span className="border border-black/10 rounded-full px-3 py-1.5 bg-black/[0.04]">No deck</span>
+              <span className="border border-black/10 rounded-full px-3 py-1.5 bg-black/[0.04]">No jargon</span>
+              <span className="border border-black/10 rounded-full px-3 py-1.5 bg-black/[0.04]">Built for customers</span>
             </div>
 
-            <div className="mt-10 pt-6 border-t border-white/10 flex items-center gap-3 text-xs text-white/50">
-              <span>Or email directly</span>
-              <a href="mailto:hello@nordatelier.studio" className="text-white underline decoration-white/20 underline-offset-4">
-                hello@nordatelier.studio
+            <div className="mt-10 pt-6 border-t border-black/10 flex items-center gap-3 font-[JetBrains_Mono] text-xs text-black/50">
+              <span>Direct</span>
+              <a href="mailto:hello@qraft.build" className="text-black font-bold underline decoration-black/20 underline-offset-4">
+                hello@qraft.build
               </a>
             </div>
           </div>
 
-          <div className="bg-white border border-black/10 rounded-[24px] p-6 sm:p-8">
+          <div className="bg-[#111113] border border-white/10 rounded-[24px] p-6 sm:p-8">
             <div className="flex items-center justify-between">
-              <h3 className="text-[15px] font-medium tracking-tight">Book your 20-minute audit</h3>
-              <span className="text-[11px] tracking-wide text-black/40 border border-black/10 rounded-full px-2.5 py-1">2 min · No spam</span>
+              <h3 className="font-[Space_Grotesk] text-[15px] font-bold tracking-tight">Start your build</h3>
+              <span className="font-[JetBrains_Mono] text-[11px] tracking-wide text-white/30 border border-white/10 rounded-full px-2.5 py-1">2 MIN · OPEN TO ALL</span>
             </div>
 
             {sent ? (
-              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-8 bg-[#F6F6F3] border border-black/5 rounded-2xl p-8 text-center">
-                <div className="h-10 w-10 mx-auto grid place-items-center rounded-full bg-black text-white">
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-8 bg-white/[0.04] border border-white/10 rounded-2xl p-8 text-center">
+                <div className="h-10 w-10 mx-auto grid place-items-center rounded-full bg-[#D6FF33] text-black">
                   <Check className="h-5 w-5" />
                 </div>
-                <div className="mt-4 text-[16px] font-medium">You’re on the list.</div>
-                <div className="mt-2 text-[13px] leading-5 text-black/60">
-                  We’ll email you within a few hours with times. If you’re in a hurry, write to hello@nordatelier.studio.
+                <div className="mt-4 font-[Space_Grotesk] text-[16px] font-bold">Build request received.</div>
+                <div className="mt-2 text-[13px] leading-5 text-white/50">
+                  We will email you within hours with times. In a hurry? Write to hello@qraft.build — we reply the same day.
                 </div>
-                <button onClick={() => setSent(false)} className="mt-5 text-xs underline decoration-black/20 underline-offset-4">
+                <button onClick={() => setSent(false)} className="mt-5 font-[JetBrains_Mono] text-xs underline decoration-white/20 underline-offset-4 text-white/60">
                   Send another
                 </button>
               </motion.div>
@@ -879,113 +928,124 @@ export default function Landing() {
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <label className="space-y-1.5">
-                    <span className="text-[11px] tracking-[0.08em] font-medium text-black/60">YOUR NAME</span>
+                    <span className="font-[JetBrains_Mono] text-[11px] tracking-[0.08em] font-medium text-white/60">YOUR NAME</span>
                     <input
                       required
                       value={form.name}
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
                       placeholder="Alex Morgan"
-                      className="w-full h-11 rounded-xl border border-black/10 bg-[#FCFCFB] px-4 text-sm placeholder:text-black/30 focus:outline-none focus:border-black/20 focus:bg-white transition-colors"
+                      className="w-full h-11 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm placeholder:text-white/25 focus:outline-none focus:border-[#D6FF33]/40 focus:bg-white/[0.06] transition-colors text-white"
                     />
                   </label>
                   <label className="space-y-1.5">
-                    <span className="text-[11px] tracking-[0.08em] font-medium text-black/60">BUSINESS NAME</span>
+                    <span className="font-[JetBrains_Mono] text-[11px] tracking-[0.08em] font-medium text-white/60">BUSINESS</span>
                     <input
                       value={form.business}
                       onChange={(e) => setForm({ ...form, business: e.target.value })}
                       placeholder="Lumière — Café"
-                      className="w-full h-11 rounded-xl border border-black/10 bg-[#FCFCFB] px-4 text-sm placeholder:text-black/30 focus:outline-none focus:border-black/20 focus:bg-white transition-colors"
+                      className="w-full h-11 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm placeholder:text-white/25 focus:outline-none focus:border-[#D6FF33]/40 focus:bg-white/[0.06] transition-colors text-white"
                     />
                   </label>
                 </div>
 
                 <label className="space-y-1.5 block">
-                  <span className="text-[11px] tracking-[0.08em] font-medium text-black/60">WORK EMAIL</span>
+                  <span className="font-[JetBrains_Mono] text-[11px] tracking-[0.08em] font-medium text-white/60">WORK EMAIL</span>
                   <input
                     required
                     type="email"
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     placeholder="alex@lumiere.cafe"
-                    className="w-full h-11 rounded-xl border border-black/10 bg-[#FCFCFB] px-4 text-sm placeholder:text-black/30 focus:outline-none focus:border-black/20 focus:bg-white transition-colors"
+                    className="w-full h-11 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm placeholder:text-white/25 focus:outline-none focus:border-[#D6FF33]/40 focus:bg-white/[0.06] transition-colors text-white"
                   />
                 </label>
 
                 <label className="space-y-1.5 block">
-                  <span className="text-[11px] tracking-[0.08em] font-medium text-black/60">WHAT’S THE GOAL? — optional</span>
+                  <span className="font-[JetBrains_Mono] text-[11px] tracking-[0.08em] font-medium text-white/60">CUSTOMER GOAL — optional</span>
                   <textarea
                     value={form.goal}
                     onChange={(e) => setForm({ ...form, goal: e.target.value })}
-                    placeholder="e.g. ‘We’re great on weekends, dead Tue–Thu. Need more mid-week covers.’"
+                    placeholder="e.g. ‘We serve customers well on weekends but need more of them Tue–Thu.’"
                     rows={3}
-                    className="w-full rounded-xl border border-black/10 bg-[#FCFCFB] px-4 py-3 text-sm placeholder:text-black/30 focus:outline-none focus:border-black/20 focus:bg-white transition-colors resize-none"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm placeholder:text-white/25 focus:outline-none focus:border-[#D6FF33]/40 focus:bg-white/[0.06] transition-colors resize-none text-white"
                   />
                 </label>
 
-                <div className="flex items-center gap-2 text-[11px] text-black/50">
-                  <Check className="h-3 w-3" /> We reply within hours. No newsletter unless you ask.
+                <div className="flex items-center gap-2 font-[JetBrains_Mono] text-[11px] text-white/30">
+                  <Check className="h-3 w-3 text-[#D6FF33]" /> Reply within hours. No newsletter unless you ask. Access is open to all.
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full h-12 rounded-full bg-black text-white text-[13px] tracking-[0.06em] font-medium hover:bg-black/90 transition-colors flex items-center justify-center gap-2"
+                  className="w-full h-12 rounded-full bg-[#D6FF33] text-black font-[Space_Grotesk] text-[13px] tracking-[0.02em] font-bold hover:bg-[#E0FF66] transition-colors flex items-center justify-center gap-2"
                 >
-                  REQUEST AUDIT — IT’S FREE <ArrowRight className="h-4 w-4" />
+                  REQUEST AUDIT — FREE <ArrowRight className="h-4 w-4" />
                 </button>
 
-                <div className="text-center text-[11px] text-black/40">Or <button type="button" onClick={() => navigate("/auth")} className="underline decoration-black/20 underline-offset-4 hover:decoration-black">sign in</button> to manage your project</div>
+                <div className="text-center font-[JetBrains_Mono] text-[11px] text-white/30">Or <button type="button" onClick={() => navigate("/auth")} className="underline decoration-white/20 underline-offset-4 hover:decoration-[#D6FF33] text-white/60">sign in</button> to manage your build</div>
               </form>
             )}
 
-            <div className="mt-6 flex items-center gap-2 text-[11px] text-black/40 border-t border-black/5 pt-5">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" /> Average reply: 3 hours · Mon–Fri, 9–18
+            <div className="mt-6 flex items-center gap-2 font-[JetBrains_Mono] text-[11px] text-white/25 border-t border-white/5 pt-5">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" /> Avg. reply: 3 hours · Mon–Fri, 09:00–18:00
             </div>
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-black/5 bg-white">
+      <footer className="border-t border-white/5 bg-[#08080A]">
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-10">
           <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-8">
             <div>
               <div className="flex items-center gap-2">
-                <div className="h-7 w-7 rounded-full border border-black/15 grid place-items-center">
-                  <span className="text-[11px] tracking-[0.18em] font-medium">N—</span>
+                <div className="h-7 w-7 rounded-[8px] bg-white text-black grid place-items-center">
+                  <span className="font-[Space_Grotesk] text-[11px] font-bold">Q</span>
                 </div>
-                <span className="text-[13px] tracking-[0.16em] font-medium">NORD ATELIER</span>
-                <span className="text-[11px] tracking-wide text-black/40">© {new Date().getFullYear()}</span>
+                <span className="font-[Space_Grotesk] text-[13px] tracking-[-0.02em] font-bold">QRAFT</span>
+                <span className="font-[JetBrains_Mono] text-[10px] tracking-[0.14em] text-white/30 border-l border-white/10 pl-3 ml-1">PERFECTION BUILDS BRANDS</span>
+                <span className="font-[JetBrains_Mono] text-[11px] tracking-wide text-white/20 ml-2">© {new Date().getFullYear()}</span>
               </div>
-              <div className="mt-3 max-w-[420px] text-[12.5px] leading-5 text-black/50">
-                A premium, minimal marketing atelier for local businesses. We make neighbourhood favourites impossible to ignore — with services that prove themselves and results you can count in the till.
+              <div className="mt-3 max-w-[460px] text-[12.5px] leading-5 text-white/40">
+                QRAFT is a technical marketing system for businesses that put customers first. Premium, serious, and auditable — we build brands the way engineers build products.
+              </div>
+              <div className="mt-4 flex gap-2 font-[JetBrains_Mono] text-[10px] tracking-[0.1em] text-white/25">
+                <span className="border border-white/10 rounded-full px-2.5 py-1">SERIOUS</span>
+                <span className="border border-white/10 rounded-full px-2.5 py-1">DARK</span>
+                <span className="border border-white/10 rounded-full px-2.5 py-1">TECHNICAL</span>
+                <span className="bg-[#D6FF33] text-black rounded-full px-2.5 py-1 font-bold">BOLD</span>
               </div>
             </div>
 
-            <div className="flex gap-10 sm:gap-16 text-[12px]">
+            <div className="flex gap-10 sm:gap-16 font-[JetBrains_Mono] text-[12px]">
               <div>
-                <div className="tracking-[0.12em] font-medium text-black/40 text-[11px]">STUDIO</div>
-                <div className="mt-3 space-y-1.5 text-black/70">
+                <div className="tracking-[0.12em] font-bold text-white/30 text-[11px]">SYSTEM</div>
+                <div className="mt-3 space-y-1.5 text-white/60">
                   <div>London — Shoreditch</div>
                   <div>Paris — Le Marais</div>
-                  <a href="mailto:hello@nordatelier.studio" className="block hover:text-black">hello@nordatelier.studio</a>
+                  <a href="mailto:hello@qraft.build" className="block hover:text-white">hello@qraft.build</a>
                 </div>
               </div>
               <div>
-                <div className="tracking-[0.12em] font-medium text-black/40 text-[11px]">INDEX</div>
+                <div className="tracking-[0.12em] font-bold text-white/30 text-[11px]">INDEX</div>
                 <div className="mt-3 flex flex-col gap-1.5">
-                  <button onClick={() => scrollTo("services")} className="text-left hover:text-black text-black/70">Services</button>
-                  <button onClick={() => scrollTo("results")} className="text-left hover:text-black text-black/70">Results</button>
-                  <button onClick={() => scrollTo("process")} className="text-left hover:text-black text-black/70">Process</button>
-                  <button onClick={() => navigate("/auth")} className="text-left hover:text-black text-black/70">Sign in</button>
+                  <button onClick={() => scrollTo("services")} className="text-left hover:text-white text-white/60">System</button>
+                  <button onClick={() => scrollTo("results")} className="text-left hover:text-white text-white/60">Proof</button>
+                  <button onClick={() => scrollTo("process")} className="text-left hover:text-white text-white/60">Process</button>
+                  <button onClick={() => navigate("/auth")} className="text-left hover:text-white text-white/60">Sign in</button>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-black/5 pt-6 text-[11px] tracking-wide text-black/40">
-            <div>MINIMALISM · PRECISE · LOCAL-FIRST · © NORD ATELIER LTD.</div>
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/5 pt-6 font-[JetBrains_Mono] text-[11px] tracking-wide text-white/25">
+            <div className="flex items-center gap-2">
+              <span>QRAFT.BUILD</span>
+              <span className="h-1 w-1 rounded-full bg-white/20" />
+              <span>ALL SYSTEMS OPEN · BUILT FOR EVERY CUSTOMER</span>
+            </div>
             <div className="flex gap-4">
-              <span>Privacy — minimal & honest</span>
+              <span>Privacy — minimal</span>
               <span className="hidden sm:inline">·</span>
               <span>Terms</span>
             </div>
