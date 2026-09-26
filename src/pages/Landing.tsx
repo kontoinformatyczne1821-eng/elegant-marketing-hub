@@ -45,7 +45,7 @@ const plans = [
 ];
 
 function CursorAura() {
-  const [mouse, setMouse] = useState({ x: -200, y: -200 });
+  const [mouse, setMouse] = useState({ x: -400, y: -400 });
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const fine = window.matchMedia("(pointer: fine)").matches;
@@ -61,51 +61,74 @@ function CursorAura() {
     window.addEventListener("mousemove", onMove);
     document.addEventListener("mouseleave", onLeave);
     document.addEventListener("mouseenter", onEnter);
+    // start visible after first move
+    const t = setTimeout(() => setVisible(true), 300);
     return () => {
       window.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseleave", onLeave);
       document.removeEventListener("mouseenter", onEnter);
       cancelAnimationFrame(raf);
+      clearTimeout(t);
     };
   }, [visible]);
   if (!visible) return null;
   return (
-    <div className="pointer-events-none fixed inset-0 z-30 hidden lg:block">
-      {/* duża subtelna aura */}
+    <div className="pointer-events-none fixed inset-0 z-[80] hidden lg:block">
+      {/* outer — large subtle aura, black-theme */}
       <motion.div
         className="absolute rounded-full"
         style={{
           left: mouse.x,
           top: mouse.y,
-          width: 640,
-          height: 640,
+          width: 760,
+          height: 760,
           x: "-50%",
           y: "-50%",
-          background: "radial-gradient(circle at center, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 30%, rgba(255,255,255,0.008) 48%, transparent 70%)",
-          filter: "blur(22px)",
+          background: "radial-gradient(circle at center, rgba(255,255,255,0.085) 0%, rgba(255,255,255,0.03) 32%, rgba(255,255,255,0.01) 52%, transparent 72%)",
+          filter: "blur(28px)",
         }}
         animate={{ left: mouse.x, top: mouse.y }}
-        transition={{ type: "spring", damping: 30, stiffness: 180, mass: 0.7 }}
+        transition={{ type: "spring", damping: 30, stiffness: 160, mass: 0.8 }}
       />
-      {/* wewnętrzna poświata */}
+      {/* mid — tighter glow */}
       <motion.div
         className="absolute rounded-full"
         style={{
           left: mouse.x,
           top: mouse.y,
-          width: 180,
-          height: 180,
+          width: 240,
+          height: 240,
           x: "-50%",
           y: "-50%",
-          background: "radial-gradient(circle at center, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 42%, transparent 72%)",
-          filter: "blur(10px)",
+          background: "radial-gradient(circle at center, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.045) 42%, transparent 72%)",
+          filter: "blur(14px)",
         }}
         animate={{ left: mouse.x, top: mouse.y }}
-        transition={{ type: "spring", damping: 28, stiffness: 260, mass: 0.5 }}
+        transition={{ type: "spring", damping: 26, stiffness: 240, mass: 0.5 }}
       />
-      {/* rdzeń */}
+      {/* inner core */}
       <motion.div
-        className="absolute rounded-full bg-white/80"
+        className="absolute rounded-full"
+        style={{
+          left: mouse.x,
+          top: mouse.y,
+          width: 36,
+          height: 36,
+          x: "-50%",
+          y: "-50%",
+          background: "radial-gradient(circle at center, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 38%, transparent 70%)",
+          filter: "blur(8px)",
+        }}
+        animate={{ left: mouse.x, top: mouse.y, scale: [1, 1.08, 1] }}
+        transition={{
+          left: { type: "spring", damping: 26, stiffness: 320 },
+          top: { type: "spring", damping: 26, stiffness: 320 },
+          scale: { duration: 2.2, repeat: Infinity, ease: "easeInOut" },
+        }}
+      />
+      {/* dot */}
+      <motion.div
+        className="absolute rounded-full bg-white"
         style={{
           left: mouse.x,
           top: mouse.y,
@@ -113,10 +136,29 @@ function CursorAura() {
           height: 3,
           x: "-50%",
           y: "-50%",
-          boxShadow: "0 0 10px rgba(255,255,255,0.9), 0 0 20px rgba(255,255,255,0.35)",
+          boxShadow: "0 0 12px rgba(255,255,255,0.95), 0 0 24px rgba(255,255,255,0.4)",
         }}
         animate={{ left: mouse.x, top: mouse.y }}
-        transition={{ type: "spring", damping: 32, stiffness: 420 }}
+        transition={{ type: "spring", damping: 34, stiffness: 460 }}
+      />
+      {/* subtle ring */}
+      <motion.div
+        className="absolute rounded-full border border-white/10"
+        style={{
+          left: mouse.x,
+          top: mouse.y,
+          width: 48,
+          height: 48,
+          x: "-50%",
+          y: "-50%",
+        }}
+        animate={{ left: mouse.x, top: mouse.y, scale: [1, 1.12, 1], opacity: [0.18, 0.08, 0.18] }}
+        transition={{
+          left: { type: "spring", damping: 28, stiffness: 220 },
+          top: { type: "spring", damping: 28, stiffness: 220 },
+          scale: { duration: 2.8, repeat: Infinity, ease: "easeInOut" },
+          opacity: { duration: 2.8, repeat: Infinity, ease: "easeInOut" },
+        }}
       />
     </div>
   );
