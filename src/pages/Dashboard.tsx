@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { PopNumber } from "@/components/transitions";
 import { LogOut, Terminal, Activity, Check, ArrowUpRight, Layers, Cpu, Clock, Mail } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -60,15 +61,15 @@ export default function Dashboard() {
             <div className="mt-3 font-[Space_Grotesk] text-[30px] font-bold leading-none">Otwarte dla wszystkich.</div>
             <p className="mt-2 text-[13px] leading-5 text-white/80">Ka\u017cdy panel, raport i blueprint dost\u0119pny dla ca\u0142ego zespo\u0142u \u2014 i ka\u017cdego klienta.</p>
             <div className="mt-6 grid grid-cols-2 gap-3">
-              <div className="bg-black text-white rounded-xl p-3 text-center"><div className="font-[Space_Grotesk] text-lg font-bold">340+</div><div className="font-[JetBrains_Mono] text-[10px] text-white/50">FIRM</div></div>
-              <div className="bg-white rounded-xl p-3 text-center"><div className="font-[Space_Grotesk] text-lg font-bold text-black">4.9/5</div><div className="font-[JetBrains_Mono] text-[10px] text-black/40">OCENA</div></div>
+              <div className="bg-black text-white rounded-xl p-3 text-center"><div className="font-[Space_Grotesk] text-lg font-bold"><PopNumber text="340+" /></div><div className="font-[JetBrains_Mono] text-[10px] text-white/50">FIRM</div></div>
+              <div className="bg-white rounded-xl p-3 text-center"><div className="font-[Space_Grotesk] text-lg font-bold text-black"><PopNumber text="4.9/5" /></div><div className="font-[JetBrains_Mono] text-[10px] text-black/40">OCENA</div></div>
             </div>
             <button onClick={() => navigate("/")} className="mt-auto w-full bg-black text-white rounded-full h-10 font-[Space_Grotesk] text-xs font-bold flex items-center justify-center gap-1.5"><Mail className="h-3.5 w-3.5"/> Porozmawiaj z nami</button>
           </div>
         </div>
         <div className="mt-4 grid md:grid-cols-3 gap-4">
           {[{ k: "01", t: "Modu\u0142y systemu", d: "Sze\u015b\u0107 modu\u0142\u00f3w \u2014 marka, strona, pozyskiwanie, tre\u015b\u0107, kampanie, dowody." },{ k: "02", t: "Dowody, nie obietnice", d: "Cotygodniowy raport powi\u0105zany z klientami i przychodem." },{ k: "03", t: "Zbudowane dla klient\u00f3w", d: "Wszystko mierzymy tym, jak zdobywa i utrzymuje klient\u00f3w." }].map((c)=>(
-            <div key={c.k} className="bg-[#111113] border border-white/5 rounded-2xl p-5"><div className="font-[JetBrains_Mono] text-[11px] text-white/20">{c.k}</div><div className="mt-2 font-[Space_Grotesk] font-bold">{c.t}</div><div className="mt-1 text-[13px] leading-5 text-white/50">{c.d}</div></div>
+            <div key={c.k} className="bg-[#111113] border border-white/5 rounded-2xl p-5"><div className="font-[JetBrains_Mono] text-[11px] text-white/20"><PopNumber text={c.k} /></div><div className="mt-2 font-[Space_Grotesk] font-bold">{c.t}</div><div className="mt-1 text-[13px] leading-5 text-white/50">{c.d}</div></div>
           ))}
         </div>
         <div className="mt-8 flex items-center justify-between border-t border-white/5 pt-6 font-[JetBrains_Mono] text-[11px] text-white/25"><span>QRAFT \u00b7 qraft.build \u00b7 Otwarte dla ka\u017cdego.</span><span className="hidden sm:inline">PERFEKCJA BUDUJE MARKI</span></div>

@@ -2,9 +2,11 @@ import { motion, AnimatePresence, useScroll, useTransform, useInView } from "fra
 import { ArrowUpRight, ArrowRight, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
+import { ClearField, DigitChars, PopNumber, usePopIn } from "@/components/transitions";
 
-function EditableText({ ek, def, className, as: Tag = "span", isEditing }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean }) {
+function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean }) {
   const [val, setVal] = useState(def);
+  const popRef = usePopIn<HTMLSpanElement>([val]);
   useEffect(() => {
     try {
       const saved = localStorage.getItem(ek);
@@ -16,6 +18,12 @@ function EditableText({ ek, def, className, as: Tag = "span", isEditing }: { ek:
     setVal(t);
     try { localStorage.setItem(ek, t); } catch {}
   };
+  if (!isEditing && pop && /\d/.test(val))
+    return (
+      <span ref={popRef} className={`t-digit-group ${className || ""}`}>
+        <DigitChars text={val} />
+      </span>
+    );
   if (!isEditing) return <Tag className={className}>{val}</Tag>;
   return (
     <Tag
@@ -320,6 +328,7 @@ function CountUp({ to, suffix = "", decimals = 0 }: { to: number; suffix?: strin
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-15%" });
   const [v, setV] = useState(0);
+  const [done, setDone] = useState(false);
   useEffect(() => {
     if (!inView) return;
     let raf = 0;
@@ -329,14 +338,30 @@ function CountUp({ to, suffix = "", decimals = 0 }: { to: number; suffix?: strin
       const pr = Math.min(1, (now - start) / dur);
       setV(to * (1 - Math.pow(1 - pr, 3)));
       if (pr < 1) raf = requestAnimationFrame(tick);
+      else setDone(true);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [inView, to]);
+  /* pop-in fires once, the moment the counter lands on its final value */
+  useEffect(() => {
+    if (!inView || !done) return;
+    const el = ref.current;
+    if (!el) return;
+    el.classList.remove("is-animating");
+    void el.offsetWidth;
+    el.classList.add("is-animating");
+  }, [inView, done]);
   return (
-    <span ref={ref}>
-      {v.toLocaleString("pl-PL", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}
-      {suffix}
+    <span ref={ref} className="t-digit-group">
+      <DigitChars
+        text={
+          v.toLocaleString("pl-PL", {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals,
+          }) + suffix
+        }
+      />
     </span>
   );
 }
@@ -345,7 +370,16 @@ export default function Landing() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
-  const [form, setForm] = useState({ name: "", business: "", email: "" });
+  const [form, setForm] = useState({
+    name: "",
+    business: "",
+    email: "",
+    phone: "",
+    service: "audyt",
+    date: "",
+    time: "10:30",
+    message: "",
+  });
   const [sent, setSent] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const cinemaRef = useRef<HTMLElement>(null);
@@ -362,9 +396,9 @@ export default function Landing() {
   };
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.email || !form.name) return;
+    if (!form.email || !form.name || !form.date) return;
     setSent(true);
-    setTimeout(()=>setSent(false), 3800);
+    setTimeout(()=>setSent(false), 6000);
   };
 
   return (
@@ -578,7 +612,7 @@ export default function Landing() {
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/0 to-transparent group-hover:via-white/10 transition duration-700"/>
               <div className="pointer-events-none absolute -inset-20 opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ background: "radial-gradient(55% 45% at 50% 0%, rgba(255,255,255,0.10), transparent 70%)" }} />
               <div className="flex items-center justify-between">
-                <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-white/20">{s.n}</span>
+                <PopNumber text={s.n} className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-white/20" />
                 <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10 text-white/20 group-hover:border-white/30 group-hover:text-white group-hover:rotate-45 group-hover:bg-white/5 transition-all duration-500"><ArrowUpRight className="h-3.5 w-3.5"/></span>
               </div>
               <h3 className="mt-7 font-[Cormorant_Garamond] font-light text-[23px] tracking-[-0.01em] leading-none">
@@ -608,7 +642,7 @@ export default function Landing() {
 
       <section className="bg-[#F7F7F5] text-[#0A0A0A] border-t border-white/5">
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-24">
-          <Reveal><div className="grid lg:grid-cols-[360px_1fr] gap-12"><div className="lg:sticky lg:top-28 self-start"><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-black/30">02 — PROCES</div><h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[36px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.process.h1" def="Cztery tygodnie" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.process.h2" def="do rozpędu." className="block font-[Cormorant_Garamond] font-light italic text-black/30" isEditing={isEditing} as="span" /></h3><EditableText ek="qraft.process.desc" def="Otwarty proces. Cotygodniowe dowody. Bez teatru." className="mt-4 block font-[Inter] font-light text-[15px] leading-7 text-black/40" isEditing={isEditing} as="p" /></div><div className="relative"><motion.div initial={{ scaleY:0 }} whileInView={{ scaleY:1 }} viewport={{ once:true }} transition={{ duration:1.1, ease:[0.22,1,0.36,1] }} className="absolute left-[11px] top-2 bottom-2 w-px bg-black/10 origin-top hidden sm:block"/><div className="space-y-5">{[["01","Audyt — 20 min","Ocena + pierwsza dźwignia."],["02","Blueprint — 1 strona","Pozycjonowanie dla Twojej okolicy."],["03","Budowa — 2–3 tyg.","Tożsamość, strona, materiały."],["04","Skalowanie — co tydzień","Raport w złotówkach."]].map(([n,t,d],i)=>(<motion.div key={n} initial={{ opacity:0, x:10 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ delay:i*0.06, duration:0.6 }} className="flex gap-4 group"><div className="hidden sm:grid h-6 w-6 shrink-0 place-items-center rounded-full bg-black text-white font-[JetBrains_Mono] font-light text-[10px]">{n}</div><div className="flex-1 bg-white border border-black/5 rounded-2xl px-6 py-5 group-hover:border-black/10 transition"><div className="font-[Cormorant_Garamond] font-light text-[17px]"><EditableText ek={`qraft.process.${i}.title`} def={t} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></div><div className="font-[Inter] font-light text-[13px] text-black/45 mt-1"><EditableText ek={`qraft.process.${i}.desc`} def={d} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></div></div></motion.div>))}</div></div></div></Reveal>
+          <Reveal><div className="grid lg:grid-cols-[360px_1fr] gap-12"><div className="lg:sticky lg:top-28 self-start"><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-black/30">02 — PROCES</div><h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[36px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.process.h1" def="Cztery tygodnie" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.process.h2" def="do rozpędu." className="block font-[Cormorant_Garamond] font-light italic text-black/30" isEditing={isEditing} as="span" /></h3><EditableText ek="qraft.process.desc" def="Otwarty proces. Cotygodniowe dowody. Bez teatru." className="mt-4 block font-[Inter] font-light text-[15px] leading-7 text-black/40" isEditing={isEditing} as="p" /></div><div className="relative"><motion.div initial={{ scaleY:0 }} whileInView={{ scaleY:1 }} viewport={{ once:true }} transition={{ duration:1.1, ease:[0.22,1,0.36,1] }} className="absolute left-[11px] top-2 bottom-2 w-px bg-black/10 origin-top hidden sm:block"/><div className="space-y-5">{[["01","Audyt — 20 min","Ocena + pierwsza dźwignia."],["02","Blueprint — 1 strona","Pozycjonowanie dla Twojej okolicy."],["03","Budowa — 2–3 tyg.","Tożsamość, strona, materiały."],["04","Skalowanie — co tydzień","Raport w złotówkach."]].map(([n,t,d],i)=>(<motion.div key={n} initial={{ opacity:0, x:10 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ delay:i*0.06, duration:0.6 }} className="flex gap-4 group"><div className="hidden sm:grid h-6 w-6 shrink-0 place-items-center rounded-full bg-black text-white font-[JetBrains_Mono] font-light text-[10px]"><PopNumber text={n} /></div><div className="flex-1 bg-white border border-black/5 rounded-2xl px-6 py-5 group-hover:border-black/10 transition"><div className="font-[Cormorant_Garamond] font-light text-[17px]"><EditableText ek={`qraft.process.${i}.title`} def={t} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></div><div className="font-[Inter] font-light text-[13px] text-black/45 mt-1"><EditableText ek={`qraft.process.${i}.desc`} def={d} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></div></div></motion.div>))}</div></div></div></Reveal>
         </div>
       </section>
 
@@ -618,7 +652,7 @@ export default function Landing() {
           {plans.map((p,i)=>(
             <motion.div key={p.name} initial={{ opacity:0, y:14 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.6, delay:i*0.05, ease:[0.22,1,0.36,1]}} className={`rounded-[28px] border p-8 lg:p-9 flex flex-col ${p.featured?"bg-[#F7F7F5] text-black border-[#F7F7F5] shadow-[0_24px_64px_rgba(0,0,0,0.18)] lg:scale-[1.02]":"bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.3] border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_12px_40px_rgba(0,0,0,0.3)]"}`}>
               <div className="flex items-center justify-between"><span className={`font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] ${p.featured?"text-black/35":"text-white/25"}`}><EditableText ek={`qraft.plan.${i}.name`} def={p.name.toUpperCase()} className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span>{p.featured&&<span className="font-[JetBrains_Mono] font-light text-[10px] bg-black text-white rounded-full px-3 py-1">WYRÓŻNIONY</span>}</div>
-              <div className="mt-8 flex items-baseline gap-2"><span className="font-[Cormorant_Garamond] font-light text-[36px] tracking-[-0.02em]"><EditableText ek={`qraft.plan.${i}.price`} def={p.price} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span><span className={`font-[JetBrains_Mono] font-light text-[11px] ${p.featured?"text-black/35":"text-white/25"}`}><EditableText ek={`qraft.plan.${i}.sub`} def={p.sub} className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div>
+              <div className="mt-8 flex items-baseline gap-2"><span className="font-[Cormorant_Garamond] font-light text-[36px] tracking-[-0.02em]"><EditableText ek={`qraft.plan.${i}.price`} def={p.price} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" pop /></span><span className={`font-[JetBrains_Mono] font-light text-[11px] ${p.featured?"text-black/35":"text-white/25"}`}><EditableText ek={`qraft.plan.${i}.sub`} def={p.sub} className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div>
               <EditableText ek={`qraft.plan.${i}.line`} def={p.line} className={`mt-2 block font-[Inter] font-light text-[14px] ${p.featured?"text-black/45":"text-white/30"}`} isEditing={isEditing} as="div" />
               <ul className="mt-8 space-y-3 flex-1">
                 {p.pts.map((x, idx)=>(
@@ -638,8 +672,44 @@ export default function Landing() {
 
       <section id="contact" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-12 lg:py-20">
         <div className="grid lg:grid-cols-[1fr_1fr] gap-6">
-          <Reveal><div className="bg-[#0F0F11] border border-white/10 text-white rounded-[32px] p-8 lg:p-10 relative overflow-hidden min-h-[440px] flex flex-col"><div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/[0.04] blur-2xl"/><div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"/><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/30">05 — BUDOWA</div><h2 className="mt-6 font-[Cormorant_Garamond] font-light text-[40px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.contact.h1" def="Spraw, by każdy" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.contact.h2" def="klient się liczył." className="block font-[Cormorant_Garamond] font-light italic text-white/50" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.contact.desc" def="20 minut. Znajdziemy lukę i zostawimy Ci plan — nawet jeśli nas nie wybierzesz. Otwarte dla wszystkich." className="mt-4 block font-[Inter] font-light text-[14px] leading-7 text-white/40 max-w-[380px]" isEditing={isEditing} as="p" /><div className="mt-8 space-y-3 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.06em] text-white/35"><div className="flex items-center gap-2.5"><Clock className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line1" def="Dwa terminy w tym tygodniu · 20 min" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div><div className="flex items-center gap-2.5"><Terminal className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line2" def="Otwarte dla każdego klienta" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div></div><div className="mt-auto pt-10 flex gap-2 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.1em]"><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge1" def="BEZ PREZENTACJI" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge2" def="BEZ ŻARGONU" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div></div></Reveal>
-          <Reveal delay={0.06}><div className="bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.4] border border-white/10 rounded-[32px] p-7 sm:p-8" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.32)" } as any}><div className="flex items-center justify-between"><h3 className="font-[Cormorant_Garamond] font-light text-[22px]"><EditableText ek="qraft.form.h" def="Rozpocznij budowę" className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/20 border border-white/10 rounded-full px-3 py-1">2 MIN</span></div>{sent ? (<motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} className="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-8 text-center"><div className="h-10 w-10 mx-auto grid place-items-center rounded-full bg-white text-black"><Check className="h-5 w-5"/></div><div className="mt-4 font-[Cormorant_Garamond] font-light text-[18px]">Zgłoszenie otrzymane.</div><div className="mt-2 font-[Inter] font-light text-[13px] text-white/30">Wyślemy terminy w ciągu kilku godzin.</div><button onClick={()=>setSent(false)} className="mt-5 font-[JetBrains_Mono] font-light text-xs underline decoration-white/20 text-white/40">Wyślij kolejne</button></motion.div>) : (<form onSubmit={submit} className="mt-8 space-y-5"><div className="grid sm:grid-cols-2 gap-4"><label className="space-y-2"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">IMIĘ I NAZWISKO</span><input required value={form.name} onChange={e=>setForm({...form, name:e.target.value})} placeholder="Alex Kowalski" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label><label className="space-y-2"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">FIRMA</span><input value={form.business} onChange={e=>setForm({...form, business:e.target.value})} placeholder="Lumière" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label></div><label className="space-y-2 block"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">EMAIL</span><input required type="email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} placeholder="alex@firma.pl" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label><BtnPrimary type="submit" className="w-full h-[48px] text-[11px]">ZAMÓW AUDYT — ZA DARMO <ArrowRight className="h-4 w-4 opacity-60" /></BtnPrimary><div className="text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.04em] text-white/20">Lub <button type="button" onClick={()=>navigate("/auth")} className="underline decoration-white/15 text-white/30 hover:text-white/60">zaloguj się</button> by zarządzać budową</div></form>)}</div></Reveal>
+          <Reveal><div className="bg-[#0F0F11] border border-white/10 text-white rounded-[32px] p-8 lg:p-10 relative overflow-hidden min-h-[440px] flex flex-col"><div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/[0.04] blur-2xl"/><div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"/><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/30">05 — TERMIN</div><h2 className="mt-6 font-[Cormorant_Garamond] font-light text-[40px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.contact.h1" def="Zarezerwuj termin" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.contact.h2" def="na bezpłatny audyt." className="block font-[Cormorant_Garamond] font-light italic text-white/50" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.contact.desc" def="20 minut online. Wybierz dzień i godzinę — potwierdzimy w ciągu kilku godzin. Nawet jeśli nas nie wybierzesz, zostajesz z planem." className="mt-4 block font-[Inter] font-light text-[14px] leading-7 text-white/40 max-w-[380px]" isEditing={isEditing} as="p" /><div className="mt-8 space-y-3 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.06em] text-white/35"><div className="flex items-center gap-2.5"><Clock className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line1" def="Dwa terminy w tym tygodniu · 20 min" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div><div className="flex items-center gap-2.5"><Terminal className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line2" def="Otwarte dla każdego klienta" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div></div><div className="mt-auto pt-10 flex gap-2 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.1em]"><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge1" def="BEZ OPŁAT" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge2" def="BEZ ZOBOWIĄZAŃ" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div></div></Reveal>
+          <Reveal delay={0.06}><div className="bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.4] border border-white/10 rounded-[32px] p-7 sm:p-8" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.32)" } as any}><div className="flex items-center justify-between"><h3 className="font-[Cormorant_Garamond] font-light text-[22px]"><EditableText ek="qraft.form.h" def="Zapytanie o termin" className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/20 border border-white/10 rounded-full px-3 py-1"><PopNumber text="2 MIN" /></span></div>{sent ? (<motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} className="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-8 text-center"><div className="h-10 w-10 mx-auto grid place-items-center rounded-full bg-white text-black"><Check className="h-5 w-5"/></div><div className="mt-4 font-[Cormorant_Garamond] font-light text-[18px]">Termin zarezerwowany.</div><div className="mt-2 font-[Inter] font-light text-[13px] text-white/30">{form.date ? new Date(form.date + "T12:00:00").toLocaleDateString("pl-PL", { weekday: "long", day: "numeric", month: "long" }) : ""} \u00b7 {form.time} — potwierdzenie wyślemy na {form.email}.</div><button onClick={()=>setSent(false)} className="mt-5 font-[JetBrains_Mono] font-light text-xs underline decoration-white/20 text-white/40">Wyślij kolejne</button></motion.div>) : (<form onSubmit={submit} className="mt-8 space-y-5">
+          <div className="grid sm:grid-cols-2 gap-4">
+            <ClearField label="Imię i nazwisko" name="name" value={form.name} onChange={(v)=>setForm({...form, name:v})} placeholder="Alex Kowalski" autoComplete="name" required />
+            <ClearField label="Firma" name="business" value={form.business} onChange={(v)=>setForm({...form, business:v})} placeholder="Lumière" autoComplete="organization" />
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <ClearField label="Telefon" name="phone" type="tel" value={form.phone} onChange={(v)=>setForm({...form, phone:v})} placeholder="600 100 200" autoComplete="tel" />
+            <ClearField label="Email" name="email" type="email" value={form.email} onChange={(v)=>setForm({...form, email:v})} placeholder="alex@firma.pl" autoComplete="email" required />
+          </div>
+          <div className="grid sm:grid-cols-3 gap-4">
+            <label className="block space-y-2">
+              <span className="block font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">USŁUGA</span>
+              <select name="service" value={form.service} onChange={(e)=>setForm({...form, service:e.target.value})} className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm text-white [color-scheme:dark] focus:outline-none focus:border-white/20">
+                <option className="bg-[#0F0F11]" value="audyt">Audyt 20 min</option>
+                <option className="bg-[#0F0F11]" value="start">Start</option>
+                <option className="bg-[#0F0F11]" value="skala">Skala</option>
+                <option className="bg-[#0F0F11]" value="lab">Lab / warsztat</option>
+              </select>
+            </label>
+            <label className="block space-y-2">
+              <span className="block font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">DZIEŃ</span>
+              <input required type="date" name="date" min={new Date().toISOString().slice(0,10)} value={form.date} onChange={(e)=>setForm({...form, date:e.target.value})} className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm text-white [color-scheme:dark] focus:outline-none focus:border-white/20"/>
+            </label>
+            <label className="block space-y-2">
+              <span className="block font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">GODZINA</span>
+              <select name="time" value={form.time} onChange={(e)=>setForm({...form, time:e.target.value})} className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm text-white [color-scheme:dark] focus:outline-none focus:border-white/20">
+                {["9:00","10:30","12:00","14:00","16:00","18:00"].map((t)=>(<option key={t} className="bg-[#0F0F11]" value={t}>{t}</option>))}
+              </select>
+            </label>
+          </div>
+          <label className="block space-y-2">
+            <span className="block font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">CO CHCESZ POPRAWIĆ</span>
+            <textarea name="message" rows={3} value={form.message} onChange={(e)=>setForm({...form, message:e.target.value})} placeholder="np. pusty kalendarz w weekendy, brak zdjęć w Mapach…" className="w-full rounded-[20px] border border-white/10 bg-white/[0.02] px-5 py-4 font-[Inter] font-light text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-white/20"/>
+          </label>
+          <BtnPrimary type="submit" className="w-full h-[48px] text-[11px]">WYŚLIJ ZAPYTANIE O TERMIN <ArrowRight className="h-4 w-4 opacity-60" /></BtnPrimary>
+          <div className="text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.04em] text-white/20">Lub <button type="button" onClick={()=>navigate("/auth")} className="underline decoration-white/15 text-white/30 hover:text-white/60">zaloguj się</button> by zarządzać terminami</div>
+        </form>)}</div></Reveal>
         </div>
       </section>
 
