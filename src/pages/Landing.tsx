@@ -1,4 +1,4 @@
-import { motion, AnimatePresence, useScroll, useSpring, useTransform, useInView, useMotionValueEvent } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring, useTransform, useInView, useMotionValue, useMotionValueEvent } from "framer-motion";
 import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save, RefreshCw } from "lucide-react";
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router";
@@ -1011,8 +1011,13 @@ export default function Landing() {
   const cinemaY2 = useTransform(cinemaProgress, [0, 1], ["6%", "-10%"]);
   const cinemaText = useTransform(cinemaProgress, [0, 0.5], ["-40px", "0px"]);
   const progress = useTransform(scrollYProgress, [0,1], [0,1]);
-  /* pasek boczny wjeżdża dopiero po minięciu hero */
-  const navFade = useSpring(useTransform(scrollY, [520, 940], [0, 1]), { stiffness: 120, damping: 28 });
+  /* pasek boczny pokazuje się po kliknięciu Q w nagłówku */
+  const [navOpen, setNavOpen] = useState(false);
+  const navTarget = useMotionValue(0);
+  const navFade = useSpring(navTarget, { stiffness: 120, damping: 28 });
+  useEffect(() => {
+    navTarget.set(navOpen ? 1 : 0);
+  }, [navOpen, navTarget]);
   const navShift = useTransform(navFade, [0, 1], [-26, 0]);
   const navBlur = useTransform(navFade, [0, 1], [14, 0]);
   /* górny pasek chowa się przy jeździe w dół i wraca przy powrocie */
@@ -1094,7 +1099,7 @@ export default function Landing() {
           pointerEvents: "none",
         }}
       />
-      {/* boczny pasek nawigacji — znak QRAFT w szkle, wjeżdża po minięciu hero */}
+      {/* boczny pasek nawigacji (LineSidebar) — otwiera go kliknięcie Q w nagłówku */}
       <div className="hidden min-[1640px]:block fixed left-3 top-1/2 z-40 -translate-y-1/2">
         <motion.aside
           aria-label="Nawigacja strony"
@@ -1102,6 +1107,7 @@ export default function Landing() {
             opacity: navFade,
             x: navShift,
             filter: navBlur,
+            pointerEvents: navOpen ? "auto" : "none",
             background: inProcess ? "rgba(247,247,245,0.45)" : "rgba(12,12,15,0.34)",
             borderColor: inProcess ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.10)",
             boxShadow: inProcess
@@ -1172,18 +1178,24 @@ export default function Landing() {
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className="sticky top-0 z-40 bg-[#050507]/28 backdrop-blur-[28px] backdrop-saturate-[1.5] border-b border-white/[0.08] supports-[backdrop-filter]:bg-[#050507]/20" style={{ WebkitBackdropFilter: "blur(28px) saturate(1.5)" } as any}>
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 h-[72px] flex items-center justify-between">
-          <motion.button
-            onClick={()=>window.scrollTo({top:0,behavior:"smooth"})}
+          <motion.div
             animate={{ y: barHidden ? 12 : 0, opacity: barHidden ? 0 : 1 }}
             transition={{ duration: 0.45, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
             className="flex items-center gap-4"
           >
-            <div className="h-[32px] w-[32px] rounded-[10px] border border-white/15 bg-white/[0.02] grid place-items-center">
+            <button
+              onClick={()=>setNavOpen((v)=>!v)}
+              aria-label={navOpen ? "Ukryj nawigację" : "Pokaż nawigację"}
+              aria-expanded={navOpen}
+              className={`h-[32px] w-[32px] rounded-[10px] border grid place-items-center cursor-pointer transition-all duration-300 ${navOpen ? "bg-white text-black border-white" : "border-white/15 bg-white/[0.02] hover:border-white/45 hover:bg-white/[0.08]"}`}
+            >
               <span className="font-[Instrument_Serif] text-[16px]">Q</span>
-            </div>
-            <span className="font-[Space_Grotesk] font-light tracking-[0.28em] text-[12px]">QRAFT</span>
-            <span className="hidden lg:inline font-[JetBrains_Mono] font-light text-[10px] tracking-[0.18em] text-white/25 border-l border-white/10 pl-4 ml-1">PERFEKCJA BUDUJE MARKI</span>
-          </motion.button>
+            </button>
+            <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} className="flex items-center gap-4 cursor-pointer">
+              <span className="font-[Space_Grotesk] font-light tracking-[0.28em] text-[12px]">QRAFT</span>
+              <span className="hidden lg:inline font-[JetBrains_Mono] font-light text-[10px] tracking-[0.18em] text-white/25 border-l border-white/10 pl-4 ml-1">PERFEKCJA BUDUJE MARKI</span>
+            </button>
+          </motion.div>
           <motion.nav
             animate={{ y: barHidden ? 12 : 0, opacity: barHidden ? 0 : 1 }}
             transition={{ duration: 0.45, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
@@ -1311,7 +1323,7 @@ export default function Landing() {
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              <h1 className="font-[Space_Grotesk] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[52px] sm:text-[92px] lg:text-[152px]">
+              <h1 className="font-[Space_Grotesk] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[clamp(40px,7.8vw,100px)]">
                 <span className="block text-white">Precision</span>
                 <span className="block text-white">Builds</span>
                 <span className="block text-transparent" style={{ WebkitTextStroke: "1.2px rgba(255,255,255,0.6)" }}>
