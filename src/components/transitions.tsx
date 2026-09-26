@@ -47,11 +47,11 @@ function bezier(str: string) {
 
 /* ------------------------- 1) Number pop-in ------------------------ */
 
-export function usePopIn<T extends HTMLElement>(deps: unknown[] = []) {
+export function usePopIn<T extends HTMLElement>(deps: unknown[] = [], enabled = true) {
   const ref = useRef<T>(null);
   const inView = useInView(ref, { once: true, margin: "-10%" });
   useEffect(() => {
-    if (!inView) return;
+    if (!inView || !enabled) return;
     const el = ref.current;
     if (!el) return;
     el.classList.remove("is-animating");

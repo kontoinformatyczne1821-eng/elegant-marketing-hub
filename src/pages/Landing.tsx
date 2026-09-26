@@ -1,12 +1,12 @@
 import { motion, AnimatePresence, useScroll, useTransform, useInView } from "framer-motion";
-import { ArrowUpRight, ArrowRight, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save } from "lucide-react";
+import { ArrowUpRight, ArrowRight, ArrowLeft, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, usePopIn } from "@/components/transitions";
 
-function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean }) {
+function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, popKey }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean; popKey?: string }) {
   const [val, setVal] = useState(def);
-  const popRef = usePopIn<HTMLSpanElement>([val]);
+  const popRef = usePopIn<HTMLSpanElement>([val, popKey], popKey !== "off");
   useEffect(() => {
     try {
       const saved = localStorage.getItem(ek);
@@ -366,6 +366,241 @@ function CountUp({ to, suffix = "", decimals = 0 }: { to: number; suffix?: strin
   );
 }
 
+/* ---------------- spiral plan showcase (desktop) ------------------ */
+
+function useDesktop() {
+  const [on, setOn] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setOn(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+  return on;
+}
+
+/** off = -1 / 0 / 1 — position on a cylinder wound into a spiral. */
+const SPIRAL_R = 340;
+function spiralAt(off: number) {
+  const a = off * 0.7;
+  return {
+    x: Math.sin(a) * SPIRAL_R,
+    y: (1 - Math.cos(a)) * 150,
+    rotate: Math.sin(a) * 11,
+    scale: 1 - Math.abs(off) * 0.07,
+    opacity: off === 0 ? 1 : 0.4,
+    filter: off === 0 ? "blur(0px)" : "blur(1.5px)",
+    zIndex: 20 - Math.abs(off) * 10,
+  };
+}
+
+function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () => void }) {
+  const L = plans.length;
+  const [active, setActive] = useState(1);
+  const isDesktop = useDesktop();
+  const signed = (n: number) => {
+    const m = ((n % L) + L) % L;
+    return m > L / 2 ? m - L : m;
+  };
+  const turn = (d: number) => setActive((a) => ((a + d) % L + L) % L);
+
+  return (
+    <>
+      <div className="relative mt-14 flex flex-col lg:block lg:h-[660px]">
+        {/* guide rings + floor light (desktop only) */}
+        <div
+          className="pointer-events-none absolute left-1/2 top-1/2 hidden lg:block"
+          style={{ width: 920, height: 480, transform: "translate(-50%,-50%)" }}
+        >
+          <div className="absolute inset-0 rounded-[50%] border border-white/[0.05]" />
+          <div className="absolute inset-[70px_-50px] rounded-[50%] border border-dashed border-white/[0.035]" />
+        </div>
+        <div
+          className="pointer-events-none absolute left-1/2 bottom-20 hidden lg:block rounded-[50%] blur-2xl -translate-x-1/2"
+          style={{
+            width: 640,
+            height: 90,
+            background:
+              "radial-gradient(ellipse at center, rgba(255,255,255,0.12), transparent 70%)",
+          }}
+        />
+
+        {plans.map((p, i) => {
+          const off = signed(i - active);
+          const pos = isDesktop
+            ? spiralAt(off)
+            : { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, filter: "blur(0px)", zIndex: 1 };
+          const cta = (
+            <EditableText
+              ek={`qraft.plan.${i}.cta`}
+              def={p.cta}
+              className="font-[JetBrains_Mono] font-light tracking-[0.14em]"
+              isEditing={isEditing}
+              as="span"
+            />
+          );
+          return (
+            <motion.div
+              key={p.name}
+              onClick={() => (off === 1 ? turn(1) : off === -1 ? turn(-1) : undefined)}
+              initial={false}
+              animate={pos}
+              transition={{ type: "spring", stiffness: 70, damping: 15, mass: 1.1 }}
+              style={{ transformOrigin: "50% 50%" }}
+              className={`relative mb-6 last:mb-0 lg:absolute lg:mb-0 lg:left-1/2 lg:top-1/2 lg:w-[360px] lg:-ml-[180px] lg:-mt-[300px] ${
+                off === 0 ? "cursor-default" : "cursor-pointer"
+              }`}
+            >
+              <div
+                className={`rounded-[28px] border p-8 flex flex-col h-full ${
+                  p.featured
+                    ? "bg-[#F7F7F5] text-black border-[#F7F7F5] shadow-[0_24px_64px_rgba(0,0,0,0.35)]"
+                    : "bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.3] border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_12px_40px_rgba(0,0,0,0.3)]"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span
+                    className={`font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] ${
+                      p.featured ? "text-black/35" : "text-white/25"
+                    }`}
+                  >
+                    <EditableText
+                      ek={`qraft.plan.${i}.name`}
+                      def={p.name.toUpperCase()}
+                      className="font-[JetBrains_Mono] font-light"
+                      isEditing={isEditing}
+                      as="span"
+                    />
+                  </span>
+                  {p.featured && (
+                    <span className="font-[JetBrains_Mono] font-light text-[10px] bg-black text-white rounded-full px-3 py-1">
+                      WYRÓŻNIONY
+                    </span>
+                  )}
+                </div>
+                <div className="mt-8 flex items-baseline gap-2">
+                  <span className="font-[Cormorant_Garamond] font-light text-[36px] tracking-[-0.02em]">
+                    <EditableText
+                      ek={`qraft.plan.${i}.price`}
+                      def={p.price}
+                      className="font-[Cormorant_Garamond] font-light"
+                      isEditing={isEditing}
+                      as="span"
+                      pop
+                      popKey={off === 0 ? String(active) : "off"}
+                    />
+                  </span>
+                  <span
+                    className={`font-[JetBrains_Mono] font-light text-[11px] ${
+                      p.featured ? "text-black/35" : "text-white/25"
+                    }`}
+                  >
+                    <EditableText
+                      ek={`qraft.plan.${i}.sub`}
+                      def={p.sub}
+                      className="font-[JetBrains_Mono] font-light"
+                      isEditing={isEditing}
+                      as="span"
+                    />
+                  </span>
+                </div>
+                <EditableText
+                  ek={`qraft.plan.${i}.line`}
+                  def={p.line}
+                  className={`mt-2 block font-[Inter] font-light text-[14px] ${
+                    p.featured ? "text-black/45" : "text-white/30"
+                  }`}
+                  isEditing={isEditing}
+                  as="div"
+                />
+                <ul className="mt-8 space-y-3 flex-1">
+                  {p.pts.map((x, idx) => (
+                    <li
+                      key={x}
+                      className={`flex gap-3 font-[Inter] font-light text-[14px] ${
+                        p.featured ? "text-black/65" : "text-white/55"
+                      }`}
+                    >
+                      <Check
+                        className={`h-4 w-4 mt-0.5 shrink-0 ${
+                          p.featured ? "text-black/20" : "text-white/40"
+                        }`}
+                      />
+                      <EditableText
+                        ek={`qraft.plan.${i}.pt${idx}`}
+                        def={x}
+                        className="font-[Inter] font-light"
+                        isEditing={isEditing}
+                        as="span"
+                      />
+                    </li>
+                  ))}
+                </ul>
+                <div onClick={(e) => e.stopPropagation()} className="mt-10">
+                  {p.featured ? (
+                    <BtnDark onClick={onPick} className="w-full h-11 text-[11px]">
+                      {cta}
+                    </BtnDark>
+                  ) : (
+                    <BtnPrimary onClick={onPick} className="w-full h-11 text-[11px]">
+                      {cta}
+                    </BtnPrimary>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* desktop: spiral controls */}
+      <div className="mt-8 hidden lg:block">
+        <div className="text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-white/25">
+          KLIKNIJ PLAN — SPIRALA PRZESUNIE SIĘ DALEJ
+        </div>
+        <div className="mt-6 flex items-center justify-center gap-4">
+          <button
+            onClick={() => turn(-1)}
+            aria-label="Poprzedni plan"
+            className="h-11 w-11 grid place-items-center rounded-full border border-white/15 text-white/50 transition-colors duration-300 hover:text-white hover:border-white/40"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+          <div className="flex items-center gap-2">
+            {plans.map((p, i) => (
+              <button
+                key={p.name}
+                onClick={() => setActive(i)}
+                className="h-11 px-5 rounded-full border transition-colors duration-300"
+                style={
+                  i === active
+                    ? { backgroundColor: "#ffffff", borderColor: "#ffffff", color: "#0a0a0a" }
+                    : { borderColor: "rgba(255,255,255,0.14)", color: "rgba(255,255,255,0.5)" }
+                }
+              >
+                <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] flex items-center gap-2">
+                  <PopNumber text={`0${i + 1}`} />
+                  <span className="opacity-70">{p.name}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => turn(1)}
+            aria-label="Następny plan"
+            className="h-11 w-11 grid place-items-center rounded-full border border-white/15 text-white/50 transition-colors duration-300 hover:text-white hover:border-white/40"
+          >
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
 export default function Landing() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -648,21 +883,7 @@ export default function Landing() {
 
       <section id="pricing" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-24 lg:py-32">
         <Reveal><div className="text-center max-w-xl mx-auto"><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.2em] text-white/30">03 — PLANY</div><h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[42px] sm:text-[50px] tracking-[-0.02em] leading-none"><EditableText ek="qraft.pricing.h" def="Jasne ceny." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.pricing.sub" def="Miesiąc do miesiąca po 90 dniach. Bez zobowiązań. W odcieniach czerni — wyrafinowane." className="mt-4 block font-[Inter] font-light text-[15px] leading-7 text-white/30 max-w-[480px] mx-auto" isEditing={isEditing} as="p" /></div></Reveal>
-        <div className="mt-14 grid lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
-          {plans.map((p,i)=>(
-            <motion.div key={p.name} initial={{ opacity:0, y:14 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.6, delay:i*0.05, ease:[0.22,1,0.36,1]}} className={`rounded-[28px] border p-8 lg:p-9 flex flex-col ${p.featured?"bg-[#F7F7F5] text-black border-[#F7F7F5] shadow-[0_24px_64px_rgba(0,0,0,0.18)] lg:scale-[1.02]":"bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.3] border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_12px_40px_rgba(0,0,0,0.3)]"}`}>
-              <div className="flex items-center justify-between"><span className={`font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] ${p.featured?"text-black/35":"text-white/25"}`}><EditableText ek={`qraft.plan.${i}.name`} def={p.name.toUpperCase()} className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span>{p.featured&&<span className="font-[JetBrains_Mono] font-light text-[10px] bg-black text-white rounded-full px-3 py-1">WYRÓŻNIONY</span>}</div>
-              <div className="mt-8 flex items-baseline gap-2"><span className="font-[Cormorant_Garamond] font-light text-[36px] tracking-[-0.02em]"><EditableText ek={`qraft.plan.${i}.price`} def={p.price} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" pop /></span><span className={`font-[JetBrains_Mono] font-light text-[11px] ${p.featured?"text-black/35":"text-white/25"}`}><EditableText ek={`qraft.plan.${i}.sub`} def={p.sub} className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div>
-              <EditableText ek={`qraft.plan.${i}.line`} def={p.line} className={`mt-2 block font-[Inter] font-light text-[14px] ${p.featured?"text-black/45":"text-white/30"}`} isEditing={isEditing} as="div" />
-              <ul className="mt-8 space-y-3 flex-1">
-                {p.pts.map((x, idx)=>(
-                  <li key={x} className={`flex gap-3 font-[Inter] font-light text-[14px] ${p.featured?"text-black/65":"text-white/55"}`}><Check className={`h-4 w-4 mt-0.5 shrink-0 ${p.featured?"text-black/20":"text-white/40"}`}/><EditableText ek={`qraft.plan.${i}.pt${idx}`} def={x} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></li>
-                ))}
-              </ul>
-              {(() => { const inner = <EditableText ek={`qraft.plan.${i}.cta`} def={p.cta} className="font-[JetBrains_Mono] font-light tracking-[0.14em]" isEditing={isEditing} as="span" />; return p.featured ? <BtnDark onClick={()=>go("contact")} className="mt-10 w-full h-11 text-[11px]">{inner}</BtnDark> : <BtnPrimary onClick={()=>go("contact")} className="mt-10 w-full h-11 text-[11px]">{inner}</BtnPrimary>; })()}
-            </motion.div>
-          ))}
-        </div>
+        <Reveal><PlanShowcase isEditing={isEditing} onPick={()=>go("contact")} /></Reveal>
         <div className="mt-8 text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.06em] text-white/20"><EditableText ek="qraft.pricing.note" def="Start bez sesji zdjęciowej — dostępna od Skali. Szczegóły na audycie." className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div>
       </section>
 
