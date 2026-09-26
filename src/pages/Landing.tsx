@@ -1352,6 +1352,18 @@ export default function Landing() {
     sfxWhoosh(true);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+  /* wybrany pakiet trafia od razu do zapytania o audyt */
+  const pickPlan = (i: number) => {
+    sfxConfirm();
+    setChosenPlan(i);
+    setForm((f) => ({ ...f, service: plans[i].name.toLowerCase() }));
+    go("promo");
+  };
+  /* anulowanie wyboru odblokowuje znowu pasek pakietów */
+  const clearPlan = () => {
+    sfxTap();
+    setChosenPlan(null);
+  };
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.email || !form.name || !form.date) return;
@@ -1844,7 +1856,7 @@ export default function Landing() {
         <Reveal><div className="text-center max-w-xl mx-auto"><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.2em] text-white/30">03 — PLANY</div><h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[27px] sm:text-[50px] tracking-[-0.02em] leading-none"><EditableText ek="qraft.pricing.h" def="Jasne ceny." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.pricing.sub" def="Miesiąc do miesiąca po 90 dniach. Bez zobowiązań. W odcieniach czerni — wyrafinowane." className="mt-4 block font-[Inter] font-light text-[14px] sm:text-[15px] leading-7 text-white/50 max-w-[480px] mx-auto" isEditing={isEditing} as="p" /></div></Reveal>
         <Reveal><PlanShowcase
           isEditing={isEditing}
-          onPick={(i)=>{ sfxConfirm(); setChosenPlan(i); go("promo"); }}
+          onPick={pickPlan}
           recommended={recommended}
           pickedCount={picked.length}
           onWhiteHover={setOverWhiteCard}
@@ -2023,13 +2035,50 @@ export default function Landing() {
               </div>
 
               <div className="mt-7">
-                <SlidingTabs
-                  items={auditServices.map((s) => ({ id: s.id, label: s.label }))}
-                  value={form.service}
-                  onChange={(id) => setForm({ ...form, service: id })}
-                  className="t-tabs--fill"
-                  tabClassName="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.12em]"
-                />
+                <AnimatePresence mode="wait" initial={false}>
+                  {chosenPlan !== null ? (
+                    <motion.div
+                      key="picked"
+                      initial={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      exit={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+                      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                      className="flex items-center justify-between gap-3 rounded-[14px] border border-[#7DF0AE]/45 bg-[#0A120E] px-4 py-3"
+                    >
+                      <span className="min-w-0">
+                        <span className="block font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.18em] text-[#7DF0AE]">
+                          PAKIET WYBRANY
+                        </span>
+                        <span className="mt-1 block font-[Space_Grotesk] font-light text-[14px] sm:text-[16px] text-white">
+                          {svc.label}
+                          <span className="text-white/45"> · {svc.note}</span>
+                        </span>
+                      </span>
+                      <button
+                        onClick={clearPlan}
+                        className="shrink-0 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.14em] text-white/50 underline underline-offset-4 transition-colors duration-300 hover:text-white"
+                      >
+                        ZMIEŁ
+                      </button>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="tabs"
+                      initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+                      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <SlidingTabs
+                        items={auditServices.map((s) => ({ id: s.id, label: s.label }))}
+                        value={form.service}
+                        onChange={(id) => { sfxPop(); setForm({ ...form, service: id }); }}
+                        className="t-tabs--fill"
+                        tabClassName="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.12em]"
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <span className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.12em] text-white/40">W ZAKRESIE</span>
                   <span className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.1em] text-white/45 text-right">
