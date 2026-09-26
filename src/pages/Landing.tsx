@@ -307,10 +307,26 @@ function spiralAt(off: number) {
   };
 }
 
-function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () => void }) {
+function PlanShowcase({
+  isEditing,
+  onPick,
+  recommended = 1,
+  pickedCount = 0,
+}: {
+  isEditing: boolean;
+  onPick: () => void;
+  recommended?: number;
+  pickedCount?: number;
+}) {
   const L = plans.length;
-  const [active, setActive] = useState(1);
+  const [active, setActive] = useState(recommended);
   const isDesktop = useDesktop();
+  const stageRef = useRef<HTMLDivElement>(null);
+  /* wjeżdżając w sekcję planów podpowiadamy pakiet dobrany do liczby modułów */
+  const inView = useInView(stageRef, { amount: 0.25, margin: "0px 0px -12% 0px" });
+  useEffect(() => {
+    if (inView) setActive(recommended);
+  }, [inView, recommended]);
   const signed = (n: number) => {
     const m = ((n % L) + L) % L;
     return m > L / 2 ? m - L : m;
@@ -319,7 +335,7 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
 
   return (
     <>
-      <div className="relative mt-14 flex flex-col lg:block lg:h-[660px]">
+      <div ref={stageRef} className="relative mt-14 flex flex-col lg:block lg:h-[660px]">
         {/* strzałki obok wybranego planu, nie pod nim */}
         <button
           onClick={() => turn(-1)}
@@ -406,6 +422,13 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
                 {!front && (
                   <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
                 )}
+                {/* pakiet dobrany do liczby zaznaczonych modułów */}
+                {i === recommended && (
+                  <div className="absolute right-0 top-0 z-20 flex items-center gap-2 rounded-bl-[22px] rounded-tr-[28px] bg-[#7DF0AE] px-4 py-2.5 font-[JetBrains_Mono] font-light text-[9px] tracking-[0.16em] text-black">
+                    <span className="h-1.5 w-1.5 rounded-full bg-black/55" />
+                    IDEALNY DLA CIEBIE
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <span
                     className={`font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] ${
@@ -420,7 +443,7 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
                       as="span"
                     />
                   </span>
-                  {p.featured && (
+                  {p.featured && i !== recommended && (
                     <span
                       className={`font-[JetBrains_Mono] font-light text-[10px] rounded-full px-3 py-1 ${
                         front
@@ -490,8 +513,10 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
                     </li>
                   ))}
                 </ul>
+                {/* guzik wyboru musi być czytelny na obu wariantach karty:
+                    front jest biały → przycisk ciemny, karty boczne szklane → jasny */}
                 <div onClick={(e) => e.stopPropagation()} className="mt-10">
-                  {p.featured ? (
+                  {front ? (
                     <BtnDark onClick={onPick} className="w-full h-11 text-[11px]">
                       {cta}
                     </BtnDark>
@@ -510,24 +535,48 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
 
       {/* desktop: spiral controls */}
       <div className="mt-8 hidden lg:block">
-        <div className="text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-white/25">
-          KLIKNIJ PLAN — SPIRALA PRZESUNIE SIĘ DALEJ
+        <div className="text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-white/30">
+          WYBIERZ PAKIET
+          <span className="mx-2 text-white/15">/</span>
+          {pickedCount > 0 ? (
+            <span className="text-[#7DF0AE]">DOPASOWANE DO {pickedCount} MODUŁÓW</span>
+          ) : (
+            <span className="text-white/20">OD 3 KM W TWOIM MIEŚCIE</span>
+          )}
         </div>
-        <div className="mt-6 flex items-center justify-center gap-2">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
           {plans.map((p, i) => (
             <button
               key={p.name}
               onClick={() => setActive(i)}
-              className="h-11 px-5 rounded-full border transition-colors duration-300"
+              className="h-12 px-6 rounded-full border transition-all duration-300 hover:-translate-y-0.5"
               style={
                 i === active
-                  ? { backgroundColor: "#ffffff", borderColor: "#ffffff", color: "#0a0a0a" }
-                  : { borderColor: "rgba(255,255,255,0.14)", color: "rgba(255,255,255,0.5)" }
+                  ? {
+                      backgroundColor: "#ffffff",
+                      borderColor: "#ffffff",
+                      color: "#0a0a0a",
+                      boxShadow: "0 12px 34px rgba(0,0,0,0.4)",
+                    }
+                  : i === recommended
+                    ? {
+                        borderColor: "rgba(125,240,174,0.55)",
+                        backgroundColor: "rgba(125,240,174,0.07)",
+                        color: "rgba(125,240,174,0.95)",
+                      }
+                    : { borderColor: "rgba(255,255,255,0.14)", color: "rgba(255,255,255,0.5)" }
               }
             >
               <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] flex items-center gap-2">
-                <PopNumber text={`0${i + 1}`} />
-                <span className="opacity-70">{p.name}</span>
+                {i === active ? (
+                  <Check className="h-3.5 w-3.5" />
+                ) : (
+                  <PopNumber text={`0${i + 1}`} />
+                )}
+                <span className="opacity-80">{p.name}</span>
+                {i === recommended && i !== active && (
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#7DF0AE]" />
+                )}
               </span>
             </button>
           ))}
@@ -931,6 +980,11 @@ export default function Landing() {
   const atPageEnd = useAtPageEnd();
   const finePointer = useFinePointer();
   const spy = useSectionSpy(SIDEBAR_IDS);
+  /* zaznaczone moduły w SYSTEM napędzają rekomendowany pakiet */
+  const [picked, setPicked] = useState<number[]>([]);
+  const toggleModule = (i: number) =>
+    setPicked((p) => (p.includes(i) ? p.filter((x) => x !== i) : [...p, i]));
+  const recommended = picked.length > 3 ? 2 : 1;
   const cinemaRef = useRef<HTMLElement>(null);
   const { scrollY, scrollYProgress } = useScroll();
   const { scrollYProgress: cinemaProgress } = useScroll({ target: cinemaRef, offset: ["start end", "end start"] });
@@ -960,20 +1014,6 @@ export default function Landing() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&family=Space+Grotesk:wght@300;400&display=swap'); html{scroll-behavior:smooth} @keyframes qmarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}} @keyframes qmsheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}} @keyframes qmbreathe{0%,100%{opacity:.35}50%{opacity:.9}}`}</style>
       <motion.div className="fixed top-0 inset-x-0 h-[1px] bg-white/80 z-50 origin-left" style={{ scaleX: progress }} />
       <FlowBackdrop />
-      <GradualBlur
-        target="page"
-        position="top"
-        height="9rem"
-        strength={3}
-        divCount={10}
-        curve="bezier"
-        exponential={false}
-        opacity={1}
-        animated="scroll"
-        duration="0.4s"
-        easing="ease-out"
-        style={{ zIndex: 30 }}
-      />
       <GradualBlur
         target="page"
         position="bottom"
@@ -1305,9 +1345,11 @@ export default function Landing() {
               <FlipCard
                 fill
                 editable={isEditing}
+                selected={picked.includes(i)}
+                onActivate={() => toggleModule(i)}
                 axis="y"
                 ariaLabel={`Modu\u0142 ${s.n} \u2014 ${s.title}`}
-                background="#0A0A0D"
+                background={picked.includes(i) ? "#0A120E" : "#0A0A0D"}
                 color="#F2F2F0"
                 radius={24}
                 width={420}
@@ -1342,8 +1384,26 @@ export default function Landing() {
                           <EditableText ek={`qraft.service.${i}.c`} def={s.cel} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
                         </p>
                       )}
-                      <div className="flex items-center gap-2 pt-3 font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.18em] text-white/25">
-                        {isEditing ? "TRYB EDYCJI \u2014 OBR\u00d3T WY\u0141\u0105CZONE" : <><RefreshCw className="h-3 w-3"/> OBR\u00d3\u0106 KAFEL</>}
+                      <div className="flex items-center justify-between gap-3 pt-3">
+                        {isEditing ? (
+                          <span className="font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.18em] text-white/25">TRYB EDYCJI</span>
+                        ) : (
+                          <span
+                            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-[JetBrains_Mono] font-light text-[9px] tracking-[0.16em] transition-colors duration-500 ${
+                              picked.includes(i)
+                                ? "border-[#7DF0AE]/60 bg-[#7DF0AE]/12 text-[#9BF3C0]"
+                                : "border-white/12 text-white/35"
+                            }`}
+                          >
+                            <span className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${picked.includes(i) ? "bg-[#7DF0AE]" : "bg-white/25"}`} />
+                            {picked.includes(i) ? "W TWOIM SYSTEMIE" : "DODAJ DO SYSTEMU"}
+                          </span>
+                        )}
+                        {!isEditing && (
+                          <span className="flex items-center gap-2 font-[JetBrains_Mono] font-light text-[9px] tracking-[0.18em] text-white/25">
+                            <RefreshCw className="h-3 w-3"/> OBR\u00d3\u0106
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1367,15 +1427,26 @@ export default function Landing() {
                         </li>
                       ))}
                     </ul>
-                    <div className="relative mt-auto flex items-center justify-between gap-3 pt-6">
-                      <span className="font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.18em] text-white/25">COFNIJ</span>
-                      <button
-                        onPointerDown={(e)=>e.stopPropagation()}
-                        onClick={(e)=>{ e.stopPropagation(); go("contact"); }}
-                        className="inline-flex items-center gap-2 h-9 px-4 rounded-full bg-white text-black font-[JetBrains_Mono] font-light text-[10px] tracking-[0.14em]"
+                    <div className="relative mt-auto space-y-3 pt-6">
+                      <span
+                        className={`flex h-10 w-full items-center justify-center gap-2 rounded-full border font-[JetBrains_Mono] font-light text-[10px] tracking-[0.16em] transition-colors duration-500 ${
+                          picked.includes(i)
+                            ? "border-[#7DF0AE] bg-[#7DF0AE] text-black"
+                            : "border-white/20 text-white/75"
+                        }`}
                       >
-                        DODAJ DO SYSTEMU <ArrowRight className="h-3 w-3 opacity-60"/>
-                      </button>
+                        {picked.includes(i) ? <><Check className="h-3.5 w-3.5"/> W TWOIM SYSTEMIE</> : <>DODAJ DO SYSTEMU <ArrowRight className="h-3 w-3 opacity-60"/></>}
+                      </span>
+                      <div className="flex items-center justify-between font-[JetBrains_Mono] font-light text-[9px] tracking-[0.18em]">
+                        <span className="text-white/25">COFNIJ</span>
+                        <button
+                          onPointerDown={(e)=>e.stopPropagation()}
+                          onClick={(e)=>{ e.stopPropagation(); go("contact"); }}
+                          className="text-white/50 transition-colors duration-300 hover:text-white"
+                        >
+                          SPRAWDZIMY NA AUDYCIE \u2192
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1399,7 +1470,12 @@ export default function Landing() {
 
       <section id="pricing" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-24 lg:py-32">
         <Reveal><div className="text-center max-w-xl mx-auto"><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.2em] text-white/30">03 — PLANY</div><h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[42px] sm:text-[50px] tracking-[-0.02em] leading-none"><EditableText ek="qraft.pricing.h" def="Jasne ceny." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.pricing.sub" def="Miesiąc do miesiąca po 90 dniach. Bez zobowiązań. W odcieniach czerni — wyrafinowane." className="mt-4 block font-[Inter] font-light text-[15px] leading-7 text-white/50 max-w-[480px] mx-auto" isEditing={isEditing} as="p" /></div></Reveal>
-        <Reveal><PlanShowcase isEditing={isEditing} onPick={()=>go("contact")} /></Reveal>
+        <Reveal><PlanShowcase
+          isEditing={isEditing}
+          onPick={()=>go("contact")}
+          recommended={recommended}
+          pickedCount={picked.length}
+        /></Reveal>
         <div className="mt-8 text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.06em] text-white/20"><EditableText ek="qraft.pricing.note2" def="Start bez sesji zdjęciowej — dostępna od Signature. Szczegóły na audycie." className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div>
       </section>
 

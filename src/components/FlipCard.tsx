@@ -88,6 +88,10 @@ export interface FlipCardProps {
   fill?: boolean;
   /** Lets the text inside be selected and edited (disables the grab cursor). */
   editable?: boolean;
+  /** Marks the card as picked — adds a green ring and glow. */
+  selected?: boolean;
+  /** Fires on a tap / key press that turns the card over. */
+  onActivate?: () => void;
   /** Dimmed, flat and inert. */
   disabled?: boolean;
   /** Accessible name. The face is carried by aria-pressed. */
@@ -123,6 +127,8 @@ const FlipCard = ({
   shadowOpacity = 0.45,
   fill = false,
   editable = false,
+  selected = false,
+  onActivate,
   disabled = false,
   ariaLabel = "Flip card",
   className = "",
@@ -178,6 +184,7 @@ const FlipCard = ({
 
   const flip = (instant: boolean) => {
     const base = snap(turn.get());
+    onActivate?.();
     settle(isBack(base) ? base - 180 : base + 180, 0, instant);
   };
 
@@ -294,7 +301,7 @@ const FlipCard = ({
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (disabled || (e.key !== "Enter" && e.key !== " ")) return;
     e.preventDefault();
-    if (!e.repeat) flip(true);
+    if (!e.repeat && flipOnClick) flip(true);
   };
 
   const onClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -320,6 +327,7 @@ const FlipCard = ({
       data-axis={axis}
       data-fill={fill ? "" : undefined}
       data-editable={editable ? "" : undefined}
+      data-selected={selected ? "" : undefined}
       data-draggable={draggable && !disabled && !reduce ? "" : undefined}
       data-dragging={dragging ? "" : undefined}
       data-disabled={disabled ? "" : undefined}
