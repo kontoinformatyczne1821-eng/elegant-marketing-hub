@@ -6,6 +6,7 @@ import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } fr
 import GradualBlur from "@/components/GradualBlur";
 import FlipCard from "@/components/FlipCard";
 import WarpText from "@/components/WarpText";
+import BorderGlow from "@/components/BorderGlow";
 import LineSidebar from "@/components/LineSidebar";
 import QraftMark from "@/components/QraftMark";
 
@@ -1423,13 +1424,29 @@ export default function Landing() {
         </Reveal>
         <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
           {serviceDefaults.map((s,i)=>(
-            <motion.div
+            /* zaznaczony moduł = zapalone szkło w kolorze systemu */
+            <BorderGlow
               key={s.n}
+              active={picked.includes(i)}
+              animated={picked.includes(i)}
+              followPointer={false}
+              glowAngle={112}
+              glowColor="150 72% 58%"
+              colors={["#7DF0AE", "#2DD4A7", "#0EA5E9"]}
+              backgroundColor="transparent"
+              borderRadius={24}
+              glowRadius={24}
+              glowIntensity={0.9}
+              coneSpread={30}
+              fillOpacity={0}
+              className="h-[330px] sm:h-[348px]"
+            >
+            <motion.div
               initial={{ opacity:0, y:14 }}
               whileInView={{ opacity:1, y:0 }}
               viewport={{ once:true }}
               transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}}
-              className="h-[330px] sm:h-[348px]"
+              className="h-full"
             >
               <FlipCard
                 fill
@@ -1541,6 +1558,7 @@ export default function Landing() {
                 )}
               />
             </motion.div>
+            </BorderGlow>
           ))}
         </div>
         <div className="mt-10 flex flex-col sm:flex-row justify-between gap-4 font-[JetBrains_Mono] font-light text-[11px]">
