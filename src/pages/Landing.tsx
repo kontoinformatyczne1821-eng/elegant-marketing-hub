@@ -8,7 +8,6 @@ import FlipCard from "@/components/FlipCard";
 import LineSidebar from "@/components/LineSidebar";
 import QraftMark from "@/components/QraftMark";
 import GlowCursor from "@/components/GlowCursor";
-import GlareHover from "@/components/GlareHover";
 import PixelTrail from "@/components/PixelTrail";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import type { StaggeredMenuItem } from "@/components/StaggeredMenu";
@@ -450,9 +449,11 @@ function PlanShowcase({
   onPick,
   recommended = 1,
   pickedCount = 0,
+  onWhiteHover,
 }: {
   isEditing: boolean;
   onPick: () => void;
+  onWhiteHover: (on: boolean) => void;
   recommended?: number;
   pickedCount?: number;
 }) {
@@ -524,6 +525,8 @@ function PlanShowcase({
             <motion.div
               key={p.name}
               onClick={() => (off === 1 ? turn(1) : off === -1 ? turn(-1) : undefined)}
+              onPointerEnter={() => { if (front) onWhiteHover(true); }}
+              onPointerLeave={() => { if (front) onWhiteHover(false); }}
               initial={false}
               animate={pos}
               transition={{ type: "spring", stiffness: 70, damping: 15, mass: 1.1 }}
@@ -545,19 +548,6 @@ function PlanShowcase({
                   filter: "blur(30px)",
                 }}
               />
-              <GlareHover
-                width="100%"
-                height="100%"
-                background="transparent"
-                borderRadius="28px"
-                borderColor="transparent"
-                glareColor={front ? "#0a0a0a" : "#ffffff"}
-                glareOpacity={front ? 0.14 : 0}
-                glareAngle={-30}
-                glareSize={320}
-                transitionDuration={850}
-                style={{ display: "block", border: "none", outline: "none" }}
-              >
               <div
                 className={`relative overflow-hidden rounded-[28px] border p-8 flex flex-col h-full transition-colors duration-500 ${
                   front
@@ -674,7 +664,6 @@ function PlanShowcase({
                   )}
                 </div>
               </div>
-              </GlareHover>
             </motion.div>
           );
         })}
@@ -1078,6 +1067,9 @@ export default function Landing() {
   const [isEditing, setIsEditing] = useState(false);
   /* w sekcji PROCES tło jest jasne — kursor przechodzi na czarne światło */
   const [inProcess, setInProcess] = useState(false);
+  /* biała karta frontowa PLANY — ślad kursora robi się czarny */
+  const [overWhiteCard, setOverWhiteCard] = useState(false);
+  const darkCursor = inProcess || overWhiteCard;
   const atPageEnd = useAtPageEnd();
   /* ślad pikselowy w hero ma sens tylko dla myszy/trackpada */
   const finePointer = useFinePointer();
@@ -1161,23 +1153,23 @@ export default function Landing() {
       <GlowCursor
         globalPointer
         enabled={!REDUCE_MOTION}
-        color={inProcess ? "#0a0a0a" : "#ffffff"}
-        secondaryColor={inProcess ? "#3c3e3d" : "#c9c9cf"}
+        color={darkCursor ? "#0a0a0a" : "#ffffff"}
+        secondaryColor={darkCursor ? "#3c3e3d" : "#c9c9cf"}
         trailLength={38}
         trailWidth={6}
         trailTaper={0.82}
         followSpeed={0.16}
         glowIntensity={1.7}
         glowSpread={1.15}
-        hotspot={inProcess ? 0.05 : 0.7}
-        brightness={inProcess ? 0.9 : 1.2}
-        opacity={inProcess ? 0.42 : 0.5}
+        hotspot={darkCursor ? 0.05 : 0.7}
+        brightness={darkCursor ? 0.9 : 1.2}
+        opacity={darkCursor ? 0.42 : 0.5}
         pulseSpeed={1.1}
         noiseStrength={0.03}
         idleFade
         idleTimeout={700}
         fadeDuration={600}
-        blendMode={inProcess ? "normal" : "screen"}
+        blendMode={darkCursor ? "normal" : "screen"}
         maxDevicePixelRatio={1.25}
         style={{
           position: "fixed",
@@ -1612,6 +1604,7 @@ export default function Landing() {
           onPick={()=>go("contact")}
           recommended={recommended}
           pickedCount={picked.length}
+          onWhiteHover={setOverWhiteCard}
         /></Reveal>
         <div className="mt-8 text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.06em] text-white/20"><EditableText ek="qraft.pricing.note2" def="Start bez sesji zdjęciowej — dostępna od Signature. Szczegóły na audycie." className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div>
       </section>
