@@ -383,12 +383,11 @@ export default function Landing() {
   const cinemaRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll();
   const { scrollYProgress: cinemaProgress } = useScroll({ target: cinemaRef, offset: ["start end", "end start"] });
-  const cinemaY = useTransform(cinemaProgress, [0, 1], ["-12%", "12%"]);
+  const cinemaY = useTransform(cinemaProgress, [0, 1], ["-14%", "14%"]);
+  const cinemaY2 = useTransform(cinemaProgress, [0, 1], ["6%", "-10%"]);
   const cinemaText = useTransform(cinemaProgress, [0, 0.5], ["-40px", "0px"]);
   const heroY = useTransform(scrollYProgress, [0,0.22], [0,-40]);
   const progress = useTransform(scrollYProgress, [0,1], [0,1]);
-  const cardY = useTransform(scrollYProgress, [0,0.3], [0, -12]);
-  const cardRotate = useTransform(scrollYProgress, [0,0.25], [0, -0.6]);
 
   const go = (id: string) => {
     setMobileOpen(false);
@@ -471,13 +470,13 @@ export default function Landing() {
       <section className="relative overflow-hidden">
         <SynapseBG />
         <motion.div style={{ y: heroY }} className="mx-auto max-w-[1280px] px-6 lg:px-8">
-          <div className="grid lg:grid-cols-[1.02fr_0.98fr] gap-10 lg:gap-14 pt-16 lg:pt-28 pb-12 lg:pb-20 items-center min-h-[540px]">
+          <div className="pt-20 lg:pt-32 pb-14 lg:pb-20 min-h-[calc(100vh-72px)] flex flex-col justify-center max-w-[1100px]">
             <div>
 
               <motion.h1 initial={{ opacity:0, y:16, filter:"blur(10px)" }} animate={{ opacity:1, y:0, filter:"blur(0px)" }} transition={{ duration:1, delay:0.08, ease:[0.22,1,0.36,1] }} className="mt-8 leading-[0.88] tracking-[-0.03em]">
                 <EditableText ek="qraft.hero.kicker" def="PERFEKCJA BUDUJE MARKI" className="block font-[JetBrains_Mono] font-light text-[11px] tracking-[0.24em] text-white/35 mb-4" isEditing={isEditing} as="span" />
-                <span className="block font-[Cormorant_Garamond] font-light text-[52px] sm:text-[64px] lg:text-[84px] leading-[0.9]"><EditableText ek="qraft.hero.title1" def="Perfekcja" className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span>
-                <span className="block font-[Cormorant_Garamond] font-light italic text-[52px] sm:text-[64px] lg:text-[84px] leading-[0.9] flex items-baseline gap-4 text-white/60">
+                <span className="block font-[Cormorant_Garamond] font-light text-[58px] sm:text-[78px] lg:text-[108px] leading-[0.88]"><EditableText ek="qraft.hero.title1" def="Perfekcja" className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span>
+                <span className="block font-[Cormorant_Garamond] font-light italic text-[58px] sm:text-[78px] lg:text-[108px] leading-[0.88] flex items-baseline gap-4 text-white/60">
                   <EditableText ek="qraft.hero.title2a" def="buduje" className="font-[Cormorant_Garamond] font-light italic" isEditing={isEditing} as="span" />
                   <EditableText ek="qraft.hero.title2b" def="marki." className="font-[Cormorant_Garamond] not-italic font-light text-white" isEditing={isEditing} as="span" />
                 </span>
@@ -486,7 +485,7 @@ export default function Landing() {
                   <EditableText
                     ek="qraft.hero.desc"
                     def="Techniczny Atelier"
-                    className="block font-[Instrument_Serif] italic text-[36px] sm:text-[48px] leading-[1.02] tracking-[-0.015em] text-white/85 hover:text-white transition-colors duration-500 ease-out cursor-default"
+                    className="block font-[Instrument_Serif] italic text-[40px] sm:text-[54px] leading-[1.02] tracking-[-0.015em] text-white/85 hover:text-white transition-colors duration-500 ease-out cursor-default"
                     isEditing={isEditing}
                     as="span"
                   />
@@ -523,48 +522,6 @@ export default function Landing() {
               </motion.div>
             </div>
 
-            <motion.div style={{ y: cardY, rotate: cardRotate }} initial={{ opacity:0, y:20, scale:0.99 }} animate={{ opacity:1, y:0, scale:1 }} transition={{ duration:1, delay:0.2, ease:[0.22,1,0.36,1]}} className="relative hidden lg:block">
-              <div className="bg-white/[0.03] backdrop-blur-[32px] backdrop-saturate-[1.5] border border-white/12 rounded-[32px] p-4" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.08), 0 24px 64px rgba(0,0,0,0.45)", WebkitBackdropFilter: "blur(32px) saturate(1.5)" } as any}>
-                <div className="flex items-center justify-between px-3 pb-4 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.16em] text-white/25">
-                  <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-white/60"/> QRAFT — LIVE</span>
-                  <span className="flex gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-white/12"/><span className="h-1.5 w-1.5 rounded-full bg-white/12"/><span className="h-1.5 w-1.5 rounded-full bg-white/70"/></span>
-                </div>
-                <div className="rounded-[24px] overflow-hidden bg-[#0A0A0B] border border-white/[0.06]">
-                  <div className="aspect-[4/2.5] relative overflow-hidden">
-                    <motion.img style={{ y: useTransform(scrollYProgress, [0,0.3], [0,14]) }} src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=1000&q=80&auto=format&fit=crop" alt="Atelier" className="h-full w-full object-cover opacity-[0.78] scale-[1.02] grayscale-[0.15]"/>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"/>
-                    <div className="absolute bottom-4 left-4 right-4 bg-[#F7F7F5] rounded-[18px] p-4 flex items-center justify-between">
-                      <div><div className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.14em] text-black/30">KLIENCI · 90 DNI</div><div className="font-[Cormorant_Garamond] font-light text-[26px] leading-none mt-1 text-black tracking-[-0.02em]">+187% <span className="font-[Inter] font-light text-[10px] text-black/40 tracking-normal align-middle">▲</span></div></div>
-                      <div className="h-9 w-[88px] flex items-end gap-[3px]">
-                        {[4,6,5,8,6,9,7,10].map((h,i)=>(
-                          <motion.div key={i} initial={{ height:6 }} whileInView={{ height: h*3.4 }} viewport={{ once:true }} transition={{ duration:0.8, delay:i*0.05, ease:[0.22,1,0.36,1]}} className="flex-1 rounded-sm" style={{ background: i===7?"#111111": i>5?"#2A2A2E":"#D9D9D9" }}/>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 divide-x divide-white/5 bg-[#0A0A0A]">
-                    {[["#1","MAPY"],["2,4×","ZAPYTANIA"],["+41%","ŚRODEK TYG."]].map(([k,v])=>(
-                      <div key={k} className="py-4 text-center"><div className="font-[Cormorant_Garamond] font-light text-white text-[18px] tracking-[-0.02em]">{k}</div><div className="font-[JetBrains_Mono] font-light text-[9px] tracking-[0.12em] text-white/30 mt-1">{v}</div></div>
-                    ))}
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center justify-between bg-[#F7F7F5] rounded-full pl-5 pr-2 py-2">
-                  <div><div className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.14em] text-black/35">NASTĘPNY AUDYT</div><div className="font-[Inter] font-light text-[13px] text-black tracking-[-0.01em]">Dwa terminy w tym tygodniu</div></div>
-                  <button onClick={()=>go("contact")} className="h-9 w-9 grid place-items-center rounded-full border border-black/15 bg-black text-white transition-all duration-500 hover:bg-white hover:text-black"><ArrowUpRight className="h-4 w-4" /></button>
-                </div>
-              </div>
-              <div className="mt-4 text-center font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/15">SCROLL — SYNAPSA BUDUJE SIĘ W RYTMIE RUCHU</div>
-            </motion.div>
-
-            <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.4 }} className="lg:hidden bg-white/[0.03] border border-white/10 rounded-[24px] p-3 backdrop-blur">
-              <div className="rounded-[20px] overflow-hidden bg-[#0A0A0B] border border-white/5">
-                <img src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=800&q=80&auto=format&fit=crop" alt="Atelier" className="h-52 w-full object-cover opacity-80 grayscale-[0.2]"/>
-                <div className="p-4 flex items-center justify-between bg-[#F7F7F5]">
-                  <div><div className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-black/40">KLIENCI · 90 DNI</div><div className="font-[Cormorant_Garamond] font-light text-[22px] text-black">+187% <span className="text-black/30 text-xs">▲</span></div></div>
-                  <div className="h-8 w-20 flex items-end gap-1">{[4,6,5,8,6,9].map((h,i)=>(<div key={i} className="flex-1 rounded-sm bg-[#111111]" style={{ height: h*3 }} />))}</div>
-                </div>
-              </div>
-            </motion.div>
           </div>
           <Reveal><div className="border-y border-white/[0.05] py-5 flex items-center gap-6 overflow-hidden"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.16em] text-white/20 shrink-0">ZBUDOWANE DLA</span><div className="relative flex-1 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
               <div className="flex w-max items-center font-[Space_Grotesk] font-light text-white/35 text-[12px] tracking-[0.14em] whitespace-nowrap" style={{ animation: "qmarquee 34s linear infinite" }}>
@@ -622,65 +579,99 @@ export default function Landing() {
       </section>
 
       <section ref={cinemaRef} className="relative overflow-hidden">
-        {/* photo */}
-        <motion.div style={{ y: cinemaY }} className="absolute inset-0 scale-[1.15]">
-          <img
-            src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1800&q=80&auto=format&fit=crop"
-            alt="Skała z pionową kreską światła"
-            className="h-full w-full object-cover grayscale contrast-125 brightness-[0.38]"
-          />
-        </motion.div>
+        {/* deep layered mountains */}
+        <div className="absolute inset-0">
+          <motion.div style={{ y: cinemaY }} className="absolute inset-0 scale-[1.2]">
+            <img
+              src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=2000&q=80&auto=format&fit=crop"
+              alt="Góry o świcie"
+              className="h-full w-full object-cover grayscale contrast-125 brightness-[0.30]"
+            />
+          </motion.div>
 
-        {/* grading + vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_10%,transparent_0%,rgba(5,5,7,0.55)_60%,#050507_100%)]" />
-        <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "88px 88px" }} />
+          {/* second ridge — depth */}
+          <motion.div style={{ y: cinemaY2 }} className="absolute inset-x-0 bottom-0 h-[62%] scale-[1.15]">
+            <img
+              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2000&q=80&auto=format&fit=crop"
+              alt="Grzbiet mgłą"
+              className="h-full w-full object-cover grayscale contrast-125 brightness-[0.22]"
+            />
+          </motion.div>
+
+          {/* drifting fog */}
+          <motion.div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(to bottom, rgba(5,5,7,0.85) 0%, transparent 28%, transparent 62%, #050507 100%)" }}
+            animate={{ opacity: [0.75, 1, 0.75] }}
+            transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute -left-1/4 top-1/3 h-[46vh] w-[160%] opacity-40"
+            style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.10), transparent 72%)", filter: "blur(30px)" }}
+            animate={{ x: ["-8%", "8%", "-8%"] }}
+            transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
+
+        {/* grading */}
+        <div className="absolute inset-0 bg-[radial-gradient(130%_100%_at_50%_6%,transparent_0%,rgba(5,5,7,0.62)_58%,#050507_100%)]" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "88px 88px" }} />
 
         {/* vertical light streak */}
         <div className="absolute inset-0">
-          <div className="absolute left-1/2 top-[-10%] h-[120%] w-px -translate-x-1/2 bg-white/80 shadow-[0_0_24px_4px_rgba(255,255,255,0.55),0_0_90px_18px_rgba(255,255,255,0.22)]" />
+          <div className="absolute left-1/2 top-[-10%] h-[120%] w-px -translate-x-1/2 bg-white/90 shadow-[0_0_30px_5px_rgba(255,255,255,0.6),0_0_110px_24px_rgba(255,255,255,0.24)]" />
           <motion.div
-            className="absolute left-1/2 top-0 h-full w-[360px] -translate-x-1/2"
-            style={{ background: "linear-gradient(to right, transparent, rgba(255,255,255,0.07) 42%, rgba(255,255,255,0.20) 50%, rgba(255,255,255,0.07) 58%, transparent)" }}
-            animate={{ opacity: [0.3, 0.75, 0.3] }}
-            transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute left-1/2 top-0 h-full w-[420px] -translate-x-1/2"
+            style={{ background: "linear-gradient(to right, transparent, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.24) 50%, rgba(255,255,255,0.08) 60%, transparent)" }}
+            animate={{ opacity: [0.28, 0.8, 0.28] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
-            className="absolute left-1/2 top-0 h-[30%] w-[560px] -translate-x-1/2"
-            style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.16), transparent)" }}
-            animate={{ y: ["0%", "235%"] }}
-            transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute left-1/2 top-0 h-[32%] w-[680px] -translate-x-1/2"
+            style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.18), transparent)" }}
+            animate={{ y: ["0%", "212%"] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           />
         </div>
 
         {/* content */}
         <motion.div style={{ y: cinemaText }} className="relative mx-auto max-w-[1280px] px-6 lg:px-8">
-          <div className="flex min-h-[78vh] flex-col justify-center py-24 lg:py-32">
+          <div className="flex min-h-[88vh] flex-col justify-center py-28 lg:py-40">
             <motion.div
-              initial={{ opacity: 0, y: 26, filter: "blur(10px)" }}
+              initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
               whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               viewport={{ once: true, margin: "-15%" }}
-              transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="flex items-center gap-4 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.24em] text-white/45">
-                <span className="h-px w-12 bg-white/40" />
+              <div className="flex items-center gap-4 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.26em] text-white/50">
+                <span className="h-px w-14 bg-white/50" />
                 MANIFEST
               </div>
 
-              <h2 className="mt-8 font-[Space_Grotesk] font-light uppercase leading-[0.86] tracking-[-0.03em] text-[40px] sm:text-[64px] lg:text-[104px]">
+              <h2 className="mt-10 font-[Space_Grotesk] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[52px] sm:text-[92px] lg:text-[156px]">
                 <span className="block text-white">Precision</span>
                 <span className="block text-white">Builds</span>
-                <span className="block text-transparent" style={{ WebkitTextStroke: "1px rgba(255,255,255,0.55)" }}>
+                <span className="block text-transparent" style={{ WebkitTextStroke: "1.2px rgba(255,255,255,0.6)" }}>
                   Brands
                 </span>
               </h2>
 
               <motion.div
-                className="mt-10 h-px bg-white origin-left"
+                className="mt-12 h-px w-full bg-white origin-left"
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
                 viewport={{ once: true, margin: "-15%" }}
-                transition={{ duration: 1.4, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 1.5, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
               />
+              <motion.div
+                className="mt-6 max-w-[520px] font-[Inter] font-light text-[15px] leading-7 text-white/45"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-15%" }}
+                transition={{ duration: 1, delay: 0.6 }}
+              >
+                Jeden system. Zero kompromisów. Budujemy marki, które widać z drugiej strony ulicy.
+              </motion.div>
             </motion.div>
           </div>
         </motion.div>
