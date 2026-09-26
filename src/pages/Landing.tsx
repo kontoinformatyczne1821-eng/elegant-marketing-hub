@@ -404,13 +404,15 @@ export default function Landing() {
                   <EditableText ek="qraft.hero.title2b" def="marki." className="font-[Cormorant_Garamond] not-italic font-light text-white" isEditing={isEditing} as="span" />
                 </span>
                 <span className="block mt-7 h-px w-[88px] bg-white/10"/>
-                <EditableText
-                  ek="qraft.hero.desc"
-                  def="Techniczny Atelier"
-                  className="block mt-7 font-[Instrument_Serif] italic text-[30px] sm:text-[38px] leading-[1.05] tracking-[-0.01em] text-white/55"
-                  isEditing={isEditing}
-                  as="span"
-                />
+                <span className="block mt-7 w-fit">
+                  <EditableText
+                    ek="qraft.hero.desc"
+                    def="Techniczny Atelier"
+                    className="block font-[Instrument_Serif] italic text-[36px] sm:text-[48px] leading-[1.02] tracking-[-0.015em] text-white/85 hover:text-white transition-colors duration-500 ease-out cursor-default"
+                    isEditing={isEditing}
+                    as="span"
+                  />
+                </span>
               </motion.h1>
 
               <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.45 }} className="mt-10 flex flex-wrap items-center gap-4">
