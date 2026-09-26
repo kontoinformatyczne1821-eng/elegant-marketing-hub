@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { v } from "convex/values";
-import { action, internalMutation, query } from "./_generated/server";import { api } from "./_generated/api";
+import { action, internalMutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
 
 
 /* plan → kwota w groszach (PLN) */

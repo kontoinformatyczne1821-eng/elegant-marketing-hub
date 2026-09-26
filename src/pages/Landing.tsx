@@ -865,7 +865,7 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
             tone="light"
             onClick={() => step(active - 1, -1)}
             label="Poprzedni etap"
-            className="grid"
+            className="hidden sm:grid"
           />
           <GlassArrow
             dir={1}
@@ -873,7 +873,7 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
             tone="light"
             onClick={() => step(active + 1, 1)}
             label="Następny etap"
-            className="grid"
+            className="hidden sm:grid"
           />
           <div className="ml-1 flex items-baseline gap-2 font-[JetBrains_Mono] font-light text-[11px] sm:text-[12px] tracking-[0.16em] text-black/50">
             ETAP
