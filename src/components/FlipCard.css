@@ -35,10 +35,9 @@
   height: 100%;
 }
 
+/* zaznaczenie świeci DOWNĄTRZ kafla — nic nie wystaje na zewnątrz */
 .flip-card[data-selected] {
-  box-shadow:
-    0 0 0 1px rgba(125, 240, 174, 0.55),
-    0 22px 60px rgba(52, 211, 120, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(125, 240, 174, 0.55);
 }
 
 .flip-card[data-editable] {
@@ -60,6 +59,8 @@
   opacity: 0.6;
 }
 
+/* miękki cień pod kartą — w QRAFT wyłączony (shadow={false}),
+   bo rozlewał poświatę na zewnątrz kafla */
 .flip-card__shadow {
   position: absolute;
   inset: 12% 9% -5%;

@@ -1527,9 +1527,8 @@ export default function Landing() {
                 perspective={1200}
                 tiltMax={9}
                 hoverScale={1.02}
-                glareOpacity={0.13}
-                shadowColor="#000000"
-                shadowOpacity={0.55}
+                glareOpacity={0.17}
+                shadow={false}
                 flipOnClick={!isEditing}
                 draggable={!isEditing}
                 front={(
