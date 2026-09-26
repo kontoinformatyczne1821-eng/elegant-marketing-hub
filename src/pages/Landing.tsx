@@ -90,17 +90,17 @@ const serviceDefaults = [
 ];
 
 const plans = [
-  { name: "ESSENCE", price: "999 zł", sub: "/ mies.", line: "Fundamenty, by dać się znaleźć.", pts: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"], featured: false, cta: "Wybierz Essence" },
-  { name: "SIGNATURE", price: "3 800 zł", sub: "/ mies.", line: "Pełny system. Wypełnia kalendarz.", pts: ["Wszystko z Essence", "Zasięg + płatne w promieniu", "Silnik treści + lista"], featured: true, cta: "Wybierz Signature" },
-  { name: "PRESTIGE", price: "5 000 zł", sub: "/ mies.", line: "Starty, rebrandingi, wiele lokalizacji.", pts: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"], featured: false, cta: "Wybierz Prestige" },
+  { name: "ESSENCE", price: "1 900 zł", sub: "/ mies.", line: "Fundamenty, by dać się znaleźć.", pts: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"], featured: false, cta: "Wybierz Essence" },
+  { name: "SIGNATURE", price: "1 999 zł", sub: "/ mies.", line: "Pełny system. Wypełnia kalendarz.", pts: ["Wszystko z Essence", "Zasięg + płatne w promieniu", "Silnik treści + lista"], featured: true, cta: "Wybierz Signature" },
+  { name: "PRESTIGE", price: "2 300 zł", sub: "/ mies.", line: "Starty, rebrandingi, wiele lokalizacji.", pts: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"], featured: false, cta: "Wybierz Prestige" },
 ];
 
 /* okienko audytu — wybór usługi przesuwa pasek */
 const auditServices = [
   { id: "audyt", label: "AUDYT", note: "bezpłatny · 20 min", items: ["Ogląd firmy z zewnątrza", "Pierwsza największa dźwignia", "Lista rzeczy do naprawy"] },
-  { id: "essence", label: "ESSENCE", note: "999 zł / mies.", items: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"] },
-  { id: "signature", label: "SIGNATURE", note: "3 800 zł / mies.", items: ["Wszystko z Essence", "Zasięg + płatne w promieniu", "Silnik treści + lista"] },
-  { id: "prestige", label: "PRESTIGE", note: "wycena indywidualna", items: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"] },
+  { id: "essence", label: "ESSENCE", note: "1 900 zł / mies.", items: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"] },
+  { id: "signature", label: "SIGNATURE", note: "1 999 zł / mies.", items: ["Wszystko z Essence", "Zasięg + płatne w promieniu", "Silnik treści + lista"] },
+  { id: "prestige", label: "PRESTIGE", note: "2 300 zł / mies.", items: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"] },
 ];
 
 /* 1 baner = 1 etap procesu */
@@ -1085,8 +1085,8 @@ const TIERS = [
   {
     value: "standard",
     name: "STANDARD",
-    amount: 4900,
-    price: "4 900 zł",
+    amount: 1900,
+    price: "1 900 zł",
     cycle: "/ mies.",
     lead: "PUNKT WYJŚCIA",
     desc: "Jedna sesja w miesiącu, pełna opieka nad profilem i raport, który mówi wprost, co działa.",
@@ -1106,8 +1106,8 @@ const TIERS = [
   {
     value: "pro",
     name: "PRO",
-    amount: 9800,
-    price: "9 800 zł",
+    amount: 1999,
+    price: "1 999 zł",
     cycle: "/ mies.",
     lead: "NAJCZĘSTSZY WYBÓR",
     desc: "Dwa strzały w miesiącu, wideo i płatne zasięgi. Tempo, przy którym marka wchodzi w rynek — i zostaje.",
@@ -1128,8 +1128,8 @@ const TIERS = [
   {
     value: "max",
     name: "MAX",
-    amount: 5000,
-    price: "5 000 zł",
+    amount: 2300,
+    price: "2 300 zł",
     cycle: "/ mies.",
     lead: "DEDYKOWANY ZESPÓŁ",
     desc: "Nieograniczone sesje, produkcja wideo i podcast oraz kierownik projektu, który zna markę na pamięć.",
