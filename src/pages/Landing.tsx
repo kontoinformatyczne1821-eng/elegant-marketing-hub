@@ -231,11 +231,14 @@ function finePointerMedia() {
 function HoverTile({
   active,
   onClick,
+  tapAdvance,
   className = "",
   children,
 }: {
   active: boolean;
   onClick: () => void;
+  /** na dotyku: cały kafelek reaguje tapnięciem (bez efektów hover) */
+  tapAdvance?: () => void;
   className?: string;
   children: React.ReactNode;
 }) {
@@ -280,6 +283,10 @@ function HoverTile({
         targetRy.set(0);
         targetScale.set(1);
         sheen.set(0);
+      }}
+      onClick={() => {
+        onClick();
+        tapAdvance?.();
       }}
       style={{ rotateX: rx, rotateY: ry, scale, transformPerspective: 900 }}
       data-on={active ? "true" : "false"}
@@ -922,6 +929,12 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                   key={s.n}
                   data-step={i}
                   data-depth={d === 3 ? 2 : d}
+                  onClick={() => {
+                    if (front && !isEditing && window.matchMedia("(hover: none)").matches) {
+                      sfxPop();
+                      step(active + 1, 1);
+                    }
+                  }}
                   className={`t-stack-banner h-[236px] sm:h-[292px] w-full rounded-[20px] sm:rounded-[24px] border p-5 sm:p-7 lg:p-8 flex flex-col ${
                     front
                       ? "bg-[#F4F4F1] border-black/12 text-black shadow-[0_24px_60px_rgba(0,0,0,0.14)]"
@@ -952,14 +965,24 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                     isEditing={isEditing}
                     as="p"
                   />
-                  <div className="mt-auto flex gap-2">
-                    {processSteps.map((_, k) => (
-                      <span
-                        key={k}
-                        className="h-[3px] flex-1 rounded-full transition-colors duration-500"
-                        style={{ backgroundColor: k <= active ? "#0a0a0a" : "rgba(0,0,0,0.12)" }}
-                      />
-                    ))}
+                  <div className="mt-auto">
+                    <div className="flex gap-2">
+                      {processSteps.map((_, k) => (
+                        <span
+                          key={k}
+                          className="h-[3px] flex-1 rounded-full transition-colors duration-500"
+                          style={{ backgroundColor: k <= active ? "#0a0a0a" : "rgba(0,0,0,0.12)" }}
+                        />
+                      ))}
+                    </div>
+                    {front && (
+                      <div className="mt-3 hidden items-center justify-between gap-3 pointer-coarse:flex">
+                        <span className="font-[JetBrains_Mono] font-light text-[8.5px] tracking-[0.14em] text-black/35">
+                          TAPNIJ — NASTĘPNY ETAP
+                        </span>
+                        <ArrowRight className="h-3 w-3 text-black/40" />
+                      </div>
+                    )}
                   </div>
                 </div>
               );
