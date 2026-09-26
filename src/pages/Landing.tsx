@@ -318,17 +318,22 @@ const GLASS_SKIN = {
     shadow:
       "inset 0 1px 1px rgba(255,255,255,0.30), inset 0 -1px 1px rgba(255,255,255,0.06), 0 10px 30px rgba(0,0,0,0.35)",
     ring: "border-white/50",
+    sheen:
+      "conic-gradient(from 200deg, transparent 0deg, rgba(255,255,255,0.55) 18deg, transparent 46deg)",
     arrow: "text-white/70",
     glow: "drop-shadow(0 0 8px rgba(255,255,255,0.45))",
   },
+  /* proces: ciemniejsze szklo z chlodnym, niebieskim akcentem */
   light: {
-    bg: "linear-gradient(160deg, rgba(255,255,255,0.45), rgba(255,255,255,0.10) 55%), rgba(20,20,23,0.10)",
-    border: "1px solid rgba(10,10,10,0.16)",
+    bg: "linear-gradient(160deg, rgba(255,255,255,0.46), rgba(255,255,255,0.12) 55%), rgba(24,36,72,0.14)",
+    border: "1px solid rgba(37,99,235,0.34)",
     shadow:
-      "inset 0 1px 1px rgba(255,255,255,0.55), inset 0 -1px 1px rgba(10,10,10,0.04), 0 10px 30px rgba(0,0,10,0.10)",
-    ring: "border-black/30",
-    arrow: "text-black/75",
-    glow: "drop-shadow(0 0 7px rgba(10,10,10,0.20))",
+      "inset 0 1px 1px rgba(255,255,255,0.55), inset 0 -1px 1px rgba(10,10,10,0.04), 0 10px 30px rgba(23,52,140,0.16)",
+    ring: "border-[#3B82F6]/50",
+    sheen:
+      "conic-gradient(from 200deg, transparent 0deg, rgba(59,130,246,0.85) 24deg, transparent 54deg)",
+    arrow: "text-[#2563EB]",
+    glow: "drop-shadow(0 0 9px rgba(37,99,235,0.45))",
   },
 } as const;
 
@@ -393,10 +398,7 @@ function GlassArrow({
           key={`sheen-${burst}`}
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-full"
-          style={{
-            background:
-              "conic-gradient(from 200deg, transparent 0deg, rgba(255,255,255,0.55) 18deg, transparent 46deg)",
-          }}
+          style={{ background: skin.sheen }}
           initial={{ rotate: 0, opacity: 0.9 }}
           animate={{ rotate: 360, opacity: 0 }}
           transition={{ duration: 0.75, ease: "easeOut" }}
@@ -808,7 +810,7 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                   style={{
                     width: i === active ? 13 : 8,
                     height: i === active ? 13 : 8,
-                    backgroundColor: i <= active ? "#0a0a0a" : "#F7F7F5",
+                    backgroundColor: i <= active ? "#0a0a0a" : "#E4E4E0",
                     border: `1px solid ${i <= active ? "#0a0a0a" : "rgba(0,0,0,0.28)"}`,
                     boxShadow: i === active ? "0 0 18px 4px rgba(0,0,0,0.30)" : "none",
                   }}
@@ -831,8 +833,8 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                   data-depth={d === 3 ? 2 : d}
                   className={`t-stack-banner h-[250px] w-full rounded-[24px] border p-7 flex flex-col ${
                     front
-                      ? "bg-white border-black/10 text-black shadow-[0_24px_60px_rgba(0,0,0,0.12)]"
-                      : "bg-white/68 border-black/[0.08] text-black/85 backdrop-blur-xl"
+                      ? "bg-[#F4F4F1] border-black/12 text-black shadow-[0_24px_60px_rgba(0,0,0,0.14)]"
+                      : "bg-[#EDEDE9]/85 border-black/[0.09] text-black/85 backdrop-blur-xl"
                   } ${d === 3 ? "is-leaving" : ""}`}
                 >
                   <div className="flex items-center justify-between">
@@ -1220,7 +1222,7 @@ export default function Landing() {
             x: navShift,
             filter: navBlur,
             pointerEvents: navOpen ? "auto" : "none",
-            background: inProcess ? "rgba(247,247,245,0.45)" : "rgba(12,12,15,0.34)",
+            background: inProcess ? "rgba(232,232,228,0.55)" : "rgba(12,12,15,0.34)",
             borderColor: inProcess ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.10)",
             boxShadow: inProcess
               ? "inset 0 1px 1px rgba(255,255,255,0.75), 0 22px 60px rgba(0,0,0,0.16)"
@@ -1637,7 +1639,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="process" className="bg-[#F7F7F5] text-[#0A0A0A] border-t border-white/5">
+      <section id="process" className="bg-[#E4E4E0] text-[#0A0A0A] border-t border-white/5">
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-24">
           <Reveal><ProcessStack isEditing={isEditing} onZoneChange={setInProcess} /></Reveal>
         </div>
