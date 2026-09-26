@@ -92,7 +92,7 @@ const serviceDefaults = [
 ];
 
 const plans = [
-  { name: "ESSENCE", price: "999 zł", sub: "/ mies.", line: "Fundamenty, by dać się znaleźć.", pts: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"], featured: false, cta: "Wybierz Essence" },
+  { name: "ESSENCE", price: "1 200 zł", sub: "/ mies.", line: "Fundamenty, by dać się znaleźć.", pts: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"], featured: false, cta: "Wybierz Essence" },
   { name: "SIGNATURE", price: "1 999 zł", sub: "/ mies.", line: "Pełny system. Wypełnia kalendarz.", pts: ["Wszystko z Essence", "Zasięg + płatne w promieniu", "Silnik treści + lista"], featured: true, cta: "Wybierz Signature" },
   { name: "PRESTIGE", price: "2 300 zł", sub: "/ mies.", line: "Starty, rebrandingi, wiele lokalizacji.", pts: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"], featured: false, cta: "Wybierz Prestige" },
 ];
@@ -100,7 +100,7 @@ const plans = [
 /* okienko audytu — wybór usługi przesuwa pasek */
 const auditServices = [
   { id: "audyt", label: "AUDYT", note: "bezpłatny · 20 min", items: ["Ogląd firmy z zewnątrza", "Pierwsza największa dźwignia", "Lista rzeczy do naprawy"] },
-  { id: "essence", label: "ESSENCE", note: "999 zł / mies.", items: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"] },
+  { id: "essence", label: "ESSENCE", note: "1 200 zł / mies.", items: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"] },
   { id: "signature", label: "SIGNATURE", note: "1 999 zł / mies.", items: ["Wszystko z Essence", "Zasięg + płatne w promieniu", "Silnik treści + lista"] },
   { id: "prestige", label: "PRESTIGE", note: "2 300 zł / mies.", items: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"] },
 ];
@@ -1087,8 +1087,8 @@ const TIERS = [
   {
     value: "standard",
     name: "STANDARD",
-    amount: 999,
-    price: "999 zł",
+    amount: 1200,
+    price: "1 200 zł",
     cycle: "/ mies.",
     lead: "PUNKT WYJŚCIA",
     desc: "Jedna sesja w miesiącu, pełna opieka nad profilem i raport, który mówi wprost, co działa.",
