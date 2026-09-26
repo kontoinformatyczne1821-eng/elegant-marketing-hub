@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from "react";
-import type { CSSProperties, KeyboardEvent, ReactNode } from "react";
+import type { ComponentProps, CSSProperties, KeyboardEvent, ReactNode } from "react";
 import { animate, motion, useReducedMotion, useTransform } from "framer-motion";
 import { motionValue } from "motion-dom";
 import type { MotionValue } from "motion-dom";
@@ -72,7 +72,9 @@ const spring = (k: number, m: number, bounce: number) => ({
   mass: m,
 });
 
-const Chip = forwardRef<HTMLButtonElement, { mv: Mv; children: ReactNode }>(
+type ChipProps = { mv: Mv } & Omit<ComponentProps<typeof motion.button>, "style">;
+
+const Chip = forwardRef<HTMLButtonElement, ChipProps>(
   function Chip({ mv, children, ...rest }, ref) {
     const transform = useTransform(
       () => `translateX(${mv.x.get()}px) scale(${mv.sx.get()}, ${mv.sy.get()})`,
