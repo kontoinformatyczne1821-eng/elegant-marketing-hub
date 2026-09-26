@@ -168,6 +168,44 @@ function CursorAura() {
   );
 }
 
+function BtnPrimary({ children, onClick, className = "", type = "button" }: { children: React.ReactNode; onClick?: () => void; className?: string; type?: "button" | "submit" }) {
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      className={`group relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-full border border-white/30 font-[JetBrains_Mono] font-light tracking-[0.14em] text-white transition-colors duration-500 hover:text-black ${className}`}
+    >
+      <span className="absolute inset-0 bg-white origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+      <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
+    </button>
+  );
+}
+
+function BtnGhost({ children, onClick, className = "" }: { children: React.ReactNode; onClick?: () => void; className?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.02] backdrop-blur font-[JetBrains_Mono] font-light tracking-[0.14em] text-white/60 transition-all duration-500 hover:border-white/45 hover:bg-white/[0.08] hover:text-white ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function BtnDark({ children, onClick, className = "" }: { children: React.ReactNode; onClick?: () => void; className?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-full border border-black/20 font-[JetBrains_Mono] font-light tracking-[0.14em] text-black transition-colors duration-500 hover:text-white ${className}`}
+    >
+      <span className="absolute inset-0 bg-black origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+      <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
+    </button>
+  );
+}
+
 function SynapseBG() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -355,12 +393,12 @@ export default function Landing() {
           <div className="flex items-center gap-3">
             <button
               onClick={()=>setIsEditing(!isEditing)}
-              className={`hidden md:inline-flex items-center gap-2 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.12em] px-4 h-9 rounded-full border transition ${isEditing ? "bg-white text-black border-white" : "border-white/15 text-white/55 hover:text-white hover:border-white/25 bg-white/[0.03]"}`}
+              className={`hidden md:inline-flex items-center gap-2 px-4 h-9 rounded-full border font-[JetBrains_Mono] font-light text-[11px] tracking-[0.12em] transition-all duration-500 backdrop-blur ${isEditing ? "bg-white text-black border-white" : "border-white/15 bg-white/[0.02] text-white/60 hover:border-white/45 hover:bg-white/[0.08] hover:text-white"}`}
             >
               {isEditing ? <><Save className="h-3.5 w-3.5"/> ZAKOŃCZ EDYCJĘ</> : <><Pencil className="h-3.5 w-3.5"/> EDYTUJ TEKSTY</>}
             </button>
             <span className="hidden md:inline-flex items-center gap-1.5 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] text-white/20"><Terminal className="h-3 w-3 opacity-60"/> qraft.build</span>
-            <button onClick={()=>go("contact")} className="hidden sm:inline-flex bg-white text-black font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] px-6 h-9 rounded-full hover:bg-white/90 transition">ROZPOCZNIJ</button>
+            <BtnPrimary onClick={()=>go("contact")} className="hidden sm:inline-flex text-[11px] tracking-[0.16em] px-6 h-9">ROZPOCZNIJ</BtnPrimary>
             <button onClick={()=>setMobileOpen(!mobileOpen)} className="lg:hidden h-9 w-9 grid place-items-center rounded-full border border-white/10 bg-white/[0.03]">{mobileOpen?<X className="h-4 w-4"/>:<Menu className="h-4 w-4"/>}</button>
           </div>
         </div>
@@ -371,8 +409,8 @@ export default function Landing() {
                 <button onClick={()=>go("services")} className="w-full text-left py-3 border-b border-white/[0.04] text-white/60">— SYSTEM</button>
                 <button onClick={()=>go("pricing")} className="w-full text-left py-3 border-b border-white/[0.04] text-white/60">— PLANY</button>
                 <button onClick={()=>go("contact")} className="w-full text-left py-3 border-b border-white/[0.04] text-white/60">— KONTAKT</button>
-                <button onClick={()=>setIsEditing(!isEditing)} className={`mt-4 w-full py-3.5 rounded-full font-[JetBrains_Mono] font-light tracking-[0.1em] text-xs flex items-center justify-center gap-2 ${isEditing ? "bg-white text-black" : "bg-white/10 text-white border border-white/10"}`}>{isEditing ? "ZAKOŃCZ EDYCJĘ" : "EDYTUJ TEKSTY"}</button>
-                <button onClick={()=>navigate("/auth")} className="mt-3 w-full bg-white text-black py-3.5 rounded-full font-[JetBrains_Mono] font-light tracking-[0.1em] text-xs">ZALOGUJ SIĘ</button>
+                <button onClick={()=>setIsEditing(!isEditing)} className={`mt-4 w-full py-3.5 rounded-full font-[JetBrains_Mono] font-light tracking-[0.1em] text-xs transition-colors duration-500 ${isEditing ? "bg-white text-black" : "border border-white/15 bg-white/[0.02] text-white/60 hover:bg-white/[0.08] hover:text-white"}`}>{isEditing ? "ZAKOŃCZ EDYCJĘ" : "EDYTUJ TEKSTY"}</button>
+                <button onClick={()=>navigate("/auth")} className="mt-3 w-full py-3.5 rounded-full font-[JetBrains_Mono] font-light tracking-[0.1em] text-xs border border-white/30 text-white transition-colors duration-500 hover:bg-white hover:text-black">ZALOGUJ SIĘ</button>
               </div>
             </motion.div>
           )}
@@ -416,13 +454,14 @@ export default function Landing() {
               </motion.h1>
 
               <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.45 }} className="mt-10 flex flex-wrap items-center gap-4">
-                <button onClick={()=>go("contact")} className="group relative overflow-hidden bg-white text-black pl-7 pr-6 h-[48px] rounded-full font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] inline-flex items-center gap-3 hover:bg-white/90 transition">
-                  <span className="pointer-events-none absolute inset-y-0 left-0 w-1/3 -translate-x-full bg-gradient-to-r from-transparent via-black/12 to-transparent group-hover:animate-[qmsheen_0.9s_ease_forwards]" />
-                  <EditableText ek="qraft.hero.cta1" def="DARMOWY AUDYT" className="font-[JetBrains_Mono] font-light tracking-[0.14em]" isEditing={isEditing} as="span" /> <ArrowRight className="h-3.5 w-3.5 opacity-60 group-hover:translate-x-0.5 transition-transform"/>
-                </button>
-                <button onClick={()=>go("pricing")} className="inline-flex items-center gap-3 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] text-white/35 hover:text-white/65 transition">
-                  <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10"><ArrowUpRight className="h-3 w-3"/></span> PLANY
-                </button>
+                <BtnPrimary onClick={()=>go("contact")} className="pl-7 pr-6 h-[48px] text-[11px]">
+                  <EditableText ek="qraft.hero.cta1" def="DARMOWY AUDYT" className="font-[JetBrains_Mono] font-light tracking-[0.14em]" isEditing={isEditing} as="span" />
+                  <ArrowRight className="h-3.5 w-3.5 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+                </BtnPrimary>
+                <BtnGhost onClick={()=>go("pricing")} className="h-[48px] pl-2 pr-6 text-[11px]">
+                  <span className="h-9 w-9 grid place-items-center rounded-full border border-white/15 transition-all duration-500 group-hover:border-white/45 group-hover:bg-white/10"><ArrowUpRight className="h-3.5 w-3.5" /></span>
+                  PLANY
+                </BtnGhost>
               </motion.div>
 
               <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.65 }} className="mt-14 flex gap-10 border-t border-white/[0.06] pt-8 max-w-[420px]">
@@ -471,7 +510,7 @@ export default function Landing() {
                 </div>
                 <div className="mt-4 flex items-center justify-between bg-[#F7F7F5] rounded-full pl-5 pr-2 py-2">
                   <div><div className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.14em] text-black/35">NASTĘPNY AUDYT</div><div className="font-[Inter] font-light text-[13px] text-black tracking-[-0.01em]">Dwa terminy w tym tygodniu</div></div>
-                  <button onClick={()=>go("contact")} className="h-9 w-9 grid place-items-center rounded-full bg-black text-white hover:bg-black/80 transition"><ArrowUpRight className="h-4 w-4"/></button>
+                  <button onClick={()=>go("contact")} className="h-9 w-9 grid place-items-center rounded-full border border-black/15 bg-black text-white transition-all duration-500 hover:bg-white hover:text-black"><ArrowUpRight className="h-4 w-4" /></button>
                 </div>
               </div>
               <div className="mt-4 text-center font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/15">SCROLL — SYNAPSA BUDUJE SIĘ W RYTMIE RUCHU</div>
@@ -536,7 +575,9 @@ export default function Landing() {
         </div>
         <div className="mt-10 flex flex-col sm:flex-row justify-between gap-4 font-[JetBrains_Mono] font-light text-[11px]">
           <EditableText ek="qraft.system.footerL" def="OTWARTE DLA KAŻDEGO KLIENTA." className="text-white/20 tracking-[0.08em]" isEditing={isEditing} as="span" />
-          <button onClick={()=>go("contact")} className="tracking-[0.08em] underline decoration-white/10 underline-offset-4 text-white/30 hover:text-white/60 hover:decoration-white/20 transition"><EditableText ek="qraft.system.footerR" def="DIAGNOSTYKA →" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></button>
+          <BtnGhost onClick={()=>go("contact")} className="h-11 px-6 text-[11px]">
+            <EditableText ek="qraft.system.footerR" def="DIAGNOSTYKA →" className="font-[JetBrains_Mono] font-light tracking-[0.14em]" isEditing={isEditing} as="span" />
+          </BtnGhost>
         </div>
       </section>
 
@@ -559,7 +600,7 @@ export default function Landing() {
                   <li key={x} className={`flex gap-3 font-[Inter] font-light text-[14px] ${p.featured?"text-black/65":"text-white/55"}`}><Check className={`h-4 w-4 mt-0.5 shrink-0 ${p.featured?"text-black/20":"text-white/40"}`}/><EditableText ek={`qraft.plan.${i}.pt${idx}`} def={x} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></li>
                 ))}
               </ul>
-              <button onClick={()=>go("contact")} className={`mt-10 w-full h-11 rounded-full font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] transition ${p.featured?"bg-black text-white hover:bg-black/85":"bg-white text-black hover:bg-white/90"}`}><EditableText ek={`qraft.plan.${i}.cta`} def={p.cta} className="font-[JetBrains_Mono] font-light tracking-[0.14em]" isEditing={isEditing} as="span" /></button>
+              {(() => { const inner = <EditableText ek={`qraft.plan.${i}.cta`} def={p.cta} className="font-[JetBrains_Mono] font-light tracking-[0.14em]" isEditing={isEditing} as="span" />; return p.featured ? <BtnDark onClick={()=>go("contact")} className="mt-10 w-full h-11 text-[11px]">{inner}</BtnDark> : <BtnPrimary onClick={()=>go("contact")} className="mt-10 w-full h-11 text-[11px]">{inner}</BtnPrimary>; })()}
             </motion.div>
           ))}
         </div>
@@ -573,7 +614,7 @@ export default function Landing() {
       <section id="contact" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-12 lg:py-20">
         <div className="grid lg:grid-cols-[1fr_1fr] gap-6">
           <Reveal><div className="bg-[#0F0F11] border border-white/10 text-white rounded-[32px] p-8 lg:p-10 relative overflow-hidden min-h-[440px] flex flex-col"><div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/[0.04] blur-2xl"/><div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"/><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/30">05 — BUDOWA</div><h2 className="mt-6 font-[Cormorant_Garamond] font-light text-[40px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.contact.h1" def="Spraw, by każdy" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.contact.h2" def="klient się liczył." className="block font-[Cormorant_Garamond] font-light italic text-white/50" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.contact.desc" def="20 minut. Znajdziemy lukę i zostawimy Ci plan — nawet jeśli nas nie wybierzesz. Otwarte dla wszystkich." className="mt-4 block font-[Inter] font-light text-[14px] leading-7 text-white/40 max-w-[380px]" isEditing={isEditing} as="p" /><div className="mt-8 space-y-3 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.06em] text-white/35"><div className="flex items-center gap-2.5"><Clock className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line1" def="Dwa terminy w tym tygodniu · 20 min" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div><div className="flex items-center gap-2.5"><Terminal className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line2" def="Otwarte dla każdego klienta" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div></div><div className="mt-auto pt-10 flex gap-2 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.1em]"><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge1" def="BEZ PREZENTACJI" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge2" def="BEZ ŻARGONU" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div></div></Reveal>
-          <Reveal delay={0.06}><div className="bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.4] border border-white/10 rounded-[32px] p-7 sm:p-8" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.32)" } as any}><div className="flex items-center justify-between"><h3 className="font-[Cormorant_Garamond] font-light text-[22px]"><EditableText ek="qraft.form.h" def="Rozpocznij budowę" className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/20 border border-white/10 rounded-full px-3 py-1">2 MIN</span></div>{sent ? (<motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} className="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-8 text-center"><div className="h-10 w-10 mx-auto grid place-items-center rounded-full bg-white text-black"><Check className="h-5 w-5"/></div><div className="mt-4 font-[Cormorant_Garamond] font-light text-[18px]">Zgłoszenie otrzymane.</div><div className="mt-2 font-[Inter] font-light text-[13px] text-white/30">Wyślemy terminy w ciągu kilku godzin.</div><button onClick={()=>setSent(false)} className="mt-5 font-[JetBrains_Mono] font-light text-xs underline decoration-white/20 text-white/40">Wyślij kolejne</button></motion.div>) : (<form onSubmit={submit} className="mt-8 space-y-5"><div className="grid sm:grid-cols-2 gap-4"><label className="space-y-2"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">IMIĘ I NAZWISKO</span><input required value={form.name} onChange={e=>setForm({...form, name:e.target.value})} placeholder="Alex Kowalski" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label><label className="space-y-2"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">FIRMA</span><input value={form.business} onChange={e=>setForm({...form, business:e.target.value})} placeholder="Lumière" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label></div><label className="space-y-2 block"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">EMAIL</span><input required type="email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} placeholder="alex@firma.pl" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label><button type="submit" className="w-full h-[48px] rounded-full bg-white text-black font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] hover:bg-white/90 transition flex items-center justify-center gap-2">ZAMÓW AUDYT — ZA DARMO <ArrowRight className="h-4 w-4 opacity-60"/></button><div className="text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.04em] text-white/20">Lub <button type="button" onClick={()=>navigate("/auth")} className="underline decoration-white/15 text-white/30 hover:text-white/60">zaloguj się</button> by zarządzać budową</div></form>)}</div></Reveal>
+          <Reveal delay={0.06}><div className="bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.4] border border-white/10 rounded-[32px] p-7 sm:p-8" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.32)" } as any}><div className="flex items-center justify-between"><h3 className="font-[Cormorant_Garamond] font-light text-[22px]"><EditableText ek="qraft.form.h" def="Rozpocznij budowę" className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/20 border border-white/10 rounded-full px-3 py-1">2 MIN</span></div>{sent ? (<motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} className="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-8 text-center"><div className="h-10 w-10 mx-auto grid place-items-center rounded-full bg-white text-black"><Check className="h-5 w-5"/></div><div className="mt-4 font-[Cormorant_Garamond] font-light text-[18px]">Zgłoszenie otrzymane.</div><div className="mt-2 font-[Inter] font-light text-[13px] text-white/30">Wyślemy terminy w ciągu kilku godzin.</div><button onClick={()=>setSent(false)} className="mt-5 font-[JetBrains_Mono] font-light text-xs underline decoration-white/20 text-white/40">Wyślij kolejne</button></motion.div>) : (<form onSubmit={submit} className="mt-8 space-y-5"><div className="grid sm:grid-cols-2 gap-4"><label className="space-y-2"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">IMIĘ I NAZWISKO</span><input required value={form.name} onChange={e=>setForm({...form, name:e.target.value})} placeholder="Alex Kowalski" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label><label className="space-y-2"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">FIRMA</span><input value={form.business} onChange={e=>setForm({...form, business:e.target.value})} placeholder="Lumière" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label></div><label className="space-y-2 block"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">EMAIL</span><input required type="email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} placeholder="alex@firma.pl" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label><BtnPrimary type="submit" className="w-full h-[48px] text-[11px]">ZAMÓW AUDYT — ZA DARMO <ArrowRight className="h-4 w-4 opacity-60" /></BtnPrimary><div className="text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.04em] text-white/20">Lub <button type="button" onClick={()=>navigate("/auth")} className="underline decoration-white/15 text-white/30 hover:text-white/60">zaloguj się</button> by zarządzać budową</div></form>)}</div></Reveal>
         </div>
       </section>
 
@@ -585,8 +626,8 @@ export default function Landing() {
       </footer>
 
       {!isEditing && (
-        <button onClick={()=>setIsEditing(true)} className="fixed bottom-6 right-6 z-50 hidden lg:inline-flex items-center gap-2 bg-white text-black font-[JetBrains_Mono] font-light text-[11px] tracking-[0.08em] px-5 h-11 rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.4)] hover:bg-white/90 transition">
-          <Pencil className="h-3.5 w-3.5"/> EDYTUJ TEKSTY
+        <button onClick={()=>setIsEditing(true)} className="group fixed bottom-6 right-6 z-50 hidden lg:inline-flex items-center gap-2 px-5 h-11 rounded-full border border-white/25 bg-white/[0.03] backdrop-blur-2xl font-[JetBrains_Mono] font-light text-[11px] tracking-[0.08em] text-white/70 transition-all duration-500 hover:border-white/50 hover:bg-white hover:text-black shadow-[0_12px_40px_rgba(0,0,0,0.4)]">
+          <Pencil className="h-3.5 w-3.5" /> EDYTUJ TEKSTY
         </button>
       )}
     </div>
