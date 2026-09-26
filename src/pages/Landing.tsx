@@ -994,7 +994,7 @@ function useAtPageEnd(threshold = 24) {
 const SIDEBAR = [
   { label: "SYSTEM", id: "services" },
   { label: "PLANY", id: "pricing" },
-  { label: "POZIOM", id: "tiers" },
+  { label: "PROMOCJE", id: "promo" },
   { label: "PROCES", id: "process" },
   { label: "FAQ", id: "faq" },
   { label: "KONTAKT", id: "contact" },
@@ -1007,6 +1007,7 @@ const TIERS = [
   {
     value: "standard",
     name: "STANDARD",
+    amount: 4900,
     price: "4 900 zł",
     cycle: "/ mies.",
     lead: "PUNKT WYJŚCIA",
@@ -1027,6 +1028,7 @@ const TIERS = [
   {
     value: "pro",
     name: "PRO",
+    amount: 9800,
     price: "9 800 zł",
     cycle: "/ mies.",
     lead: "NAJCZĘSTSZY WYBÓR",
@@ -1048,6 +1050,7 @@ const TIERS = [
   {
     value: "max",
     name: "MAX",
+    amount: 19600,
     price: "19 600 zł",
     cycle: "/ mies.",
     lead: "DEDYKOWANY ZESPÓŁ",
@@ -1068,10 +1071,34 @@ const TIERS = [
   },
 ];
 
+/* okresy współpracy — im dłużej, tym niższa cena miesięczna */
+const TERMS = [
+  { value: "h6", label: "6 mies.", months: 6, discount: 0 },
+  { value: "y1", label: "Rok", months: 12, discount: 0.17 },
+  { value: "y2", label: "2 lata", months: 24, discount: 0.24 },
+  { value: "y5", label: "5 lat", months: 60, discount: 0.28 },
+  { value: "y10", label: "10 lat", months: 120, discount: 0.3 },
+];
+
+/* nowy klient: 50% przez pierwsze 90 dni */
+const PROMO_MONTHS = 3;
+const PROMO_RATE = 0.5;
+
+const zl = (n: number) =>
+  `${Math.round(n).toLocaleString("pl-PL").replace(/\u00a0/g, " ")} zł`;
+
+const calc = (amount: number, months: number, discount: number) => {
+  const promoSaving = amount * PROMO_RATE * PROMO_MONTHS;
+  const termSaving = amount * discount * months;
+  const total = amount * months;
+  const paid = amount * (1 - discount) * months - promoSaving;
+  return { promoSaving, termSaving, total, saved: total - paid, monthly: paid / months };
+};
+
 const MENU_ITEMS: StaggeredMenuItem[] = [
   { label: "System", ariaLabel: "Przejdź do sekcji SYSTEM", link: "#services" },
   { label: "Plany", ariaLabel: "Przejdź do sekcji PLANY", link: "#pricing" },
-  { label: "Poziom", ariaLabel: "Przejdź do sekcji POZIOM", link: "#tiers" },
+  { label: "Promocje", ariaLabel: "Przejdź do sekcji PROMOCJE", link: "#promo" },
   { label: "Proces", ariaLabel: "Przejdź do sekcji PROCES", link: "#process" },
   { label: "FAQ", ariaLabel: "Przejdź do sekcji FAQ", link: "#faq" },
   { label: "Kontakt", ariaLabel: "Przejdź do sekcji KONTAKT", link: "#contact" },
@@ -1169,10 +1196,13 @@ export default function Landing() {
   /* biała karta frontowa PLANY — ślad kursora robi się czarny */
   const [overWhiteCard, setOverWhiteCard] = useState(false);
   const darkCursor = inProcess || overWhiteCard;
-  /* wybrany plan ładze do sekcji POZIOM + wybrany poziom współpracy */
+  /* wybrany plan ładze do sekcji PROMOCJE + wybrany poziom i okres */
   const [chosenPlan, setChosenPlan] = useState<number | null>(null);
   const [tier, setTier] = useState(TIERS[1].value);
+  const [term, setTerm] = useState(TERMS[1].value);
   const tierData = TIERS.find((x) => x.value === tier) ?? TIERS[1];
+  const termData = TERMS.find((x) => x.value === term) ?? TERMS[1];
+  const quote = calc(tierData.amount, termData.months, termData.discount);
   const atPageEnd = useAtPageEnd();
   /* ślad pikselowy w hero ma sens tylko dla myszy/trackpada */
   const finePointer = useFinePointer();
@@ -1704,7 +1734,7 @@ export default function Landing() {
         <Reveal><div className="text-center max-w-xl mx-auto"><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.2em] text-white/30">03 — PLANY</div><h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[27px] sm:text-[50px] tracking-[-0.02em] leading-none"><EditableText ek="qraft.pricing.h" def="Jasne ceny." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.pricing.sub" def="Miesiąc do miesiąca po 90 dniach. Bez zobowiązań. W odcieniach czerni — wyrafinowane." className="mt-4 block font-[Inter] font-light text-[14px] sm:text-[15px] leading-7 text-white/50 max-w-[480px] mx-auto" isEditing={isEditing} as="p" /></div></Reveal>
         <Reveal><PlanShowcase
           isEditing={isEditing}
-          onPick={(i)=>{ setChosenPlan(i); go("tiers"); }}
+          onPick={(i)=>{ setChosenPlan(i); go("promo"); }}
           recommended={recommended}
           pickedCount={picked.length}
           onWhiteHover={setOverWhiteCard}
@@ -1712,68 +1742,134 @@ export default function Landing() {
         <div className="mt-8 text-center font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.06em] text-white/20"><EditableText ek="qraft.pricing.note2" def="Start bez sesji zdjęciowej — dostępna od Signature. Szczegóły na audycie." className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div>
       </section>
 
-      <section id="tiers" className="relative mx-auto max-w-[1280px] px-6 lg:px-8 pb-24 lg:pb-32">
+      <section id="promo" className="relative mx-auto max-w-[1280px] px-6 lg:px-8 pb-24 lg:pb-32">
         <Reveal>
           <div className="flex flex-col gap-10 border-t border-white/[0.06] pt-16 lg:flex-row lg:items-end lg:justify-between lg:pt-20">
-            <div className="max-w-[520px]">
-              <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/20">04 — POZIOM</div>
+            <div className="max-w-[560px]">
+              <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/20">04 — PROMOCJE</div>
               <h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[27px] sm:text-[50px] leading-[0.98] tracking-[-0.02em] text-white">
-                Wybierz <span className="font-[Instrument_Serif] italic text-white/55">poziom</span> współpracy.
+                Pierwsze 90 dni <span className="font-[Instrument_Serif] italic text-white/55">połowa ceny</span>.
               </h2>
               <p className="mt-5 font-[Inter] font-light text-[14px] sm:text-[15px] leading-7 text-white/45">
-                {chosenPlan !== null ? (
-                  <>
-                    Plan <span className="text-white/80">{plans[chosenPlan]?.name}</span> wybrany. Teraz ustal, jak intensywnie pracujemy.
-                  </>
-                ) : (
-                  <>Wybierz plan powyżej, a tutaj ustalimy poziom pracy.</>
-                )}
+                Nowi klienci QRAFT płacą połowę przez pierwsze 90 dni. Potem cena zależy od okresu — im dłużej, tym niższa.
               </p>
+              {chosenPlan !== null && (
+                <p className="mt-4 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.18em] text-white/40">
+                  PLAN <span className="text-[#7DF0AE]">{plans[chosenPlan]?.name}</span> — dobraj poziom i okres
+                </p>
+              )}
             </div>
+            <div className="flex flex-col items-start gap-4">
+              <div className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-white/30">POZIOM WSPÓŁPRACY</div>
+              <JellyRadio
+                items={[
+                  { value: "standard", label: "Standard" },
+                  { value: "pro", label: "Pro" },
+                  { value: "max", label: "Max" },
+                ]}
+                value={tier}
+                onChange={(v) => setTier(v)}
+                chipColor="rgba(255,255,255,0.045)"
+                activeColor="#F7F7F5"
+                textColor="rgba(242,242,240,0.55)"
+                activeTextColor="#0A0A0A"
+                size="md"
+                gap={10}
+                radius={18}
+                swell={0.22}
+                barge={7}
+                stiffness={560}
+                ariaLabel="Poziom współpracy"
+              />
+            </div>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.06}>
+          <div className="mt-10 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-white/30">OKRES</div>
             <JellyRadio
-              items={[
-                { value: "standard", label: "Standard" },
-                { value: "pro", label: "Pro" },
-                { value: "max", label: "Max" },
-              ]}
-              value={tier}
-              onChange={(v) => setTier(v)}
+              items={TERMS.map((t) => ({ value: t.value, label: t.label }))}
+              value={term}
+              onChange={(v) => setTerm(v)}
               chipColor="rgba(255,255,255,0.045)"
-              activeColor="#F7F7F5"
+              activeColor="#7DF0AE"
               textColor="rgba(242,242,240,0.55)"
-              activeTextColor="#0A0A0A"
-              size="md"
-              gap={10}
-              radius={18}
-              swell={0.22}
-              barge={7}
-              stiffness={560}
-              ariaLabel="Poziom współpracy"
+              activeTextColor="#0A120E"
+              size="sm"
+              gap={6}
+              radius={14}
+              swell={0.16}
+              barge={4}
+              stiffness={620}
+              ariaLabel="Okres współpracy"
             />
           </div>
         </Reveal>
 
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {TERMS.map((t, k) => {
+            const q = calc(tierData.amount, t.months, t.discount);
+            const on = t.value === term;
+            return (
+              <motion.button
+                key={t.value}
+                type="button"
+                onClick={() => setTerm(t.value)}
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-10%" }}
+                transition={{ duration: 0.6, delay: k * 0.05, ease: [0.22, 1, 0.36, 1] }}
+                className={`flex flex-col items-start gap-2 rounded-[20px] border p-4 text-left outline-none backdrop-blur-2xl transition-colors duration-500 ${
+                  on
+                    ? "border-[#7DF0AE]/60 bg-[#0A120E]"
+                    : "border-white/[0.08] bg-white/[0.02] hover:border-white/25"
+                }`}
+              >
+                <span className="flex w-full items-center justify-between gap-2">
+                  <span className={`font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.2em] ${on ? "text-[#7DF0AE]" : "text-white/35"}`}>
+                    {t.label.toUpperCase()}
+                  </span>
+                  {t.discount > 0 && (
+                    <span className="font-[JetBrains_Mono] font-light text-[9px] tracking-[0.12em] text-white/35">−{Math.round(t.discount * 100)}%</span>
+                  )}
+                </span>
+                <span className="font-[Cormorant_Garamond] font-light text-[20px] sm:text-[24px] leading-none text-white">
+                  {zl(q.monthly)}
+                </span>
+                <span className="font-[Inter] font-light text-[12px] leading-5 text-white/45">
+                  <span className="text-[#7DF0AE]">oszczędzasz {zl(q.saved)}</span>
+                  <br />
+                  z {zl(tierData.amount)}
+                </span>
+              </motion.button>
+            );
+          })}
+        </div>
+
         <Reveal delay={0.08}>
           <AnimatePresence mode="wait">
             <motion.div
-              key={tier}
+              key={`${tier}-${term}`}
               initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -14, filter: "blur(8px)" }}
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-10 overflow-hidden rounded-[28px] border border-white/[0.10] bg-white/[0.03] p-7 sm:p-10 backdrop-blur-2xl backdrop-saturate-[1.4]"
+              className="mt-6 overflow-hidden rounded-[28px] border border-white/[0.10] bg-white/[0.03] p-7 sm:p-10 backdrop-blur-2xl backdrop-saturate-[1.4]"
               style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 30px 80px rgba(0,0,0,0.35)" }}
             >
               <div className="grid gap-10 lg:grid-cols-[1fr_320px]">
                 <div>
                   <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
-                    <span className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.24em] text-white/35">{tierData.name}</span>
-                    <span className="font-[Cormorant_Garamond] font-light text-[34px] sm:text-[58px] leading-none tracking-[-0.02em] text-white">
-                      <PopNumber text={tierData.price} className="font-[Cormorant_Garamond] font-light" />
+                    <span className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.24em] text-white/35">
+                      {tierData.name} · {termData.label.toUpperCase()}
                     </span>
-                    <span className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.14em] text-white/35">{tierData.cycle}</span>
+                    <span className="font-[Cormorant_Garamond] font-light text-[34px] sm:text-[58px] leading-none tracking-[-0.02em] text-white">
+                      <PopNumber text={zl(quote.monthly)} className="font-[Cormorant_Garamond] font-light" />
+                      <span className="font-[JetBrains_Mono] font-light text-[12px] sm:text-[13px] tracking-[0.14em] text-white/35"> / mies.</span>
+                    </span>
                   </div>
-                  <p className="mt-6 font-[Inter] font-light text-[14.5px] sm:text-[16px] leading-7 text-white/60">{tierData.desc}</p>
+                  <p className="mt-6 font-[Inter] font-light text-[14px] sm:text-[16px] leading-7 text-white/60">{tierData.desc}</p>
                   <ul className="mt-8 space-y-3">
                     {tierData.includes.map((x, k) => (
                       <motion.li
@@ -1781,7 +1877,7 @@ export default function Landing() {
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.45, delay: 0.06 + k * 0.06, ease: [0.22, 1, 0.36, 1] }}
-                        className="flex items-start gap-3 font-[Inter] font-light text-[14px] sm:text-[15px] leading-6 text-white/70"
+                        className="flex items-start gap-3 font-[Inter] font-light text-[13px] sm:text-[15px] leading-6 text-white/70"
                       >
                         <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#7DF0AE]" />
                         <span>{x}</span>
@@ -1789,16 +1885,29 @@ export default function Landing() {
                     ))}
                   </ul>
                 </div>
+
                 <div className="flex flex-col justify-between gap-8 rounded-[22px] border border-white/[0.08] bg-white/[0.02] p-7">
                   <div>
-                    <div className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-white/30">{tierData.lead}</div>
+                    <div className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-[#7DF0AE]">
+                      OSZCZĘDNOŚĆ {zl(quote.saved)}
+                    </div>
                     <div className="mt-6 font-[Inter] font-light text-[13px] sm:text-[14px] leading-6 text-white/50">
-                      {tierData.meta.map((m) => (
-                        <div key={m.k} className="flex items-center justify-between gap-4 border-b border-white/[0.06] py-3">
-                          <span>{m.k}</span>
-                          <span className="text-white/85">{m.v}</span>
-                        </div>
-                      ))}
+                      <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] py-3">
+                        <span>Cena katalogowa</span>
+                        <span className="text-white/80">{zl(quote.total)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] py-3">
+                        <span>−50% przez 90 dni</span>
+                        <span className="text-[#7DF0AE]">−{zl(quote.promoSaving)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] py-3">
+                        <span>Rabat za {termData.label.toLowerCase()}</span>
+                        <span className="text-[#7DF0AE]">−{zl(quote.termSaving)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4 py-3">
+                        <span>Do zapłaty</span>
+                        <span className="text-white">{zl(quote.total - quote.saved)}</span>
+                      </div>
                     </div>
                   </div>
                   <BtnGlass onClick={() => go("contact")} className="w-full h-12 text-[10px] sm:text-[11px]">ZACZNIJ WSPÓŁPRACĘ</BtnGlass>
@@ -1808,6 +1917,7 @@ export default function Landing() {
           </AnimatePresence>
         </Reveal>
       </section>
+
 
       <section id="faq" className="mx-auto max-w-[1280px] px-6 lg:px-8 pb-12">
         <Reveal><div className="grid lg:grid-cols-[320px_1fr] gap-10 border-t border-white/[0.06] pt-12"><div><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/20">05 — FAQ</div><h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[26px] sm:text-[30px] leading-none"><EditableText ek="qraft.faq.h" def="Szybkie odpowiedzi." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><EditableText ek="qraft.faq.desc" def="Jasno i bez żargonu. Resztę dopowiemy na audycie." className="mt-3 block font-[Inter] font-light text-[13px] sm:text-[14px] leading-6 text-white/30" isEditing={isEditing} as="p" /></div><div className="divide-y divide-white/5 border border-white/10 rounded-[20px] overflow-hidden bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.3]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.25)" } as any}>{[["Dla kogo jest QRAFT?","Dla firm, gdzie liczy się miejsce i reputacja. Kawiarnie, studia, butiki, kliniki."],["Jak szybko widać efekty?","2–4 tygodnie by dać się znaleźć. 30–60 dni by urosnąć w środku tygodnia."],["Czy jest zobowiązanie?","Nie. Miesiąc do miesiąca po 90 dniach."],["Czego potrzebujecie na start?","90 minut + dostęp do profilu. Resztą zajmujemy się my."]].map(([q,a],i)=>(<div key={q}><button onClick={()=>setFaqOpen(faqOpen===i?null:i)} className="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition"><span className="font-[Cormorant_Garamond] font-light text-[15px] sm:text-[17px] pr-6"><EditableText ek={`qraft.faq.${i}.q`} def={q} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span><span className={`h-7 w-7 grid place-items-center rounded-full border shrink-0 transition ${faqOpen===i?"bg-white text-black border-white":"border-white/10 text-white/20"}`}>{faqOpen===i?<Minus className="h-3.5 w-3.5"/>:<Plus className="h-3.5 w-3.5"/>}</span></button><AnimatePresence>{faqOpen===i && (<motion.div initial={{ height:0, opacity:0 }} animate={{ height:"auto", opacity:1 }} exit={{ height:0, opacity:0 }} className="overflow-hidden"><div className="px-6 pb-6 font-[Inter] font-light text-[13px] sm:text-[14px] leading-7 text-white/60 max-w-[560px]"><EditableText ek={`qraft.faq.${i}.a`} def={a} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></div></motion.div>)}</AnimatePresence></div>))}</div></div></Reveal>
