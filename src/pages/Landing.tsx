@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
 import GradualBlur from "@/components/GradualBlur";
 import FlipCard from "@/components/FlipCard";
+import WarpText from "@/components/WarpText";
 import LineSidebar from "@/components/LineSidebar";
 import QraftMark from "@/components/QraftMark";
 
@@ -1331,13 +1332,30 @@ export default function Landing() {
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              <h1 className="font-[Space_Grotesk] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[clamp(30px,7.4vw,100px)]">
-                <span className="block text-white">Precision</span>
-                <span className="block text-white">Builds</span>
-                <span className="block text-transparent" style={{ WebkitTextStroke: "1.2px rgba(255,255,255,0.6)" }}>
-                  Brands
-                </span>
-              </h1>
+              {/* tytul dla czytnikow i wyszukiwarek; wizualnie szklany napis */}
+              <h1 className="sr-only">Precision Builds Brands</h1>
+              <WarpText
+                text={"PRECISION\nBUILDS\nBRANDS"}
+                color="#F2F2F0"
+                align="left"
+                pointer={false}
+                fontFamily="'Space Grotesk', system-ui, sans-serif"
+                fontWeight={300}
+                fontSize="clamp(44px, 7.6vw, 104px)"
+                letterSpacing="-0.045em"
+                lineHeight={0.84}
+                warpStrength={0.1}
+                warpScale={1.45}
+                speed={0.45}
+                pointerInfluence={0}
+                pointerStrength={0}
+                refraction={0.016}
+                ripple={false}
+                /* szerokosc kontenera = budzet szerokosci liter: na telefonie
+                   mniej (~ł 32px), na desktopie polowa kolumny przed kreska */
+                className="w-[56%] lg:w-[calc(50%-0.5rem)]"
+                style={{ height: "clamp(120px, 23vw, 320px)", minHeight: 0 }}
+              />
 
               <motion.div
                 className="mt-12 h-px w-full bg-white origin-left"
