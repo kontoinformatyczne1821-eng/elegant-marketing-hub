@@ -1516,7 +1516,7 @@ export default function Landing() {
         items={MENU_ITEMS}
         displaySocials={false}
         displayItemNumbering
-        colors={["#0B0B0E", "#241006", "#7A2408", "#FF3E0A"]}
+        colors={["#07070A", "#1F0B03", "#5C1A05", "#FF3E0A"]}
         accentColor="#FF3E0A"
         menuButtonColor="#F2F2F0"
         openMenuButtonColor="#FF3E0A"
