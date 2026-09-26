@@ -32,6 +32,16 @@ const schema = defineSchema(
       role: v.optional(roleValidator), // role of the user. do not remove
     }).index("email", ["email"]), // index for the email. do not remove or modify
 
+    purchases: defineTable({
+      sessionId: v.string(),
+      plan: v.string(),
+      term: v.string(),
+      amount: v.number(),
+      email: v.optional(v.string()),
+      status: v.string(),
+      createdAt: v.number(),
+    }).index("by_session", ["sessionId"]),
+
     // add other tables here
 
     // tableName: defineTable({
