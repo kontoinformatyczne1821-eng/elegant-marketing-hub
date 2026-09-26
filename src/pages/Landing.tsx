@@ -1,4 +1,4 @@
-import { motion, AnimatePresence, useScroll, useSpring, useTransform, useInView } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring, useTransform, useInView, useMotionValueEvent } from "framer-motion";
 import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save, RefreshCw } from "lucide-react";
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router";
@@ -396,6 +396,51 @@ function PlanShowcase({
                 off === 0 ? "cursor-default" : "cursor-pointer"
               } ${front ? "shadow-[0_10px_26px_rgba(0,0,0,0.28)]" : "shadow-[0_8px_22px_rgba(0,0,0,0.28)]"}`}
             >
+              {/* animacja nie zostaje w granicach kafla: poświata i obracające się
+                  światło żyją poza nim i towarzyszą karcie w spirali */}
+              <motion.div
+                aria-hidden
+                className="pointer-events-none absolute -inset-x-10 -top-10 -bottom-14"
+                initial={false}
+                animate={{ opacity: front ? [0.65, 1, 0.65] : 0.26 }}
+                transition={
+                  front
+                    ? { duration: 7.5, repeat: Infinity, ease: "easeInOut" }
+                    : { duration: 0.5 }
+                }
+                style={{
+                  background:
+                    "radial-gradient(58% 52% at 50% 58%, rgba(255,255,255,0.18), rgba(255,255,255,0.05) 56%, transparent 76%)",
+                  filter: "blur(30px)",
+                }}
+              />
+              {front && (
+                <motion.div
+                  aria-hidden
+                  className="pointer-events-none absolute left-1/2 top-1/2"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 26, repeat: Infinity, ease: "linear" }}
+                >
+                  {[
+                    { x: -300, y: -60, s: 210, o: 0.5 },
+                    { x: 260, y: 130, s: 150, o: 0.34 },
+                  ].map((d, k) => (
+                    <span
+                      key={k}
+                      className="absolute rounded-full"
+                      style={{
+                        left: d.x,
+                        top: d.y,
+                        width: d.s,
+                        height: d.s,
+                        opacity: d.o,
+                        background: "radial-gradient(circle, rgba(255,255,255,0.5), transparent 70%)",
+                        filter: "blur(26px)",
+                      }}
+                    />
+                  ))}
+                </motion.div>
+              )}
               <GlareHover
                 width="100%"
                 height="100%"
@@ -995,6 +1040,21 @@ export default function Landing() {
   /* pasek boczny wjeżdża dopiero po minięciu hero */
   const navFade = useSpring(useTransform(scrollY, [520, 940], [0, 1]), { stiffness: 120, damping: 28 });
   const navShift = useTransform(navFade, [0, 1], [-26, 0]);
+  const navBlur = useTransform(navFade, [0, 1], [14, 0]);
+  /* górny pasek chowa się przy jeździe w dół i wraca przy powrocie */
+  const [barHidden, setBarHidden] = useState(false);
+  const barHiddenRef = useRef(false);
+  useMotionValueEvent(scrollY, "change", (y) => {
+    const prev = scrollY.getPrevious() ?? 0;
+    let next = barHiddenRef.current;
+    if (y < 140) next = false;
+    else if (y > prev + 6) next = true;
+    else if (y < prev - 6) next = false;
+    if (next !== barHiddenRef.current) {
+      barHiddenRef.current = next;
+      setBarHidden(next);
+    }
+  });
 
   const go = (id: string) => {
     setMobileOpen(false);
@@ -1067,7 +1127,8 @@ export default function Landing() {
           style={{
             opacity: navFade,
             x: navShift,
-            background: inProcess ? "rgba(247,247,245,0.55)" : "rgba(12,12,15,0.42)",
+            filter: navBlur,
+            background: inProcess ? "rgba(247,247,245,0.45)" : "rgba(12,12,15,0.34)",
             borderColor: inProcess ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.10)",
             boxShadow: inProcess
               ? "inset 0 1px 1px rgba(255,255,255,0.75), 0 22px 60px rgba(0,0,0,0.16)"
@@ -1132,21 +1193,37 @@ export default function Landing() {
 
       <FloatingField />
 
-      <header className="sticky top-0 z-40 bg-[#050507]/28 backdrop-blur-[28px] backdrop-saturate-[1.5] border-b border-white/[0.08] supports-[backdrop-filter]:bg-[#050507]/20" style={{ WebkitBackdropFilter: "blur(28px) saturate(1.5)" } as any}>
+      <motion.header
+        animate={{ y: barHidden && !mobileOpen && !isEditing ? "-104%" : "0%" }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        className="sticky top-0 z-40 bg-[#050507]/28 backdrop-blur-[28px] backdrop-saturate-[1.5] border-b border-white/[0.08] supports-[backdrop-filter]:bg-[#050507]/20" style={{ WebkitBackdropFilter: "blur(28px) saturate(1.5)" } as any}>
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 h-[72px] flex items-center justify-between">
-          <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} className="flex items-center gap-4">
+          <motion.button
+            onClick={()=>window.scrollTo({top:0,behavior:"smooth"})}
+            animate={{ y: barHidden ? 12 : 0, opacity: barHidden ? 0 : 1 }}
+            transition={{ duration: 0.45, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
+            className="flex items-center gap-4"
+          >
             <div className="h-[32px] w-[32px] rounded-[10px] border border-white/15 bg-white/[0.02] grid place-items-center">
               <span className="font-[Instrument_Serif] text-[16px]">Q</span>
             </div>
             <span className="font-[Space_Grotesk] font-light tracking-[0.28em] text-[12px]">QRAFT</span>
             <span className="hidden lg:inline font-[JetBrains_Mono] font-light text-[10px] tracking-[0.18em] text-white/25 border-l border-white/10 pl-4 ml-1">PERFEKCJA BUDUJE MARKI</span>
-          </button>
-          <nav className="hidden lg:flex gap-8 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/30">
+          </motion.button>
+          <motion.nav
+            animate={{ y: barHidden ? 12 : 0, opacity: barHidden ? 0 : 1 }}
+            transition={{ duration: 0.45, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+            className="hidden lg:flex gap-8 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/30"
+          >
             <button onClick={()=>go("services")} className="hover:text-white/80 transition">— SYSTEM</button>
             <button onClick={()=>go("pricing")} className="hover:text-white/80 transition">— PLANY</button>
             <button onClick={()=>go("contact")} className="hover:text-white/80 transition">— KONTAKT</button>
-          </nav>
-          <div className="flex items-center gap-3">
+          </motion.nav>
+          <motion.div
+            animate={{ y: barHidden ? 12 : 0, opacity: barHidden ? 0 : 1 }}
+            transition={{ duration: 0.45, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            className="flex items-center gap-3"
+          >
             <button
               onClick={()=>setIsEditing(!isEditing)}
               className={`hidden md:inline-flex items-center gap-2 px-4 h-9 rounded-full border font-[JetBrains_Mono] font-light text-[11px] tracking-[0.12em] transition-all duration-500 backdrop-blur ${isEditing ? "bg-white text-black border-white" : "border-white/15 bg-white/[0.02] text-white/60 hover:border-white/45 hover:bg-white/[0.08] hover:text-white"}`}
@@ -1156,7 +1233,7 @@ export default function Landing() {
             <span className="hidden md:inline-flex items-center gap-1.5 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] text-white/20"><Terminal className="h-3 w-3 opacity-60"/> qraft.build</span>
             <BtnPrimary onClick={()=>go("contact")} className="hidden sm:inline-flex text-[11px] tracking-[0.16em] px-6 h-9">ROZPOCZNIJ</BtnPrimary>
             <button onClick={()=>setMobileOpen(!mobileOpen)} className="lg:hidden h-9 w-9 grid place-items-center rounded-full border border-white/10 bg-white/[0.03]">{mobileOpen?<X className="h-4 w-4"/>:<Menu className="h-4 w-4"/>}</button>
-          </div>
+          </motion.div>
         </div>
         <AnimatePresence>
           {mobileOpen && (
@@ -1171,7 +1248,7 @@ export default function Landing() {
             </motion.div>
           )}
         </AnimatePresence>
-      </header>
+      </motion.header>
 
       {isEditing && (
         <div className="sticky top-[72px] z-30 bg-[#111113] border-y border-white/10 text-white">
