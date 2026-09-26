@@ -12,6 +12,8 @@ import PixelTrail from "@/components/PixelTrail";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import JellyRadio from "@/components/JellyRadio";
 import SavingsCount from "@/components/CountUp";
+import { Volume2, VolumeX } from "lucide-react";
+import { setMuted, sfxConfirm, sfxPop, sfxTap, sfxWhoosh, unlockAudio } from "@/lib/sound";
 import type { StaggeredMenuItem } from "@/components/StaggeredMenu";
 
 const REDUCE_MOTION =
@@ -1285,6 +1287,22 @@ export default function Landing() {
   const termData = availableTerms.find((x) => x.value === term) ?? availableTerms[0];
   const quote = calc(tierData.amount, termData.months, termData.discount);
   const atPageEnd = useAtPageEnd();
+  /* ikona głośnika musi się odświeża, więc stan trzymamy w Reaccie */
+  const [soundOn, setSoundOn] = useState(true);
+  /* przeglądarki wymagają geścia, zanim puszcza źdźwięk */
+  useEffect(() => {
+    const unlock = () => {
+      unlockAudio();
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("keydown", unlock);
+    };
+    window.addEventListener("pointerdown", unlock);
+    window.addEventListener("keydown", unlock);
+    return () => {
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("keydown", unlock);
+    };
+  }, []);
   /* ślad pikselowy w hero ma sens tylko dla myszy/trackpada */
   const finePointer = useFinePointer();
   const spy = useSectionSpy(SIDEBAR_IDS);
@@ -1331,6 +1349,7 @@ export default function Landing() {
     go(item.link.replace("#", ""));
   };
   const go = (id: string) => {
+    sfxWhoosh(true);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
   const submit = (e: React.FormEvent) => {
@@ -1439,7 +1458,7 @@ export default function Landing() {
           <LineSidebar
             items={SIDEBAR.map((x) => x.label)}
             active={spy}
-            onItemClick={(i) => go(SIDEBAR[i].id)}
+            onItemClick={(i) => { sfxTap(); go(SIDEBAR[i].id); }}
             accentColor="#FF3E0A"
             textColor={inProcess ? "rgba(10,10,10,0.45)" : "rgba(242,242,240,0.42)"}
             markerColor={inProcess ? "rgba(10,10,10,0.22)" : "rgba(255,255,255,0.16)"}
@@ -1473,14 +1492,14 @@ export default function Landing() {
         animate={{ y: barHidden && !isEditing ? "-104%" : "0%" }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className="sticky top-0 z-40 bg-[#050507]/28 backdrop-blur-[28px] backdrop-saturate-[1.5] border-b border-white/[0.08] supports-[backdrop-filter]:bg-[#050507]/20" style={{ WebkitBackdropFilter: "blur(28px) saturate(1.5)" } as any}>
-        <div className="mx-auto max-w-[1280px] pl-6 pr-[150px] lg:pl-8 lg:pr-[176px] h-[72px] flex items-center justify-between">
+        <div className="mx-auto max-w-[1280px] pl-6 pr-[150px] lg:pl-8 lg:pr-[220px] h-[72px] flex items-center justify-between">
           <motion.div
             animate={{ y: barHidden ? 12 : 0, opacity: barHidden ? 0 : 1 }}
             transition={{ duration: 0.45, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
             className="flex items-center gap-4"
           >
             <button
-              onClick={()=>setNavOpen((v)=>!v)}
+              onClick={()=>{ sfxWhoosh(!navOpen); setNavOpen((v)=>!v); }}
               aria-label={navOpen ? "Ukryj nawigację" : "Pokaż nawigację"}
               aria-expanded={navOpen}
               className={`h-[32px] w-[32px] rounded-[10px] border grid place-items-center cursor-pointer transition-all duration-300 ${navOpen ? "bg-white text-black border-white" : "border-white/15 bg-white/[0.02] hover:border-white/45 hover:bg-white/[0.08]"}`}
@@ -1504,6 +1523,14 @@ export default function Landing() {
               {isEditing ? <><Save className="h-3.5 w-3.5"/> ZAKOŃCZ EDYCJĘ</> : <><Pencil className="h-3.5 w-3.5"/> EDYTUJ TEKSTY</>}
             </button>
             <span className="hidden md:inline-flex items-center gap-1.5 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.14em] text-white/20"><Terminal className="h-3 w-3 opacity-60"/> qraft.build</span>
+            <button
+              onClick={() => { const next = !soundOn; setSoundOn(next); setMuted(!next); if (next) sfxTap(); }}
+              aria-label={soundOn ? "Wycisz dźwięki" : "Włącz dźwięki"}
+              aria-pressed={!soundOn}
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/15 bg-white/[0.02] text-white/55 transition-colors duration-300 hover:border-white/45 hover:text-white"
+            >
+              {soundOn ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+            </button>
             <BtnPrimary onClick={()=>go("contact")} className="hidden sm:inline-flex text-[10px] sm:text-[11px] tracking-[0.16em] px-6 h-9">ROZPOCZNIJ</BtnPrimary>
           </motion.div>
         </div>
@@ -1522,6 +1549,8 @@ export default function Landing() {
         openMenuButtonColor="#FF3E0A"
         changeMenuColorOnOpen
         closeOnClickAway
+        onMenuOpen={() => sfxWhoosh(true)}
+        onMenuClose={() => sfxWhoosh(false)}
         onItemClick={handleMenuItem}
       />
 
@@ -1690,7 +1719,7 @@ export default function Landing() {
                 fill
                 editable={isEditing}
                 selected={picked.includes(i)}
-                onActivate={() => toggleModule(i)}
+                onActivate={() => { sfxTap(); toggleModule(i); }}
                 axis="y"
                 ariaLabel={`Modu\u0142 ${s.n} \u2014 ${s.title}`}
                 background={picked.includes(i) ? "#0A120E" : "#0A0A0D"}
@@ -1815,7 +1844,7 @@ export default function Landing() {
         <Reveal><div className="text-center max-w-xl mx-auto"><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.2em] text-white/30">03 — PLANY</div><h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[27px] sm:text-[50px] tracking-[-0.02em] leading-none"><EditableText ek="qraft.pricing.h" def="Jasne ceny." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.pricing.sub" def="Miesiąc do miesiąca po 90 dniach. Bez zobowiązań. W odcieniach czerni — wyrafinowane." className="mt-4 block font-[Inter] font-light text-[14px] sm:text-[15px] leading-7 text-white/50 max-w-[480px] mx-auto" isEditing={isEditing} as="p" /></div></Reveal>
         <Reveal><PlanShowcase
           isEditing={isEditing}
-          onPick={(i)=>{ setChosenPlan(i); go("promo"); }}
+          onPick={(i)=>{ sfxConfirm(); setChosenPlan(i); go("promo"); }}
           recommended={recommended}
           pickedCount={picked.length}
           onWhiteHover={setOverWhiteCard}
@@ -1847,7 +1876,7 @@ export default function Landing() {
             <JellyRadio
               items={availableTerms.map((t) => ({ value: t.value, label: t.label }))}
               value={term}
-              onChange={(v) => setTerm(v)}
+              onChange={(v) => { sfxPop(); setTerm(v); }}
               chipColor="rgba(255,255,255,0.045)"
               activeColor="#7DF0AE"
               textColor="rgba(242,242,240,0.55)"
