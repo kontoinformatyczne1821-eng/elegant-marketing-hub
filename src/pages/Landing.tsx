@@ -2,7 +2,7 @@ import { motion, AnimatePresence, useScroll, useTransform, useInView } from "fra
 import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save } from "lucide-react";
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router";
-import { ClearField, DigitChars, PopNumber, usePopIn } from "@/components/transitions";
+import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
 
 function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, popKey }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean; popKey?: string }) {
   const [val, setVal] = useState(def);
@@ -50,6 +50,14 @@ const plans = [
   { name: "ESSENCE", price: "1 900 zł", sub: "/ mies.", line: "Fundamenty, by dać się znaleźć.", pts: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"], featured: false, cta: "Wybierz Essence" },
   { name: "SIGNATURE", price: "3 800 zł", sub: "/ mies.", line: "Pełny system. Wypełnia kalendarz.", pts: ["Wszystko z Essence", "Zasięg + płatne w promieniu", "Silnik treści + lista"], featured: true, cta: "Wybierz Signature" },
   { name: "PRESTIGE", price: "Wycena", sub: "", line: "Starty, rebrandingi, wiele lokalizacji.", pts: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"], featured: false, cta: "Zapytaj o Prestige" },
+];
+
+/* okienko audytu — wybór usługi przesuwa pasek */
+const auditServices = [
+  { id: "audyt", label: "AUDYT", note: "bezpłatny · 20 min", items: ["Ogląd firmy z zewnątrza", "Pierwsza największa dźwignia", "Lista rzeczy do naprawy"] },
+  { id: "essence", label: "ESSENCE", note: "1 900 zł / mies.", items: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"] },
+  { id: "signature", label: "SIGNATURE", note: "3 800 zł / mies.", items: ["Wszystko z Essence", "Zasięg + płatne w promieniu", "Silnik treści + lista"] },
+  { id: "prestige", label: "PRESTIGE", note: "wycena indywidualna", items: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"] },
 ];
 
 /* 1 baner = 1 etap procesu */
@@ -811,6 +819,8 @@ export default function Landing() {
     setTimeout(()=>setSent(false), 6000);
   };
 
+  const svc = auditServices.find((s) => s.id === form.service) || auditServices[0];
+
   return (
     <div className="min-h-screen bg-[#050507] text-[#F2F2F0] antialiased selection:bg-white selection:text-black">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&family=Space+Grotesk:wght@300;400&display=swap'); html{scroll-behavior:smooth} @keyframes qmarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}} @keyframes qmsheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}} @keyframes qmbreathe{0%,100%{opacity:.35}50%{opacity:.9}}`}</style>
@@ -1063,44 +1073,120 @@ export default function Landing() {
 
       <section id="contact" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-12 lg:py-20">
         <div className="grid lg:grid-cols-[1fr_1fr] gap-6">
-          <Reveal><div className="bg-[#0F0F11] border border-white/10 text-white rounded-[32px] p-8 lg:p-10 relative overflow-hidden min-h-[440px] flex flex-col"><div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/[0.04] blur-2xl"/><div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"/><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/30">05 — TERMIN</div><h2 className="mt-6 font-[Cormorant_Garamond] font-light text-[40px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.contact.h1" def="Zarezerwuj termin" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.contact.h2" def="na bezpłatny audyt." className="block font-[Cormorant_Garamond] font-light italic text-white/50" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.contact.desc" def="20 minut online. Wybierz dzień i godzinę — potwierdzimy w ciągu kilku godzin. Nawet jeśli nas nie wybierzesz, zostajesz z planem." className="mt-4 block font-[Inter] font-light text-[14px] leading-7 text-white/40 max-w-[380px]" isEditing={isEditing} as="p" /><div className="mt-8 space-y-3 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.06em] text-white/35"><div className="flex items-center gap-2.5"><Clock className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line1" def="Dwa terminy w tym tygodniu · 20 min" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div><div className="flex items-center gap-2.5"><Terminal className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line2" def="Otwarte dla każdego klienta" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div></div><div className="mt-auto pt-10 flex gap-2 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.1em]"><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge1" def="BEZ OPŁAT" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge2" def="BEZ ZOBOWIĄZAŃ" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div></div></Reveal>
-          <Reveal delay={0.06}><div className="bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.4] border border-white/10 rounded-[32px] p-7 sm:p-8" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.32)" } as any}><div className="flex items-center justify-between"><h3 className="font-[Cormorant_Garamond] font-light text-[22px]"><EditableText ek="qraft.form.h" def="Zapytanie o termin" className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/20 border border-white/10 rounded-full px-3 py-1"><PopNumber text="2 MIN" /></span></div>{sent ? (<motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} className="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-8 text-center"><div className="h-10 w-10 mx-auto grid place-items-center rounded-full bg-white text-black"><Check className="h-5 w-5"/></div><div className="mt-4 font-[Cormorant_Garamond] font-light text-[18px]">Termin zarezerwowany.</div><div className="mt-2 font-[Inter] font-light text-[13px] text-white/30">{form.date ? new Date(form.date + "T12:00:00").toLocaleDateString("pl-PL", { weekday: "long", day: "numeric", month: "long" }) : ""} \u00b7 {form.time} — potwierdzenie wyślemy na {form.email}.</div><button onClick={()=>setSent(false)} className="mt-5 font-[JetBrains_Mono] font-light text-xs underline decoration-white/20 text-white/40">Wyślij kolejne</button></motion.div>) : (<form onSubmit={submit} className="mt-8 space-y-5">
-          <div className="grid sm:grid-cols-2 gap-4">
-            <ClearField label="Imię i nazwisko" name="name" value={form.name} onChange={(v)=>setForm({...form, name:v})} placeholder="Alex Kowalski" autoComplete="name" required />
-            <ClearField label="Firma" name="business" value={form.business} onChange={(v)=>setForm({...form, business:v})} placeholder="Lumière" autoComplete="organization" />
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <ClearField label="Telefon" name="phone" type="tel" value={form.phone} onChange={(v)=>setForm({...form, phone:v})} placeholder="600 100 200" autoComplete="tel" />
-            <ClearField label="Email" name="email" type="email" value={form.email} onChange={(v)=>setForm({...form, email:v})} placeholder="alex@firma.pl" autoComplete="email" required />
-          </div>
-          <div className="grid sm:grid-cols-3 gap-4">
-            <label className="block space-y-2">
-              <span className="block font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">USŁUGA</span>
-              <select name="service" value={form.service} onChange={(e)=>setForm({...form, service:e.target.value})} className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm text-white [color-scheme:dark] focus:outline-none focus:border-white/20">
-                <option className="bg-[#0F0F11]" value="audyt">Audyt 20 min</option>
-                <option className="bg-[#0F0F11]" value="essence">Essence</option>
-                <option className="bg-[#0F0F11]" value="signature">Signature</option>
-                <option className="bg-[#0F0F11]" value="prestige">Prestige / warsztat</option>
-              </select>
-            </label>
-            <label className="block space-y-2">
-              <span className="block font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">DZIEŃ</span>
-              <input required type="date" name="date" min={new Date().toISOString().slice(0,10)} value={form.date} onChange={(e)=>setForm({...form, date:e.target.value})} className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm text-white [color-scheme:dark] focus:outline-none focus:border-white/20"/>
-            </label>
-            <label className="block space-y-2">
-              <span className="block font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">GODZINA</span>
-              <select name="time" value={form.time} onChange={(e)=>setForm({...form, time:e.target.value})} className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm text-white [color-scheme:dark] focus:outline-none focus:border-white/20">
-                {["9:00","10:30","12:00","14:00","16:00","18:00"].map((t)=>(<option key={t} className="bg-[#0F0F11]" value={t}>{t}</option>))}
-              </select>
-            </label>
-          </div>
-          <label className="block space-y-2">
-            <span className="block font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">CO CHCESZ POPRAWIĆ</span>
-            <textarea name="message" rows={3} value={form.message} onChange={(e)=>setForm({...form, message:e.target.value})} placeholder="np. pusty kalendarz w weekendy, brak zdjęć w Mapach…" className="w-full rounded-[20px] border border-white/10 bg-white/[0.02] px-5 py-4 font-[Inter] font-light text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-white/20"/>
-          </label>
-          <BtnPrimary type="submit" className="w-full h-[48px] text-[11px]">WYŚLIJ ZAPYTANIE O TERMIN <ArrowRight className="h-4 w-4 opacity-60" /></BtnPrimary>
-          <div className="text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.04em] text-white/20">Lub <button type="button" onClick={()=>navigate("/auth")} className="underline decoration-white/15 text-white/30 hover:text-white/60">zaloguj się</button> by zarządzać terminami</div>
-        </form>)}</div></Reveal>
+          <Reveal><div className="bg-[#0F0F11] border border-white/10 text-white rounded-[32px] p-8 lg:p-10 relative overflow-hidden min-h-[440px] flex flex-col"><div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/[0.04] blur-2xl"/><div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"/><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/30">05 — AUDYT</div><h2 className="mt-6 font-[Cormorant_Garamond] font-light text-[40px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.contact.h1b" def="Zamów bezpłatny" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.contact.h2b" def="audyt." className="block font-[Cormorant_Garamond] font-light italic text-white/50" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.contact.desc2" def="20 minut online. Wybierz usługę, dzień i godzinę — potwierdzimy w ciągu kilku godzin. Nawet jeśli nas nie wybierzesz, zostajesz z planem." className="mt-4 block font-[Inter] font-light text-[14px] leading-7 text-white/40 max-w-[380px]" isEditing={isEditing} as="p" /><div className="mt-8 space-y-3 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.06em] text-white/35"><div className="flex items-center gap-2.5"><Clock className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line1" def="Dwa terminy w tym tygodniu · 20 min" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div><div className="flex items-center gap-2.5"><Terminal className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line2" def="Otwarte dla każdego klienta" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div></div><div className="mt-auto pt-10 flex gap-2 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.1em]"><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge1" def="BEZ OPŁAT" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge2" def="BEZ ZOBOWIĄZAŃ" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div></div></Reveal>
+          <Reveal delay={0.06}>
+            <div className="bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.4] border border-white/10 rounded-[32px] p-7 sm:p-8 h-full flex flex-col" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.32)" } as any}>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-[Cormorant_Garamond] font-light text-[22px]">
+                  <EditableText ek="qraft.form.h" def="Zamów bezpłatny audyt" className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
+                </h3>
+                <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/20 border border-white/10 rounded-full px-3 py-1 whitespace-nowrap">
+                  <TextSwap text={sent ? "WYSŁANO" : "2 MIN"} />
+                </span>
+              </div>
+
+              <div className="mt-7">
+                <SlidingTabs
+                  items={auditServices.map((s) => ({ id: s.id, label: s.label }))}
+                  value={form.service}
+                  onChange={(id) => setForm({ ...form, service: id })}
+                  className="t-tabs--fill"
+                  tabClassName="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em]"
+                />
+                <div className="mt-4 flex items-center justify-between gap-3">
+                  <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/25">W ZAKRESIE</span>
+                  <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.1em] text-white/45 text-right">
+                    <TextSwap text={svc.note} />
+                  </span>
+                </div>
+                <motion.ul
+                  key={form.service}
+                  initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2"
+                >
+                  {svc.items.map((it) => (
+                    <li key={it} className="flex items-start gap-2 rounded-[14px] border border-white/10 bg-white/[0.03] px-3 py-2.5 font-[Inter] font-light text-[12.5px] leading-5 text-white/65">
+                      <Check className="mt-[3px] h-3.5 w-3.5 shrink-0 text-white/30" />
+                      {it}
+                    </li>
+                  ))}
+                </motion.ul>
+              </div>
+
+              <form onSubmit={submit} className="mt-7 space-y-5">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <ClearField label="Imię i nazwisko" name="name" value={form.name} onChange={(v)=>setForm({...form, name:v})} placeholder="Alex Kowalski" autoComplete="name" required />
+                  <ClearField label="Firma" name="business" value={form.business} onChange={(v)=>setForm({...form, business:v})} placeholder="Lumière" autoComplete="organization" />
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <ClearField label="Telefon" name="phone" type="tel" value={form.phone} onChange={(v)=>setForm({...form, phone:v})} placeholder="600 100 200" autoComplete="tel" />
+                  <ClearField label="Email" name="email" type="email" value={form.email} onChange={(v)=>setForm({...form, email:v})} placeholder="alex@firma.pl" autoComplete="email" required />
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <label className="block space-y-2">
+                    <span className="block font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">DZIEN</span>
+                    <input required type="date" name="date" min={new Date().toISOString().slice(0,10)} value={form.date} onChange={(e)=>setForm({...form, date:e.target.value})} className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm text-white [color-scheme:dark] focus:outline-none focus:border-white/25"/>
+                  </label>
+                  <label className="block space-y-2">
+                    <span className="block font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">GODZINA</span>
+                    <select name="time" value={form.time} onChange={(e)=>setForm({...form, time:e.target.value})} className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm text-white [color-scheme:dark] focus:outline-none focus:border-white/25">
+                      {["9:00","10:30","12:00","14:00","16:00","18:00"].map((t)=>(<option key={t} className="bg-[#0F0F11]" value={t}>{t}</option>))}
+                    </select>
+                  </label>
+                </div>
+                <label className="block space-y-2">
+                  <span className="block font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">CO CHCESZ POPRAWIC</span>
+                  <textarea name="message" rows={3} value={form.message} onChange={(e)=>setForm({...form, message:e.target.value})} placeholder="np. pusty kalendarz w weekendy, brak zdjęć w Mapach…" className="w-full rounded-[20px] border border-white/10 bg-white/[0.02] px-5 py-4 font-[Inter] font-light text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-white/25"/>
+                </label>
+
+                <BtnPrimary type="submit" className="w-full h-[48px] text-[11px]">
+                  <TextSwap text={sent ? "WYSŁANO ZGŁOSZENIE" : "WYŚLIJ ZAPYTANIE O TERMIN"} />
+                  <AnimatePresence initial={false} mode="wait">
+                    {sent ? (
+                      <motion.span key="check" initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6 }} transition={{ duration: 0.25 }} className="inline-flex">
+                        <Check className="h-4 w-4" />
+                      </motion.span>
+                    ) : (
+                      <motion.span key="arrow" initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="inline-flex">
+                        <ArrowRight className="h-4 w-4" />
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </BtnPrimary>
+                <div className="text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.04em] text-white/20">
+                  {sent ? (
+                    <TextSwap text="Dziękujemy — potwierdzimy termin na e-mail." />
+                  ) : (
+                    <>Lub <button type="button" onClick={()=>navigate("/auth")} className="underline decoration-white/15 text-white/30 hover:text-white/60">zaloguj się</button> by zarządzać terminami</>
+                  )}
+                </div>
+              </form>
+
+              <AnimatePresence>
+                {sent && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, filter: "blur(6px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -6, filter: "blur(6px)" }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    className="mt-6 flex items-start gap-4 rounded-[20px] border border-white/10 bg-white/[0.03] p-5"
+                  >
+                    <div className="h-9 w-9 shrink-0 grid place-items-center rounded-full bg-white text-black">
+                      <Check className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="font-[Inter] font-light text-[14px] text-white">Termin zarezerwowany</div>
+                      <div className="mt-1 font-[Inter] font-light text-[13px] leading-6 text-white/40">
+                        {form.date ? new Date(form.date + "T12:00:00").toLocaleDateString("pl-PL", { weekday: "long", day: "numeric", month: "long" }) : ""} · {form.time} · {svc.label} — potwierdzenie wyślemy na {form.email}.
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </Reveal>
         </div>
       </section>
 

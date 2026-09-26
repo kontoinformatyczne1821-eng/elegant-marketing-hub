@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
 import { useInView } from "framer-motion";
 import { X } from "lucide-react";
 
@@ -99,8 +99,136 @@ export function PopNumber({
   );
 }
 
-/* ------------------- 2) Input clear with dissolve ------------------ */
+/* -------------------- 3) Text states swap -------------------------- */
 
+/**
+ * Three-phase swap: old text exits up with blur, the node is rewritten,
+ * then the new text enters from below. Children are deliberately absent
+ * so React never overwrites the imperative textContent.
+ */
+export function TextSwap({
+  text,
+  className = "",
+}: {
+  text: string;
+  className?: string;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const prev = useRef<string | null>(null);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (prev.current === null) {
+      el.textContent = text;
+      prev.current = text;
+      return;
+    }
+    if (prev.current === text) return;
+    prev.current = text;
+    const dur =
+      parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--text-swap-dur",
+        ),
+      ) || 150;
+    el.classList.add("is-exit");
+    const t = setTimeout(() => {
+      el.textContent = text;
+      el.classList.remove("is-exit");
+      el.classList.add("is-enter-start");
+      void el.offsetHeight; // force reflow so the next change transitions
+      el.classList.remove("is-enter-start");
+    }, dur);
+    return () => clearTimeout(t);
+  }, [text]);
+
+  return <span ref={ref} className={`t-text-swap ${className}`} />;
+}
+
+/* --------------------- 4) Tabs sliding ---------------------------- */
+
+export function SlidingTabs({
+  items,
+  value,
+  onChange,
+  className = "",
+  tabClassName = "",
+}: {
+  items: { id: string; label: string }[];
+  value: string;
+  onChange: (id: string) => void;
+  className?: string;
+  tabClassName?: string;
+}) {
+  const barRef = useRef<HTMLDivElement>(null);
+  const pillRef = useRef<HTMLSpanElement>(null);
+  const first = useRef(true);
+
+  const move = useCallback(
+    (animate: boolean) => {
+      const bar = barRef.current;
+      const pill = pillRef.current;
+      if (!bar || !pill) return;
+      const tab = bar.querySelector<HTMLElement>(`[data-tab="${value}"]`);
+      if (!tab) return;
+      if (!animate) {
+        /* suspend the tween, snap into place, restore — first paint and
+           resize must never animate from a stale measurement */
+        const prev = pill.style.transition;
+        pill.style.transition = "none";
+        pill.style.transform = `translateX(${tab.offsetLeft}px)`;
+        pill.style.width = `${tab.offsetWidth}px`;
+        void pill.offsetWidth;
+        pill.style.transition = prev;
+      } else {
+        pill.style.transform = `translateX(${tab.offsetLeft}px)`;
+        pill.style.width = `${tab.offsetWidth}px`;
+      }
+    },
+    [value],
+  );
+
+  useLayoutEffect(() => {
+    if (first.current) {
+      first.current = false;
+      move(false);
+    } else {
+      move(true);
+    }
+  }, [move]);
+
+  useEffect(() => {
+    const onResize = () => move(false);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [move]);
+
+  return (
+    <div
+      ref={barRef}
+      role="tablist"
+      className={`t-tabs ${className}`}
+    >
+      <span ref={pillRef} className="t-tabs-pill" aria-hidden="true" />
+      {items.map((it) => (
+        <button
+          key={it.id}
+          type="button"
+          role="tab"
+          data-tab={it.id}
+          aria-selected={it.id === value}
+          onClick={() => onChange(it.id)}
+          className={`t-tab outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${tabClassName}`}
+        >
+          {it.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ------------------- 2) Input clear with dissolve ------------------ */
 type ClearFieldProps = {
   name: string;
   value: string;
