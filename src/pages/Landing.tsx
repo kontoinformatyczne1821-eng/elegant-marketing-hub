@@ -5,10 +5,9 @@ import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
 import GradualBlur from "@/components/GradualBlur";
 import FlipCard from "@/components/FlipCard";
+import WarpText from "@/components/WarpText";
 import LineSidebar from "@/components/LineSidebar";
 import QraftMark from "@/components/QraftMark";
-import WarpText from "@/components/WarpText";
-import BorderGlow from "@/components/BorderGlow";
 
 function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, popKey }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean; popKey?: string }) {
   const [val, setVal] = useState(def);
@@ -1342,25 +1341,20 @@ export default function Landing() {
                 pointer={false}
                 fontFamily="'Space Grotesk', system-ui, sans-serif"
                 fontWeight={300}
-                fontSize="clamp(44px, 7.4vw, 104px)"
-                /* powietrze w literach jak w znaku, nie ściśnięty klin */
-                letterSpacing="0.004em"
-                lineHeight={0.92}
-                /* trzecia linia jako cienki kontur — hierarchia masa + obrys */
-                outlineFromLine={3}
-                strokeColor="rgba(242,242,240,0.55)"
-                strokeWidth={1.3}
-                warpStrength={0.09}
-                warpScale={1.4}
-                speed={0.42}
+                fontSize="clamp(44px, 7.6vw, 104px)"
+                letterSpacing="-0.045em"
+                lineHeight={0.84}
+                warpStrength={0.1}
+                warpScale={1.45}
+                speed={0.45}
                 pointerInfluence={0}
                 pointerStrength={0}
-                refraction={0.015}
+                refraction={0.016}
                 ripple={false}
                 /* szerokosc kontenera = budzet szerokosci liter: na telefonie
-                   mniej, na desktopie polowa kolumny przed kreska */
-                className="w-[58%] lg:w-[calc(50%-0.5rem)]"
-                style={{ height: "clamp(126px, 24vw, 330px)", minHeight: 0 }}
+                   mniej (~ł 32px), na desktopie polowa kolumny przed kreska */
+                className="w-[56%] lg:w-[calc(50%-0.5rem)]"
+                style={{ height: "clamp(120px, 23vw, 320px)", minHeight: 0 }}
               />
 
               <motion.div
@@ -1429,29 +1423,13 @@ export default function Landing() {
         </Reveal>
         <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
           {serviceDefaults.map((s,i)=>(
-            /* zaznaczony moduł = zapalone szkło w kolorze systemu */
-            <BorderGlow
-              key={s.n}
-              active={picked.includes(i)}
-              animated={picked.includes(i)}
-              followPointer={false}
-              glowAngle={112}
-              glowColor="150 72% 58%"
-              colors={["#7DF0AE", "#2DD4A7", "#0EA5E9"]}
-              backgroundColor="transparent"
-              borderRadius={24}
-              glowRadius={24}
-              glowIntensity={0.9}
-              coneSpread={30}
-              fillOpacity={0}
-              className="h-[330px] sm:h-[348px]"
-            >
             <motion.div
+              key={s.n}
               initial={{ opacity:0, y:14 }}
               whileInView={{ opacity:1, y:0 }}
               viewport={{ once:true }}
               transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}}
-              className="h-full"
+              className="h-[330px] sm:h-[348px]"
             >
               <FlipCard
                 fill
@@ -1563,7 +1541,6 @@ export default function Landing() {
                 )}
               />
             </motion.div>
-            </BorderGlow>
           ))}
         </div>
         <div className="mt-10 flex flex-col sm:flex-row justify-between gap-4 font-[JetBrains_Mono] font-light text-[11px]">

@@ -1,9 +1,7 @@
-/* Tekst rasteryzowany do tekstury i przepuszczany przez szklany shader:
+/* Tekst rasteryzowany do tekstury i przepuszczony przez szklany shader:
    ambient fbm deformuje litery w spoczynku, a soczewka kursora (opcjonalna)
-   ugina i powiększa fragment pod wskaźnikiem. Kursor jest wyłączany propem
-   `pointer={false}` — wtedy zostaje tylko ambient, bez ruchu za myszką.
-   Prop `outlineFromLine` rysuje linie od podanego numeru jako cienki
-   kontur (stroke), co daje hierarchię: masa + obrys. */
+   ugina i powiększa fragment pod wskaźnikiem. Kursor jest wyłączony propem
+   `pointer={false}` — wtedy zostaje tylko ambient, bez ruchu za myszką. */
 import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import { Mesh, Program, Renderer, Texture, Triangle } from "ogl";
@@ -148,12 +146,6 @@ export interface WarpTextProps {
   fontFamily?: string;
   letterSpacing?: FontValue;
   lineHeight?: FontValue;
-  /** Od tego numeru linii (1-based) litery rysowane jako cienki kontur. */
-  outlineFromLine?: number;
-  /** Kolor konturu. */
-  strokeColor?: string;
-  /** Grubość konturu w px CSS. */
-  strokeWidth?: number;
   className?: string;
   style?: CSSProperties;
 }
@@ -172,15 +164,13 @@ const drawLine = (
   x: number,
   y: number,
   letterSpacing: number,
-  align: "center" | "left",
-  outline: boolean
+  align: "center" | "left"
 ) => {
   const chars = Array.from(line);
   let cursor = align === "left" ? x : x - measureLine(ctx, line, letterSpacing) / 2;
 
   chars.forEach((char, index) => {
-    if (outline) ctx.strokeText(char, cursor, y);
-    else ctx.fillText(char, cursor, y);
+    ctx.fillText(char, cursor, y);
     cursor += ctx.measureText(char).width + (index === chars.length - 1 ? 0 : letterSpacing);
   });
 };
@@ -194,9 +184,6 @@ type RasterConfig = {
   letterSpacing: FontValue;
   lineHeight: FontValue;
   align: "center" | "left";
-  outlineFromLine: number;
-  strokeColor: string;
-  strokeWidth: number;
 };
 
 const buildTextCanvas = ({
@@ -219,7 +206,7 @@ const buildTextCanvas = ({
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
 
-  /* niewidoczny probe: przeglądarka policzy faktyczny rozmiar, krój
+  /* niewidoczny probe: przeglądarka policzy nam faktyczny rozmiar, krój
      i tracking w jednostkach CSS, dopiero potem rysujemy do tekstury */
   const probe = document.createElement("span");
   probe.textContent = props.text;
@@ -241,11 +228,11 @@ const buildTextCanvas = ({
   let fontSizePx = parseFloat(computed.fontSize) || 96;
   const fontFamily = computed.fontFamily || "sans-serif";
   const fontWeight = computed.fontWeight || String(props.fontWeight);
-  let letterSpacing =
-    computed.letterSpacing === "normal" ? 0 : parseFloat(computed.letterSpacing) || 0;
+  let letterSpacing = computed.letterSpacing === "normal" ? 0 : parseFloat(computed.letterSpacing) || 0;
   let lineHeight = parseFloat(computed.lineHeight);
   if (!Number.isFinite(lineHeight)) {
-    lineHeight = fontSizePx * (typeof props.lineHeight === "number" ? props.lineHeight : 0.92);
+    lineHeight =
+      fontSizePx * (typeof props.lineHeight === "number" ? props.lineHeight : 0.92);
   }
   probe.remove();
 
@@ -254,11 +241,6 @@ const buildTextCanvas = ({
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillStyle = props.color;
-  /* kontur rysujemy w skali CSS, niezależnie od dopasowania rozmiaru */
-  ctx.strokeStyle = props.strokeColor;
-  ctx.lineWidth = props.strokeWidth;
-  ctx.lineJoin = "round";
-  ctx.miterLimit = 2;
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 
@@ -282,10 +264,9 @@ const buildTextCanvas = ({
   }
 
   const startY = height / 2 - (lineHeight * (lines.length - 1)) / 2;
-  lines.forEach((line, index) => {
-    const outline = props.outlineFromLine > 0 && index + 1 >= props.outlineFromLine;
-    drawLine(ctx, line, width / 2, startY + index * lineHeight, letterSpacing, props.align, outline);
-  });
+  lines.forEach((line, index) =>
+    drawLine(ctx, line, width / 2, startY + index * lineHeight, letterSpacing, props.align)
+  );
 
   return canvas;
 };
@@ -328,42 +309,15 @@ const WarpText = ({
   fontFamily = "inherit",
   letterSpacing = "-0.06em",
   lineHeight = 0.9,
-  outlineFromLine = 0,
-  strokeColor = "rgba(242,242,240,0.6)",
-  strokeWidth = 1.4,
   className = "",
   style,
 }: WarpTextProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const propsRef = useRef({
-    text,
-    color,
-    fontSize,
-    fontWeight,
-    fontFamily,
-    letterSpacing,
-    lineHeight,
-    align,
-    outlineFromLine,
-    strokeColor,
-    strokeWidth,
-  });
+  const propsRef = useRef({ text, color, fontSize, fontWeight, fontFamily, letterSpacing, lineHeight, align });
   const contextRef = useRef<{ program: Program; rasterize: () => void } | null>(null);
 
   useEffect(() => {
-    propsRef.current = {
-      text,
-      color,
-      fontSize,
-      fontWeight,
-      fontFamily,
-      letterSpacing,
-      lineHeight,
-      align,
-      outlineFromLine,
-      strokeColor,
-      strokeWidth,
-    };
+    propsRef.current = { text, color, fontSize, fontWeight, fontFamily, letterSpacing, lineHeight, align };
 
     if (contextRef.current) {
       syncUniforms(contextRef.current.program, {
@@ -386,9 +340,6 @@ const WarpText = ({
     letterSpacing,
     lineHeight,
     align,
-    outlineFromLine,
-    strokeColor,
-    strokeWidth,
     warpStrength,
     warpScale,
     speed,
@@ -624,8 +575,8 @@ const WarpText = ({
       disposed = true;
       contextRef.current = null;
       if (raf) cancelAnimationFrame(raf);
-      resizeObserver.disconnect();
-      intersectionObserver.disconnect();
+      resizeObserver?.disconnect();
+      intersectionObserver?.disconnect();
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerleave", onPointerLeave);
       canvas.removeEventListener("webglcontextlost", onContextLost);
@@ -646,7 +597,7 @@ const WarpText = ({
 
       if (canvas.parentNode === container) container.removeChild(canvas);
     };
-    /* kontekst WebGL budujemy raz; propsy lecą przez refs */
+    /* kontekst WebGL budujemy raz; propy lecą przez refs */
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, []);
 
