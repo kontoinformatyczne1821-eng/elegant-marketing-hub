@@ -1,5 +1,5 @@
 import { motion, AnimatePresence, useScroll, useSpring, useTransform, useInView, useMotionValue, useMotionValueEvent } from "framer-motion";
-import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save, RefreshCw } from "lucide-react";
+import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Check, Minus, Plus, Clock, Terminal, Pencil, Save, RefreshCw } from "lucide-react";
 import { useState, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from "react";
 import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
@@ -10,6 +10,8 @@ import QraftMark from "@/components/QraftMark";
 import GlowCursor from "@/components/GlowCursor";
 import GlareHover from "@/components/GlareHover";
 import PixelTrail from "@/components/PixelTrail";
+import StaggeredMenu from "@/components/StaggeredMenu";
+import type { StaggeredMenuItem } from "@/components/StaggeredMenu";
 
 const REDUCE_MOTION =
   typeof window !== "undefined" &&
@@ -1009,6 +1011,16 @@ const SIDEBAR = [
 ];
 const SIDEBAR_IDS = SIDEBAR.map((s) => s.id);
 
+/* menu z boku: kolejność zgodna z ławkiem bocznym */
+const MENU_ITEMS: StaggeredMenuItem[] = [
+  { label: "System", ariaLabel: "Przejdź do sekcji SYSTEM", link: "#services" },
+  { label: "Plany", ariaLabel: "Przejdź do sekcji PLANY", link: "#pricing" },
+  { label: "Proces", ariaLabel: "Przejdź do sekcji PROCES", link: "#process" },
+  { label: "FAQ", ariaLabel: "Przejdź do sekcji FAQ", link: "#faq" },
+  { label: "Kontakt", ariaLabel: "Przejdź do sekcji KONTAKT", link: "#contact" },
+  { label: "Zaloguj się", ariaLabel: "Przejdź do logowania", link: "/auth" },
+];
+
 /** Scroll-spy: numer sekcji, ktora jest teraz na srodku ekranu. */
 function useSectionSpy(ids: string[]) {
   const [active, setActive] = useState(0);
@@ -1083,7 +1095,6 @@ function FlowBackdrop() {
 
 export default function Landing() {
   const navigate = useNavigate();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
   const [form, setForm] = useState({
     name: "",
@@ -1137,8 +1148,15 @@ export default function Landing() {
     }
   });
 
+  /* pozycje z menu z boku: sekcje przewijamy gładko, /auth przez router */
+  const handleMenuItem = (_index: number, item: StaggeredMenuItem) => {
+    if (item.link === "/auth") {
+      navigate("/auth");
+      return;
+    }
+    go(item.link.replace("#", ""));
+  };
   const go = (id: string) => {
-    setMobileOpen(false);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
   const submit = (e: React.FormEvent) => {
@@ -1278,10 +1296,10 @@ export default function Landing() {
       <FloatingField />
 
       <motion.header
-        animate={{ y: barHidden && !mobileOpen && !isEditing ? "-104%" : "0%" }}
+        animate={{ y: barHidden && !isEditing ? "-104%" : "0%" }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className="sticky top-0 z-40 bg-[#050507]/28 backdrop-blur-[28px] backdrop-saturate-[1.5] border-b border-white/[0.08] supports-[backdrop-filter]:bg-[#050507]/20" style={{ WebkitBackdropFilter: "blur(28px) saturate(1.5)" } as any}>
-        <div className="mx-auto max-w-[1280px] px-6 lg:px-8 h-[72px] flex items-center justify-between">
+        <div className="mx-auto max-w-[1280px] pl-6 pr-[150px] lg:pl-8 lg:pr-[176px] h-[72px] flex items-center justify-between">
           <motion.div
             animate={{ y: barHidden ? 12 : 0, opacity: barHidden ? 0 : 1 }}
             transition={{ duration: 0.45, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
@@ -1300,15 +1318,6 @@ export default function Landing() {
               <span className="hidden lg:inline font-[JetBrains_Mono] font-light text-[10px] tracking-[0.18em] text-white/25 border-l border-white/10 pl-4 ml-1">PERFEKCJA BUDUJE MARKI</span>
             </button>
           </motion.div>
-          <motion.nav
-            animate={{ y: barHidden ? 12 : 0, opacity: barHidden ? 0 : 1 }}
-            transition={{ duration: 0.45, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-            className="hidden lg:flex gap-8 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/30"
-          >
-            <button onClick={()=>go("services")} className="hover:text-white/80 transition">— SYSTEM</button>
-            <button onClick={()=>go("pricing")} className="hover:text-white/80 transition">— PLANY</button>
-            <button onClick={()=>go("contact")} className="hover:text-white/80 transition">— KONTAKT</button>
-          </motion.nav>
           <motion.div
             animate={{ y: barHidden ? 12 : 0, opacity: barHidden ? 0 : 1 }}
             transition={{ duration: 0.45, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
@@ -1322,23 +1331,25 @@ export default function Landing() {
             </button>
             <span className="hidden md:inline-flex items-center gap-1.5 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] text-white/20"><Terminal className="h-3 w-3 opacity-60"/> qraft.build</span>
             <BtnPrimary onClick={()=>go("contact")} className="hidden sm:inline-flex text-[11px] tracking-[0.16em] px-6 h-9">ROZPOCZNIJ</BtnPrimary>
-            <button onClick={()=>setMobileOpen(!mobileOpen)} className="lg:hidden h-9 w-9 grid place-items-center rounded-full border border-white/10 bg-white/[0.03]">{mobileOpen?<X className="h-4 w-4"/>:<Menu className="h-4 w-4"/>}</button>
           </motion.div>
         </div>
-        <AnimatePresence>
-          {mobileOpen && (
-            <motion.div initial={{ height:0, opacity:0 }} animate={{ height:"auto", opacity:1 }} exit={{ height:0, opacity:0 }} className="lg:hidden border-t border-white/5 bg-[#0A0A0C]">
-              <div className="px-6 py-6 space-y-1 font-[JetBrains_Mono] font-light text-xs tracking-[0.14em]">
-                <button onClick={()=>go("services")} className="w-full text-left py-3 border-b border-white/[0.04] text-white/60">— SYSTEM</button>
-                <button onClick={()=>go("pricing")} className="w-full text-left py-3 border-b border-white/[0.04] text-white/60">— PLANY</button>
-                <button onClick={()=>go("contact")} className="w-full text-left py-3 border-b border-white/[0.04] text-white/60">— KONTAKT</button>
-                <button onClick={()=>setIsEditing(!isEditing)} className={`mt-4 w-full py-3.5 rounded-full font-[JetBrains_Mono] font-light tracking-[0.1em] text-xs transition-colors duration-500 ${isEditing ? "bg-white text-black" : "border border-white/15 bg-white/[0.02] text-white/60 hover:bg-white/[0.08] hover:text-white"}`}>{isEditing ? "ZAKOŃCZ EDYCJĘ" : "EDYTUJ TEKSTY"}</button>
-                <button onClick={()=>navigate("/auth")} className="mt-3 w-full py-3.5 rounded-full font-[JetBrains_Mono] font-light tracking-[0.1em] text-xs border border-white/30 text-white transition-colors duration-500 hover:bg-white hover:text-black">ZALOGUJ SIĘ</button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.header>
+
+      {/* menu z boku — zastąpiło górne linki i mobilny dropdown */}
+      <StaggeredMenu
+        isFixed
+        position="right"
+        items={MENU_ITEMS}
+        displaySocials={false}
+        displayItemNumbering
+        colors={["#170A04", "#33110A", "#8A2A0C", "#FF3E0A"]}
+        accentColor="#FF3E0A"
+        menuButtonColor="#F2F2F0"
+        openMenuButtonColor="#FF3E0A"
+        changeMenuColorOnOpen
+        closeOnClickAway
+        onItemClick={handleMenuItem}
+      />
 
       {isEditing && (
         <div className="sticky top-[72px] z-30 bg-[#111113] border-y border-white/10 text-white">
