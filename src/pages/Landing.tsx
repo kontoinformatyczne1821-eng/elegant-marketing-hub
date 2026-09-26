@@ -4,6 +4,7 @@ import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
 import GlowCursor from "@/components/GlowCursor";
+import GlareHover from "@/components/GlareHover";
 
 function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, popKey }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean; popKey?: string }) {
   const [val, setVal] = useState(def);
@@ -361,13 +362,26 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
               style={{ transformOrigin: "50% 50%" }}
               className={`relative mb-6 last:mb-0 lg:absolute lg:mb-0 lg:left-1/2 lg:top-1/2 lg:w-[360px] lg:-ml-[180px] lg:-mt-[300px] ${
                 off === 0 ? "cursor-default" : "cursor-pointer"
-              }`}
+              } ${front ? "shadow-[0_30px_80px_rgba(0,0,0,0.5)]" : "shadow-[0_12px_40px_rgba(0,0,0,0.35)]"}`}
             >
+              <GlareHover
+                width="100%"
+                height="100%"
+                background="transparent"
+                borderRadius="28px"
+                borderColor="transparent"
+                glareColor="#ffffff"
+                glareOpacity={front ? 0.3 : 0.15}
+                glareAngle={-30}
+                glareSize={220}
+                transitionDuration={750}
+                style={{ display: "block" }}
+              >
               <div
                 className={`relative overflow-hidden rounded-[28px] border p-8 flex flex-col h-full transition-colors duration-500 ${
                   front
-                    ? "bg-[#F7F7F5] text-black border-[#F7F7F5] shadow-[0_30px_80px_rgba(0,0,0,0.5)]"
-                    : "bg-white/[0.07] text-white border-white/[0.14] backdrop-blur-2xl backdrop-saturate-[1.4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.16),0_12px_40px_rgba(0,0,0,0.35)]"
+                    ? "bg-[#F7F7F5] text-black border-[#F7F7F5]"
+                    : "bg-white/[0.07] text-white border-white/[0.14] backdrop-blur-2xl backdrop-saturate-[1.4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.16)]"
                 }`}
               >
                 {/* szklany polysk na kartach bocznych */}
@@ -470,6 +484,7 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
                   )}
                 </div>
               </div>
+              </GlareHover>
             </motion.div>
           );
         })}
@@ -509,7 +524,7 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
 /* wjeżdża ruchem tostownika (rise + blur + scale), starsze cofają się  */
 /* w głąb, czwarty wychodzi. Sterowanie: strzałki góra/dół + kropki.    */
 
-function ProcessStack({ isEditing }: { isEditing: boolean }) {
+function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneChange?: (inside: boolean) => void }) {
   const n = processSteps.length;
   const [active, setActive] = useState(0);
   const [entering, setEntering] = useState<number | null>(null);
@@ -535,7 +550,11 @@ function ProcessStack({ isEditing }: { isEditing: boolean }) {
   }, [entering, active]);
 
   return (
-    <div className="grid lg:grid-cols-[360px_1fr] gap-12">
+    <div
+      className="grid lg:grid-cols-[360px_1fr] gap-12"
+      onPointerEnter={() => onZoneChange?.(true)}
+      onPointerLeave={() => onZoneChange?.(false)}
+    >
       <div className="lg:sticky lg:top-28 self-start">
         <div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-black/30">02 — PROCES</div>
         <h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[36px] leading-[0.9] tracking-[-0.02em]">
@@ -797,6 +816,8 @@ export default function Landing() {
   });
   const [sent, setSent] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  /* w sekcji PROCES tło jest jasne — kursor przechodzi na czarne światło */
+  const [inProcess, setInProcess] = useState(false);
   const cinemaRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll();
   const { scrollYProgress: cinemaProgress } = useScroll({ target: cinemaRef, offset: ["start end", "end start"] });
@@ -826,23 +847,23 @@ export default function Landing() {
       <GlowCursor
         globalPointer
         enabled={!REDUCE_MOTION}
-        color="#ffffff"
-        secondaryColor="#c9c9cf"
+        color={inProcess ? "#0a0a0a" : "#ffffff"}
+        secondaryColor={inProcess ? "#3c3e3d" : "#c9c9cf"}
         trailLength={38}
         trailWidth={6}
         trailTaper={0.82}
         followSpeed={0.16}
         glowIntensity={1.7}
         glowSpread={1.15}
-        hotspot={0.7}
-        brightness={1.2}
-        opacity={0.5}
+        hotspot={inProcess ? 0.05 : 0.7}
+        brightness={inProcess ? 0.9 : 1.2}
+        opacity={inProcess ? 0.42 : 0.5}
         pulseSpeed={1.1}
         noiseStrength={0.03}
         idleFade
         idleTimeout={700}
         fadeDuration={600}
-        blendMode="screen"
+        blendMode={inProcess ? "normal" : "screen"}
         maxDevicePixelRatio={1.25}
         style={{
           position: "fixed",
@@ -1076,7 +1097,7 @@ export default function Landing() {
 
       <section className="bg-[#F7F7F5] text-[#0A0A0A] border-t border-white/5">
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-24">
-          <Reveal><ProcessStack isEditing={isEditing} /></Reveal>
+          <Reveal><ProcessStack isEditing={isEditing} onZoneChange={setInProcess} /></Reveal>
         </div>
       </section>
 
