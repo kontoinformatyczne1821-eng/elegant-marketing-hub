@@ -8,6 +8,8 @@ import GlareHover from "@/components/GlareHover";
 import GradualBlur from "@/components/GradualBlur";
 import PixelTrail from "@/components/PixelTrail";
 import FlipCard from "@/components/FlipCard";
+import LineSidebar from "@/components/LineSidebar";
+import QraftMark from "@/components/QraftMark";
 
 function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, popKey }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean; popKey?: string }) {
   const [val, setVal] = useState(def);
@@ -826,6 +828,47 @@ function useFinePointer() {
   return fine;
 }
 
+/* pozycje bocznego paska nawigacji */
+const SIDEBAR = [
+  { label: "SYSTEM", id: "services" },
+  { label: "PLANY", id: "pricing" },
+  { label: "PROCES", id: "process" },
+  { label: "FAQ", id: "faq" },
+  { label: "KONTAKT", id: "contact" },
+];
+const SIDEBAR_IDS = SIDEBAR.map((s) => s.id);
+
+/** Scroll-spy: numer sekcji, ktora jest teraz na srodku ekranu. */
+function useSectionSpy(ids: string[]) {
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    const check = () => {
+      const line = window.innerHeight * 0.45;
+      let idx = 0;
+      ids.forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= line) idx = i;
+      });
+      setActive(idx);
+    };
+    /* scroll bywa gąsty — liczymy pozycje najwyżej raz na klatkę */
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(check);
+    };
+    check();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [ids]);
+  return active;
+}
+
 function FlowBackdrop() {
   const { scrollYProgress } = useScroll();
   /* niska sprężystość = tło ciągnie się za scrollem zamiast skakać */
@@ -887,13 +930,17 @@ export default function Landing() {
   const [inProcess, setInProcess] = useState(false);
   const atPageEnd = useAtPageEnd();
   const finePointer = useFinePointer();
+  const spy = useSectionSpy(SIDEBAR_IDS);
   const cinemaRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll();
+  const { scrollY, scrollYProgress } = useScroll();
   const { scrollYProgress: cinemaProgress } = useScroll({ target: cinemaRef, offset: ["start end", "end start"] });
   const cinemaY = useTransform(cinemaProgress, [0, 1], ["-14%", "14%"]);
   const cinemaY2 = useTransform(cinemaProgress, [0, 1], ["6%", "-10%"]);
   const cinemaText = useTransform(cinemaProgress, [0, 0.5], ["-40px", "0px"]);
   const progress = useTransform(scrollYProgress, [0,1], [0,1]);
+  /* pasek boczny wjeżdża dopiero po minięciu hero */
+  const navFade = useSpring(useTransform(scrollY, [520, 940], [0, 1]), { stiffness: 120, damping: 28 });
+  const navShift = useTransform(navFade, [0, 1], [-26, 0]);
 
   const go = (id: string) => {
     setMobileOpen(false);
@@ -973,6 +1020,76 @@ export default function Landing() {
           pointerEvents: "none",
         }}
       />
+      {/* boczny pasek nawigacji — znak QRAFT w szkle, wjeżdża po minięciu hero */}
+      <div className="hidden min-[1640px]:block fixed left-3 top-1/2 z-40 -translate-y-1/2">
+        <motion.aside
+          aria-label="Nawigacja strony"
+          style={{
+            opacity: navFade,
+            x: navShift,
+            background: inProcess ? "rgba(247,247,245,0.55)" : "rgba(12,12,15,0.42)",
+            borderColor: inProcess ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.10)",
+            boxShadow: inProcess
+              ? "inset 0 1px 1px rgba(255,255,255,0.75), 0 22px 60px rgba(0,0,0,0.16)"
+              : "inset 0 1px 1px rgba(255,255,255,0.08), 0 22px 60px rgba(0,0,0,0.45)",
+          }}
+          className="flex w-[176px] flex-col rounded-[28px] border px-6 py-7 backdrop-blur-[28px] backdrop-saturate-[1.5]"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-3">
+              <QraftMark className={inProcess ? "text-black" : "text-white"} height={19} />
+              <span
+                className={`font-[JetBrains_Mono] font-light text-[8px] leading-[1.7] tracking-[0.2em] ${
+                  inProcess ? "text-black/40" : "text-white/30"
+                }`}
+              >
+                PRECISION
+                <br />
+                BUILDS BRANDS
+              </span>
+            </div>
+            <span
+              className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border font-[Instrument_Serif] text-[13px] ${
+                inProcess ? "border-black/15 text-black/70" : "border-white/12 text-white/70"
+              }`}
+            >
+              Q
+            </span>
+          </div>
+
+          <div className={`my-6 h-px w-full ${inProcess ? "bg-black/10" : "bg-white/10"}`} />
+
+          <LineSidebar
+            items={SIDEBAR.map((x) => x.label)}
+            active={spy}
+            onItemClick={(i) => go(SIDEBAR[i].id)}
+            accentColor="#FF3E0A"
+            textColor={inProcess ? "rgba(10,10,10,0.45)" : "rgba(242,242,240,0.42)"}
+            markerColor={inProcess ? "rgba(10,10,10,0.22)" : "rgba(255,255,255,0.16)"}
+            showIndex
+            proximityRadius={90}
+            maxShift={14}
+            markerLength={34}
+            itemGap={15}
+            fontSize={0.66}
+            smoothing={120}
+            className="font-[JetBrains_Mono] font-light tracking-[0.16em]"
+          />
+
+          <div className={`my-6 h-px w-full ${inProcess ? "bg-black/10" : "bg-white/10"}`} />
+
+          <button
+            onClick={() => go("contact")}
+            className={`flex items-center justify-between font-[JetBrains_Mono] font-light text-[10px] tracking-[0.18em] transition-opacity duration-300 hover:opacity-100 ${
+              inProcess ? "text-black/60" : "text-white/45"
+            }`}
+          >
+            ZACZNIJMY
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </button>
+        </motion.aside>
+      </div>
+
       <FloatingField />
 
       <header className="sticky top-0 z-40 bg-[#050507]/28 backdrop-blur-[28px] backdrop-saturate-[1.5] border-b border-white/[0.08] supports-[backdrop-filter]:bg-[#050507]/20" style={{ WebkitBackdropFilter: "blur(28px) saturate(1.5)" } as any}>
@@ -1274,7 +1391,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="bg-[#F7F7F5] text-[#0A0A0A] border-t border-white/5">
+      <section id="process" className="bg-[#F7F7F5] text-[#0A0A0A] border-t border-white/5">
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-24">
           <Reveal><ProcessStack isEditing={isEditing} onZoneChange={setInProcess} /></Reveal>
         </div>
@@ -1286,7 +1403,7 @@ export default function Landing() {
         <div className="mt-8 text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.06em] text-white/20"><EditableText ek="qraft.pricing.note2" def="Start bez sesji zdjęciowej — dostępna od Signature. Szczegóły na audycie." className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div>
       </section>
 
-      <section className="mx-auto max-w-[1280px] px-6 lg:px-8 pb-12">
+      <section id="faq" className="mx-auto max-w-[1280px] px-6 lg:px-8 pb-12">
         <Reveal><div className="grid lg:grid-cols-[320px_1fr] gap-10 border-t border-white/[0.06] pt-12"><div><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/20">04 — FAQ</div><h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[30px] leading-none"><EditableText ek="qraft.faq.h" def="Szybkie odpowiedzi." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><EditableText ek="qraft.faq.desc" def="Jasno i bez żargonu. Resztę dopowiemy na audycie." className="mt-3 block font-[Inter] font-light text-[14px] leading-6 text-white/30" isEditing={isEditing} as="p" /></div><div className="divide-y divide-white/5 border border-white/10 rounded-[20px] overflow-hidden bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.3]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.25)" } as any}>{[["Dla kogo jest QRAFT?","Dla firm, gdzie liczy się miejsce i reputacja. Kawiarnie, studia, butiki, kliniki."],["Jak szybko widać efekty?","2–4 tygodnie by dać się znaleźć. 30–60 dni by urosnąć w środku tygodnia."],["Czy jest zobowiązanie?","Nie. Miesiąc do miesiąca po 90 dniach."],["Czego potrzebujecie na start?","90 minut + dostęp do profilu. Resztą zajmujemy się my."]].map(([q,a],i)=>(<div key={q}><button onClick={()=>setFaqOpen(faqOpen===i?null:i)} className="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition"><span className="font-[Cormorant_Garamond] font-light text-[17px] pr-6"><EditableText ek={`qraft.faq.${i}.q`} def={q} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span><span className={`h-7 w-7 grid place-items-center rounded-full border shrink-0 transition ${faqOpen===i?"bg-white text-black border-white":"border-white/10 text-white/20"}`}>{faqOpen===i?<Minus className="h-3.5 w-3.5"/>:<Plus className="h-3.5 w-3.5"/>}</span></button><AnimatePresence>{faqOpen===i && (<motion.div initial={{ height:0, opacity:0 }} animate={{ height:"auto", opacity:1 }} exit={{ height:0, opacity:0 }} className="overflow-hidden"><div className="px-6 pb-6 font-[Inter] font-light text-[14px] leading-7 text-white/60 max-w-[560px]"><EditableText ek={`qraft.faq.${i}.a`} def={a} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></div></motion.div>)}</AnimatePresence></div>))}</div></div></Reveal>
       </section>
 
