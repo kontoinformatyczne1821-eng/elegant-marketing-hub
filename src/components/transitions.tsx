@@ -401,7 +401,7 @@ export function ClearField({
   return (
     <label className={`block space-y-2 ${className}`}>
       {label && (
-        <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">
+        <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/45">
           {label}
         </span>
       )}
