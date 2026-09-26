@@ -169,24 +169,47 @@ function CursorAura() {
 }
 
 function BtnPrimary({ children, onClick, className = "", type = "button" }: { children: React.ReactNode; onClick?: () => void; className?: string; type?: "button" | "submit" }) {
+  const [hover, setHover] = useState(false);
   return (
     <button
       type={type}
       onClick={onClick}
-      className={`group relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-full border border-white/30 font-[JetBrains_Mono] font-light tracking-[0.14em] text-white transition-colors duration-500 hover:text-black ${className}`}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+      className={`relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-full border font-[JetBrains_Mono] font-light tracking-[0.14em] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-white/50 ${className}`}
+      style={{ borderColor: hover ? "#ffffff" : "rgba(255,255,255,0.32)", color: hover ? "#000000" : "#ffffff" }}
     >
-      <span className="absolute inset-0 bg-white origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+      <motion.span
+        aria-hidden
+        className="absolute inset-0 bg-white origin-left"
+        initial={false}
+        animate={{ scaleX: hover ? 1 : 0 }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        style={{ originX: 0 }}
+      />
       <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
     </button>
   );
 }
 
 function BtnGhost({ children, onClick, className = "" }: { children: React.ReactNode; onClick?: () => void; className?: string }) {
+  const [hover, setHover] = useState(false);
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`group inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.02] backdrop-blur font-[JetBrains_Mono] font-light tracking-[0.14em] text-white/60 transition-all duration-500 hover:border-white/45 hover:bg-white/[0.08] hover:text-white ${className}`}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+      className={`group relative inline-flex items-center justify-center gap-2 rounded-full border backdrop-blur font-[JetBrains_Mono] font-light tracking-[0.14em] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-white/50 transition-colors duration-300 ${className}`}
+      style={{
+        borderColor: hover ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.16)",
+        backgroundColor: hover ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.02)",
+        color: hover ? "#ffffff" : "rgba(255,255,255,0.62)",
+      }}
     >
       {children}
     </button>
@@ -194,13 +217,26 @@ function BtnGhost({ children, onClick, className = "" }: { children: React.React
 }
 
 function BtnDark({ children, onClick, className = "" }: { children: React.ReactNode; onClick?: () => void; className?: string }) {
+  const [hover, setHover] = useState(false);
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`group relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-full border border-black/20 font-[JetBrains_Mono] font-light tracking-[0.14em] text-black transition-colors duration-500 hover:text-white ${className}`}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+      className={`relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-full border font-[JetBrains_Mono] font-light tracking-[0.14em] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-black/40 ${className}`}
+      style={{ borderColor: hover ? "#000000" : "rgba(0,0,0,0.22)", color: hover ? "#ffffff" : "#000000" }}
     >
-      <span className="absolute inset-0 bg-black origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+      <motion.span
+        aria-hidden
+        className="absolute inset-0 bg-black origin-left"
+        initial={false}
+        animate={{ scaleX: hover ? 1 : 0 }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        style={{ originX: 0 }}
+      />
       <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
     </button>
   );
@@ -344,7 +380,11 @@ export default function Landing() {
   const [form, setForm] = useState({ name: "", business: "", email: "" });
   const [sent, setSent] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const cinemaRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll();
+  const { scrollYProgress: cinemaProgress } = useScroll({ target: cinemaRef, offset: ["start end", "end start"] });
+  const cinemaY = useTransform(cinemaProgress, [0, 1], ["-12%", "12%"]);
+  const cinemaText = useTransform(cinemaProgress, [0, 0.5], ["-40px", "0px"]);
   const heroY = useTransform(scrollYProgress, [0,0.22], [0,-40]);
   const progress = useTransform(scrollYProgress, [0,1], [0,1]);
   const cardY = useTransform(scrollYProgress, [0,0.3], [0, -12]);
@@ -579,6 +619,71 @@ export default function Landing() {
             <EditableText ek="qraft.system.footerR" def="DIAGNOSTYKA →" className="font-[JetBrains_Mono] font-light tracking-[0.14em]" isEditing={isEditing} as="span" />
           </BtnGhost>
         </div>
+      </section>
+
+      <section ref={cinemaRef} className="relative overflow-hidden">
+        {/* photo */}
+        <motion.div style={{ y: cinemaY }} className="absolute inset-0 scale-[1.15]">
+          <img
+            src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1800&q=80&auto=format&fit=crop"
+            alt="Skała z pionową kreską światła"
+            className="h-full w-full object-cover grayscale contrast-125 brightness-[0.38]"
+          />
+        </motion.div>
+
+        {/* grading + vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_10%,transparent_0%,rgba(5,5,7,0.55)_60%,#050507_100%)]" />
+        <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "88px 88px" }} />
+
+        {/* vertical light streak */}
+        <div className="absolute inset-0">
+          <div className="absolute left-1/2 top-[-10%] h-[120%] w-px -translate-x-1/2 bg-white/80 shadow-[0_0_24px_4px_rgba(255,255,255,0.55),0_0_90px_18px_rgba(255,255,255,0.22)]" />
+          <motion.div
+            className="absolute left-1/2 top-0 h-full w-[360px] -translate-x-1/2"
+            style={{ background: "linear-gradient(to right, transparent, rgba(255,255,255,0.07) 42%, rgba(255,255,255,0.20) 50%, rgba(255,255,255,0.07) 58%, transparent)" }}
+            animate={{ opacity: [0.3, 0.75, 0.3] }}
+            transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute left-1/2 top-0 h-[30%] w-[560px] -translate-x-1/2"
+            style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.16), transparent)" }}
+            animate={{ y: ["0%", "235%"] }}
+            transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
+
+        {/* content */}
+        <motion.div style={{ y: cinemaText }} className="relative mx-auto max-w-[1280px] px-6 lg:px-8">
+          <div className="flex min-h-[78vh] flex-col justify-center py-24 lg:py-32">
+            <motion.div
+              initial={{ opacity: 0, y: 26, filter: "blur(10px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, margin: "-15%" }}
+              transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="flex items-center gap-4 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.24em] text-white/45">
+                <span className="h-px w-12 bg-white/40" />
+                MANIFEST
+              </div>
+
+              <h2 className="mt-8 font-[Space_Grotesk] font-light uppercase leading-[0.86] tracking-[-0.03em] text-[40px] sm:text-[64px] lg:text-[104px]">
+                <span className="block text-white">Precision</span>
+                <span className="block text-white">Builds</span>
+                <span className="block text-transparent" style={{ WebkitTextStroke: "1px rgba(255,255,255,0.55)" }}>
+                  Brands
+                </span>
+              </h2>
+
+              <motion.div
+                className="mt-10 h-px bg-white origin-left"
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true, margin: "-15%" }}
+                transition={{ duration: 1.4, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              />
+            </motion.div>
+          </div>
+        </motion.div>
       </section>
 
       <section className="bg-[#F7F7F5] text-[#0A0A0A] border-t border-white/5">
