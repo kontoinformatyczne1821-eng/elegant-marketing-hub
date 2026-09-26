@@ -6,6 +6,7 @@ import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } fr
 import GlowCursor from "@/components/GlowCursor";
 import GlareHover from "@/components/GlareHover";
 import GradualBlur from "@/components/GradualBlur";
+import PixelTrail from "@/components/PixelTrail";
 
 function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, popKey }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean; popKey?: string }) {
   const [val, setVal] = useState(def);
@@ -787,6 +788,32 @@ function useAtPageEnd(threshold = 24) {
   return atEnd;
 }
 
+/** Prawdziwe dla myszy/trackpada — canvas ma się rysować tylko przy kursorze.
+ *  `pointer: fine` bywa złane w podglądach iframe, więc traktujemy pierwszy
+ *  ruch myszy jako twardy dowód. Na dotyku wracamy do wyłączenia, żeby
+ *  płótno nie łapało przewijania. */
+function useFinePointer() {
+  const [fine, setFine] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: fine)");
+    const sync = () => setFine(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType === "mouse" || e.pointerType === "pen") setFine(true);
+    };
+    const onTouch = () => setFine(false);
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerdown", onTouch, { passive: true });
+    return () => {
+      mq.removeEventListener("change", sync);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerdown", onTouch);
+    };
+  }, []);
+  return fine;
+}
+
 function FlowBackdrop() {
   const { scrollYProgress } = useScroll();
   /* niska sprężystość = tło ciągnie się za scrollem zamiast skakać */
@@ -847,6 +874,7 @@ export default function Landing() {
   /* w sekcji PROCES tło jest jasne — kursor przechodzi na czarne światło */
   const [inProcess, setInProcess] = useState(false);
   const atPageEnd = useAtPageEnd();
+  const finePointer = useFinePointer();
   const cinemaRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll();
   const { scrollYProgress: cinemaProgress } = useScroll({ target: cinemaRef, offset: ["start end", "end start"] });
@@ -1023,7 +1051,22 @@ export default function Landing() {
         <div className="absolute inset-0 bg-[radial-gradient(130%_100%_at_50%_6%,transparent_0%,rgba(5,5,7,0.62)_58%,#050507_100%)]" />
         <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "88px 88px" }} />
 
-        {/* vertical light streak */}
+        {/* pixel trail — ślad kursora w hero, tam gdzie „Precision Builds Brands” */}
+        {finePointer && (
+          <div className="absolute inset-0 z-[5] mix-blend-screen">
+            <PixelTrail
+              gridSize={80}
+              trailSize={0.09}
+              maxAge={520}
+              interpolate={5}
+              color="#ffffff"
+              gooeyFilter={{ id: "qraft-goo", strength: 2.4 }}
+              canvasProps={{ dpr: [1, 1.25] }}
+              style={{ touchAction: "auto" }}
+            />
+          </div>
+        )}
+
         <div className="absolute inset-0">
           <div className="absolute left-1/2 top-[-10%] h-[120%] w-px -translate-x-1/2 bg-white/90 shadow-[0_0_30px_5px_rgba(255,255,255,0.6),0_0_110px_24px_rgba(255,255,255,0.24)]" />
           <motion.div
@@ -1041,7 +1084,7 @@ export default function Landing() {
         </div>
 
         {/* content */}
-        <div className="relative mx-auto max-w-[1280px] px-6 lg:px-8">
+        <div className="relative z-10 mx-auto max-w-[1280px] px-6 lg:px-8 pointer-events-none">
           <div className="flex min-h-[calc(100vh-72px)] flex-col justify-center py-24 lg:py-32">
             <motion.div
               initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
@@ -1069,10 +1112,10 @@ export default function Landing() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.9, delay: 0.6 }}
               >
-                <BtnPrimary onClick={() => go("contact")} className="h-[52px] px-8 text-[11px]">
+                <BtnPrimary onClick={() => go("contact")} className="h-[52px] px-8 text-[11px] pointer-events-auto">
                   ZAMÓW DARMOWY AUDYT <ArrowRight className="h-3.5 w-3.5 opacity-60" />
                 </BtnPrimary>
-                <BtnGhost onClick={() => go("services")} className="h-[52px] pl-2 pr-6 text-[11px]">
+                <BtnGhost onClick={() => go("services")} className="h-[52px] pl-2 pr-6 text-[11px] pointer-events-auto">
                   <span className="h-9 w-9 grid place-items-center rounded-full border border-white/15 transition-colors duration-300 group-hover:bg-white/10">
                     <ArrowUpRight className="h-3.5 w-3.5" />
                   </span>
