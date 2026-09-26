@@ -762,6 +762,31 @@ function FlowArt() {
   );
 }
 
+/** true, gdy strona jest przesunięta do samego końca — blur dolny
+ *  wtedy się wyłącza, żeby stopka pozostała w pełni czytelna. */
+function useAtPageEnd(threshold = 24) {
+  const [atEnd, setAtEnd] = useState(false);
+  useEffect(() => {
+    let raf = 0;
+    const check = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const doc = document.documentElement;
+        setAtEnd(window.innerHeight + window.scrollY >= doc.scrollHeight - threshold);
+      });
+    };
+    check();
+    window.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+    };
+  }, [threshold]);
+  return atEnd;
+}
+
 function FlowBackdrop() {
   const { scrollYProgress } = useScroll();
   /* niska sprężystość = tło ciągnie się za scrollem zamiast skakać */
@@ -821,6 +846,7 @@ export default function Landing() {
   const [isEditing, setIsEditing] = useState(false);
   /* w sekcji PROCES tło jest jasne — kursor przechodzi na czarne światło */
   const [inProcess, setInProcess] = useState(false);
+  const atPageEnd = useAtPageEnd();
   const cinemaRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll();
   const { scrollYProgress: cinemaProgress } = useScroll({ target: cinemaRef, offset: ["start end", "end start"] });
@@ -856,6 +882,21 @@ export default function Landing() {
         curve="bezier"
         exponential={false}
         opacity={1}
+        animated="scroll"
+        duration="0.4s"
+        easing="ease-out"
+        style={{ zIndex: 30 }}
+      />
+      <GradualBlur
+        target="page"
+        position="bottom"
+        height="8rem"
+        strength={3}
+        divCount={10}
+        curve="bezier"
+        exponential={false}
+        /* na samym dole strony gasniemy, żeby stopka nie zniknęła w rozmazie */
+        opacity={atPageEnd ? 0 : 1}
         animated="scroll"
         duration="0.4s"
         easing="ease-out"
@@ -1000,18 +1041,6 @@ export default function Landing() {
         </div>
 
         {/* content */}
-        <GradualBlur
-          target="parent"
-          position="bottom"
-          height="16rem"
-          strength={2.6}
-          divCount={8}
-          curve="bezier"
-          exponential={true}
-          opacity={1}
-          zIndex={0}
-        />
-
         <div className="relative mx-auto max-w-[1280px] px-6 lg:px-8">
           <div className="flex min-h-[calc(100vh-72px)] flex-col justify-center py-24 lg:py-32">
             <motion.div
