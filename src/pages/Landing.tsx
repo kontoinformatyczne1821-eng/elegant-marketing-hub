@@ -322,13 +322,13 @@ const GLASS_SKIN = {
     glow: "drop-shadow(0 0 8px rgba(255,255,255,0.45))",
   },
   light: {
-    bg: "linear-gradient(160deg, rgba(255,255,255,0.88), rgba(255,255,255,0.42) 55%), rgba(247,247,245,0.38)",
-    border: "1px solid rgba(10,10,10,0.12)",
+    bg: "linear-gradient(160deg, rgba(255,255,255,0.45), rgba(255,255,255,0.10) 55%), rgba(20,20,23,0.10)",
+    border: "1px solid rgba(10,10,10,0.16)",
     shadow:
-      "inset 0 1px 1px rgba(255,255,255,0.92), inset 0 -1px 1px rgba(10,10,10,0.05), 0 10px 30px rgba(0,0,10,0.10)",
-    ring: "border-black/25",
-    arrow: "text-black/60",
-    glow: "drop-shadow(0 0 8px rgba(10,10,10,0.16))",
+      "inset 0 1px 1px rgba(255,255,255,0.55), inset 0 -1px 1px rgba(10,10,10,0.04), 0 10px 30px rgba(0,0,10,0.10)",
+    ring: "border-black/30",
+    arrow: "text-black/75",
+    glow: "drop-shadow(0 0 7px rgba(10,10,10,0.20))",
   },
 } as const;
 
@@ -832,14 +832,14 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                   className={`t-stack-banner h-[250px] w-full rounded-[24px] border p-7 flex flex-col ${
                     front
                       ? "bg-white border-black/10 text-black shadow-[0_24px_60px_rgba(0,0,0,0.12)]"
-                      : "bg-white/60 border-black/[0.07] text-black/75 backdrop-blur-xl"
+                      : "bg-white/68 border-black/[0.08] text-black/85 backdrop-blur-xl"
                   } ${d === 3 ? "is-leaving" : ""}`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em]">
                       {s.n}
                     </span>
-                    <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.12em] opacity-60">
+                    <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.12em] opacity-80">
                       {s.meta}
                     </span>
                   </div>
@@ -855,7 +855,7 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                   <EditableText
                     ek={`qraft.process.${i}.desc`}
                     def={s.d}
-                    className="mt-4 block font-[Inter] font-light text-[15px] leading-7 opacity-75"
+                    className="mt-4 block font-[Inter] font-light text-[15px] leading-7 opacity-95"
                     isEditing={isEditing}
                     as="p"
                   />
