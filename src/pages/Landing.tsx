@@ -1,6 +1,6 @@
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useInView } from "framer-motion";
 import { ArrowUpRight, ArrowRight, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 
 function EditableText({ ek, def, className, as: Tag = "span", isEditing }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean }) {
@@ -274,6 +274,31 @@ function Reveal({ children, delay=0, y=18 }: { children: React.ReactNode; delay?
   );
 }
 
+function CountUp({ to, suffix = "", decimals = 0 }: { to: number; suffix?: string; decimals?: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-15%" });
+  const [v, setV] = useState(0);
+  useEffect(() => {
+    if (!inView) return;
+    let raf = 0;
+    const start = performance.now();
+    const dur = 1500;
+    const tick = (now: number) => {
+      const pr = Math.min(1, (now - start) / dur);
+      setV(to * (1 - Math.pow(1 - pr, 3)));
+      if (pr < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, to]);
+  return (
+    <span ref={ref}>
+      {v.toLocaleString("pl-PL", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}
+      {suffix}
+    </span>
+  );
+}
+
 export default function Landing() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -300,7 +325,7 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-[#050507] text-[#F2F2F0] antialiased selection:bg-white selection:text-black">
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&family=Space+Grotesk:wght@300;400&display=swap'); html{scroll-behavior:smooth}`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&family=Space+Grotesk:wght@300;400&display=swap'); html{scroll-behavior:smooth} @keyframes qmarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}} @keyframes qmsheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}} @keyframes qmbreathe{0%,100%{opacity:.35}50%{opacity:.9}}`}</style>
       <CursorAura />
       <motion.div className="fixed top-0 inset-x-0 h-[1px] bg-white/80 z-50 origin-left" style={{ scaleX: progress }} />
       <div className="pointer-events-none fixed inset-0 -z-10">
@@ -370,9 +395,12 @@ export default function Landing() {
         <motion.div style={{ y: heroY }} className="mx-auto max-w-[1280px] px-6 lg:px-8">
           <div className="grid lg:grid-cols-[1.02fr_0.98fr] gap-10 lg:gap-14 pt-16 lg:pt-28 pb-12 lg:pb-20 items-center min-h-[540px]">
             <div>
-              <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.8, ease:[0.22,1,0.36,1] }} className="inline-flex items-center gap-3 border border-white/10 rounded-full pl-1 pr-4 py-1 bg-white/[0.03] backdrop-blur">
-                <span className="bg-white text-black font-[JetBrains_Mono] font-light text-[10px] tracking-[0.14em] px-3 py-1 rounded-full">QRAFT</span>
-                <EditableText ek="qraft.hero.badge" def="Stworzone dla klientów Twojej firmy." className="font-[Inter] font-light text-[12px] tracking-[0.02em] text-white/60" isEditing={isEditing} />
+              <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.8, ease:[0.22,1,0.36,1] }} className="inline-flex items-center gap-2.5 border border-white/10 rounded-full pl-3.5 pr-4 py-1.5 bg-white/[0.03] backdrop-blur">
+                <span className="relative flex h-1.5 w-1.5 shrink-0">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-white/60 animate-ping" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white" />
+                </span>
+                <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.2em] text-white/45">QRAFT — EST. 2018</span>
               </motion.div>
 
               <motion.h1 initial={{ opacity:0, y:16, filter:"blur(10px)" }} animate={{ opacity:1, y:0, filter:"blur(0px)" }} transition={{ duration:1, delay:0.08, ease:[0.22,1,0.36,1] }} className="mt-8 leading-[0.88] tracking-[-0.03em]">
@@ -387,7 +415,8 @@ export default function Landing() {
               </motion.h1>
 
               <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.45 }} className="mt-10 flex flex-wrap items-center gap-4">
-                <button onClick={()=>go("contact")} className="group bg-white text-black pl-7 pr-6 h-[48px] rounded-full font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] inline-flex items-center gap-3 hover:bg-white/90 transition">
+                <button onClick={()=>go("contact")} className="group relative overflow-hidden bg-white text-black pl-7 pr-6 h-[48px] rounded-full font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] inline-flex items-center gap-3 hover:bg-white/90 transition">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 w-1/3 -translate-x-full bg-gradient-to-r from-transparent via-black/12 to-transparent group-hover:animate-[qmsheen_0.9s_ease_forwards]" />
                   <EditableText ek="qraft.hero.cta1" def="DARMOWY AUDYT" className="font-[JetBrains_Mono] font-light tracking-[0.14em]" isEditing={isEditing} as="span" /> <ArrowRight className="h-3.5 w-3.5 opacity-60 group-hover:translate-x-0.5 transition-transform"/>
                 </button>
                 <button onClick={()=>go("pricing")} className="inline-flex items-center gap-3 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] text-white/35 hover:text-white/65 transition">
@@ -396,8 +425,20 @@ export default function Landing() {
               </motion.div>
 
               <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.65 }} className="mt-14 flex gap-10 border-t border-white/[0.06] pt-8 max-w-[420px]">
-                {[["340+","Zbudowanych"],["4,9","Ocena"],["14 mies.","Średnio"]].map(([v,l])=>(
-                  <div key={v}><div className="font-[Cormorant_Garamond] font-light text-[26px] leading-none">{v}</div><div className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.14em] text-white/25 mt-2">{l}</div></div>
+                {[
+                  { v: <CountUp to={340} suffix="+" />, l: "Zbudowanych" },
+                  { v: <CountUp to={4.9} decimals={1} />, l: "Ocena" },
+                  { v: <CountUp to={14} suffix=" mies." />, l: "Średnio" },
+                ].map((s, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 + i * 0.09, duration: 0.7 }}
+                  >
+                    <div className="font-[Cormorant_Garamond] font-light text-[26px] leading-none">{s.v}</div>
+                    <div className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.14em] text-white/25 mt-2">{s.l}</div>
+                  </motion.div>
                 ))}
               </motion.div>
             </div>
@@ -445,7 +486,20 @@ export default function Landing() {
               </div>
             </motion.div>
           </div>
-          <Reveal><div className="border-y border-white/[0.05] py-5 flex items-center gap-6 overflow-hidden"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.16em] text-white/20 shrink-0">ZBUDOWANE DLA</span><div className="flex items-center gap-8 font-[Space_Grotesk] font-light text-white/35 text-[12px] tracking-[0.14em] whitespace-nowrap"><span>LUMIÈRE</span><span className="h-3 w-px bg-white/5"/><span>FORM</span><span className="h-3 w-px bg-white/5"/><span>MARLOWE</span><span className="hidden sm:inline h-3 w-px bg-white/5"/><span className="hidden sm:inline">FLEUR</span><span className="ml-auto hidden lg:inline font-[JetBrains_Mono] font-light text-[10px] text-white/20">+340 FIRM</span></div></div></Reveal>
+          <Reveal><div className="border-y border-white/[0.05] py-5 flex items-center gap-6 overflow-hidden"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.16em] text-white/20 shrink-0">ZBUDOWANE DLA</span><div className="relative flex-1 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+              <div className="flex w-max items-center font-[Space_Grotesk] font-light text-white/35 text-[12px] tracking-[0.14em] whitespace-nowrap" style={{ animation: "qmarquee 34s linear infinite" }}>
+                {[0, 1].map((dup) => (
+                  <span key={dup} className="flex items-center">
+                    {["LUMIÈRE", "FORM", "MARLOWE", "FLEUR ATELIER", "GOOD ROOM", "PILATES & CO", "OSTEOPATHICA"].map((n, i) => (
+                      <span key={i} className="flex items-center">
+                        <span>{n}</span>
+                        <span className="h-3 w-px bg-white/8 mx-8" />
+                      </span>
+                    ))}
+                  </span>
+                ))}
+              </div>
+            </div></div></Reveal>
         </motion.div>
       </section>
 
@@ -464,11 +518,12 @@ export default function Landing() {
         </Reveal>
         <div className="mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {serviceDefaults.map((s,i)=>(
-            <motion.div key={s.n} initial={{ opacity:0, y:14 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}} className="group bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.2] border border-white/[0.08] rounded-[28px] p-10 lg:p-10 hover:bg-white/[0.05] hover:border-white/15 transition-colors relative overflow-hidden" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 8px 32px rgba(0,0,0,0.35)" } as any}>
+            <motion.div key={s.n} initial={{ opacity:0, y:14 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}} className="group bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.2] border border-white/[0.08] rounded-[28px] p-10 lg:p-10 hover:bg-white/[0.06] hover:border-white/20 hover:-translate-y-2 transition-all duration-500 relative overflow-hidden" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 8px 32px rgba(0,0,0,0.35)" } as any}>
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/0 to-transparent group-hover:via-white/10 transition duration-700"/>
+              <div className="pointer-events-none absolute -inset-20 opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ background: "radial-gradient(55% 45% at 50% 0%, rgba(255,255,255,0.10), transparent 70%)" }} />
               <div className="flex items-center justify-between">
                 <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-white/20">{s.n}</span>
-                <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10 text-white/20 group-hover:border-white/20 group-hover:text-white/60 transition"><ArrowUpRight className="h-3.5 w-3.5"/></span>
+                <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10 text-white/20 group-hover:border-white/30 group-hover:text-white group-hover:rotate-45 group-hover:bg-white/5 transition-all duration-500"><ArrowUpRight className="h-3.5 w-3.5"/></span>
               </div>
               <h3 className="mt-8 font-[Cormorant_Garamond] font-light text-[24px] tracking-[-0.01em] leading-none">
                 <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
