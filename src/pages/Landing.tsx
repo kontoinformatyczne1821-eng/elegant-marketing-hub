@@ -3,13 +3,12 @@ import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Menu, X, Check
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
-import GlowCursor from "@/components/GlowCursor";
-import GlareHover from "@/components/GlareHover";
 import GradualBlur from "@/components/GradualBlur";
-import PixelTrail from "@/components/PixelTrail";
 import FlipCard from "@/components/FlipCard";
 import LineSidebar from "@/components/LineSidebar";
 import QraftMark from "@/components/QraftMark";
+import WarpText from "@/components/WarpText";
+import BorderGlow from "@/components/BorderGlow";
 
 function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, popKey }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean; popKey?: string }) {
   const [val, setVal] = useState(def);
@@ -553,21 +552,6 @@ function PlanShowcase({
                   ))}
                 </motion.div>
               )}
-              <GlareHover
-                width="100%"
-                height="100%"
-                background="transparent"
-                borderRadius="28px"
-                borderColor="transparent"
-                glareColor="#ffffff"
-                /* poświata tylko na wybranym pakiecie — na bocznych kartach
-                   rgba(255,255,255,0) = całkowicie przezroczysty pas */
-                glareOpacity={front ? 0.18 : 0}
-                glareAngle={-30}
-                glareSize={320}
-                transitionDuration={850}
-                style={{ display: "block", border: "none", outline: "none" }}
-              >
               <div
                 className={`relative overflow-hidden rounded-[28px] border p-8 flex flex-col h-full transition-colors duration-500 ${
                   front
@@ -684,7 +668,6 @@ function PlanShowcase({
                   )}
                 </div>
               </div>
-              </GlareHover>
             </motion.div>
           );
         })}
@@ -888,11 +871,6 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
 
 const FLOW_BG_SRC = "";
 
-/* użytkownik poprosił system o mniej animacji — kursor gasną */
-const REDUCE_MOTION =
-  typeof window !== "undefined" &&
-  !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-
 function FlowArt() {
   return (
     <svg
@@ -982,32 +960,6 @@ function useAtPageEnd(threshold = 24) {
     };
   }, [threshold]);
   return atEnd;
-}
-
-/** Prawdziwe dla myszy/trackpada — canvas ma się rysować tylko przy kursorze.
- *  `pointer: fine` bywa złane w podglądach iframe, więc traktujemy pierwszy
- *  ruch myszy jako twardy dowód. Na dotyku wracamy do wyłączenia, żeby
- *  płótno nie łapało przewijania. */
-function useFinePointer() {
-  const [fine, setFine] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(pointer: fine)");
-    const sync = () => setFine(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    const onMove = (e: PointerEvent) => {
-      if (e.pointerType === "mouse" || e.pointerType === "pen") setFine(true);
-    };
-    const onTouch = () => setFine(false);
-    window.addEventListener("pointermove", onMove, { passive: true });
-    window.addEventListener("pointerdown", onTouch, { passive: true });
-    return () => {
-      mq.removeEventListener("change", sync);
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerdown", onTouch);
-    };
-  }, []);
-  return fine;
 }
 
 /* pozycje bocznego paska nawigacji */
@@ -1111,7 +1063,6 @@ export default function Landing() {
   /* w sekcji PROCES tło jest jasne — kursor przechodzi na czarne światło */
   const [inProcess, setInProcess] = useState(false);
   const atPageEnd = useAtPageEnd();
-  const finePointer = useFinePointer();
   const spy = useSectionSpy(SIDEBAR_IDS);
   /* zaznaczone moduły w SYSTEM napędzają rekomendowany pakiet */
   const [picked, setPicked] = useState<number[]>([]);
@@ -1181,36 +1132,6 @@ export default function Landing() {
         style={{ zIndex: 30 }}
       />
 
-      <GlowCursor
-        globalPointer
-        enabled={!REDUCE_MOTION}
-        color={inProcess ? "#0a0a0a" : "#ffffff"}
-        secondaryColor={inProcess ? "#3c3e3d" : "#c9c9cf"}
-        trailLength={38}
-        trailWidth={6}
-        trailTaper={0.82}
-        followSpeed={0.16}
-        glowIntensity={1.7}
-        glowSpread={1.15}
-        hotspot={inProcess ? 0.05 : 0.7}
-        brightness={inProcess ? 0.9 : 1.2}
-        opacity={inProcess ? 0.42 : 0.5}
-        pulseSpeed={1.1}
-        noiseStrength={0.03}
-        idleFade
-        idleTimeout={700}
-        fadeDuration={600}
-        blendMode={inProcess ? "normal" : "screen"}
-        maxDevicePixelRatio={1.25}
-        style={{
-          position: "fixed",
-          inset: 0,
-          width: "100vw",
-          height: "100vh",
-          zIndex: 60,
-          pointerEvents: "none",
-        }}
-      />
       {/* boczny pasek nawigacji (LineSidebar) — otwiera go kliknięcie Q w nagłówku */}
       <div className="hidden min-[1640px]:block fixed left-3 top-1/2 z-40 -translate-y-1/2">
         <motion.aside
@@ -1255,6 +1176,7 @@ export default function Landing() {
           <LineSidebar
             items={SIDEBAR.map((x) => x.label)}
             active={spy}
+            followPointer={false}
             onItemClick={(i) => go(SIDEBAR[i].id)}
             accentColor="#FF3E0A"
             textColor={inProcess ? "rgba(10,10,10,0.45)" : "rgba(242,242,240,0.42)"}
@@ -1387,22 +1309,6 @@ export default function Landing() {
         <div className="absolute inset-0 bg-[radial-gradient(130%_100%_at_50%_6%,transparent_0%,rgba(5,5,7,0.30)_64%,rgba(5,5,7,0.88)_100%)]" />
         <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "88px 88px" }} />
 
-        {/* pixel trail — ślad kursora w hero, tam gdzie „Precision Builds Brands” */}
-        {finePointer && (
-          <div className="absolute inset-0 z-[5] mix-blend-screen">
-            <PixelTrail
-              gridSize={80}
-              trailSize={0.09}
-              maxAge={520}
-              interpolate={5}
-              color="#ffffff"
-              gooeyFilter={{ id: "qraft-goo", strength: 2.4 }}
-              canvasProps={{ dpr: [1, 1.25] }}
-              style={{ touchAction: "auto" }}
-            />
-          </div>
-        )}
-
         <div className="absolute inset-0">
           <div className="absolute left-1/2 top-[-10%] h-[120%] w-px -translate-x-1/2 bg-white/90 shadow-[0_0_30px_5px_rgba(255,255,255,0.6),0_0_110px_24px_rgba(255,255,255,0.24)]" />
           <motion.div
@@ -1427,13 +1333,35 @@ export default function Landing() {
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              <h1 className="font-[Space_Grotesk] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[clamp(30px,7.4vw,100px)]">
-                <span className="block text-white">Precision</span>
-                <span className="block text-white">Builds</span>
-                <span className="block text-transparent" style={{ WebkitTextStroke: "1.2px rgba(255,255,255,0.6)" }}>
-                  Brands
-                </span>
-              </h1>
+              {/* tytul dla czytnikow i wyszukiwarek; wizualnie szklany napis */}
+              <h1 className="sr-only">Precision Builds Brands</h1>
+              <WarpText
+                text={"PRECISION\nBUILDS\nBRANDS"}
+                color="#F2F2F0"
+                align="left"
+                pointer={false}
+                fontFamily="'Space Grotesk', system-ui, sans-serif"
+                fontWeight={300}
+                fontSize="clamp(44px, 7.4vw, 104px)"
+                /* powietrze w literach jak w znaku, nie ściśnięty klin */
+                letterSpacing="0.004em"
+                lineHeight={0.92}
+                /* trzecia linia jako cienki kontur — hierarchia masa + obrys */
+                outlineFromLine={3}
+                strokeColor="rgba(242,242,240,0.55)"
+                strokeWidth={1.3}
+                warpStrength={0.09}
+                warpScale={1.4}
+                speed={0.42}
+                pointerInfluence={0}
+                pointerStrength={0}
+                refraction={0.015}
+                ripple={false}
+                /* szerokosc kontenera = budzet szerokosci liter: na telefonie
+                   mniej, na desktopie polowa kolumny przed kreska */
+                className="w-[58%] lg:w-[calc(50%-0.5rem)]"
+                style={{ height: "clamp(126px, 24vw, 330px)", minHeight: 0 }}
+              />
 
               <motion.div
                 className="mt-12 h-px w-full bg-white origin-left"
@@ -1501,13 +1429,29 @@ export default function Landing() {
         </Reveal>
         <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
           {serviceDefaults.map((s,i)=>(
-            <motion.div
+            /* zaznaczony moduł = zapalone szkło w kolorze systemu */
+            <BorderGlow
               key={s.n}
+              active={picked.includes(i)}
+              animated={picked.includes(i)}
+              followPointer={false}
+              glowAngle={112}
+              glowColor="150 72% 58%"
+              colors={["#7DF0AE", "#2DD4A7", "#0EA5E9"]}
+              backgroundColor="transparent"
+              borderRadius={24}
+              glowRadius={24}
+              glowIntensity={0.9}
+              coneSpread={30}
+              fillOpacity={0}
+              className="h-[330px] sm:h-[348px]"
+            >
+            <motion.div
               initial={{ opacity:0, y:14 }}
               whileInView={{ opacity:1, y:0 }}
               viewport={{ once:true }}
               transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}}
-              className="h-[330px] sm:h-[348px]"
+              className="h-full"
             >
               <FlipCard
                 fill
@@ -1522,9 +1466,9 @@ export default function Landing() {
                 width={420}
                 height={348}
                 perspective={1200}
-                tiltMax={9}
+                tiltMax={0}
                 hoverScale={1.02}
-                glareOpacity={0.13}
+                glareOpacity={0}
                 shadowColor="#000000"
                 shadowOpacity={0.55}
                 flipOnClick={!isEditing}
@@ -1619,6 +1563,7 @@ export default function Landing() {
                 )}
               />
             </motion.div>
+            </BorderGlow>
           ))}
         </div>
         <div className="mt-10 flex flex-col sm:flex-row justify-between gap-4 font-[JetBrains_Mono] font-light text-[11px]">
