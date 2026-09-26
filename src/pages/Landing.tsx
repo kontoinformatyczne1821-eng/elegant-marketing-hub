@@ -395,13 +395,6 @@ export default function Landing() {
         <motion.div style={{ y: heroY }} className="mx-auto max-w-[1280px] px-6 lg:px-8">
           <div className="grid lg:grid-cols-[1.02fr_0.98fr] gap-10 lg:gap-14 pt-16 lg:pt-28 pb-12 lg:pb-20 items-center min-h-[540px]">
             <div>
-              <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.8, ease:[0.22,1,0.36,1] }} className="inline-flex items-center gap-2.5 border border-white/10 rounded-full pl-3.5 pr-4 py-1.5 bg-white/[0.03] backdrop-blur">
-                <span className="relative flex h-1.5 w-1.5 shrink-0">
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-white/60 animate-ping" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white" />
-                </span>
-                <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.2em] text-white/45">QRAFT — EST. 2018</span>
-              </motion.div>
 
               <motion.h1 initial={{ opacity:0, y:16, filter:"blur(10px)" }} animate={{ opacity:1, y:0, filter:"blur(0px)" }} transition={{ duration:1, delay:0.08, ease:[0.22,1,0.36,1] }} className="mt-8 leading-[0.88] tracking-[-0.03em]">
                 <EditableText ek="qraft.hero.kicker" def="PERFEKCJA BUDUJE MARKI" className="block font-[JetBrains_Mono] font-light text-[11px] tracking-[0.24em] text-white/35 mb-4" isEditing={isEditing} as="span" />
