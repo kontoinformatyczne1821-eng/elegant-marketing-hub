@@ -307,6 +307,88 @@ function spiralAt(off: number) {
   };
 }
 
+/* Szklany przycisk strzałki karuzeli planów. Klik = wciśnięcie szkła,
+   błysk przebiegający przez obręcz, fala rozchodząca się od środka
+   i strzałka wysuwająca się w kierunku podróży. */
+function PlanArrow({
+  dir,
+  onClick,
+  label,
+  className = "",
+}: {
+  dir: 1 | -1;
+  onClick: () => void;
+  label: string;
+  className?: string;
+}) {
+  const [pressing, setPressing] = useState(false);
+  const [burst, setBurst] = useState(0);
+  const fire = () => {
+    onClick();
+    setBurst((b) => b + 1);
+  };
+  return (
+    <motion.button
+      type="button"
+      aria-label={label}
+      onClick={fire}
+      onPointerDown={() => setPressing(true)}
+      onPointerUp={() => setPressing(false)}
+      onPointerLeave={() => setPressing(false)}
+      className={`hidden lg:grid z-30 h-12 w-12 place-items-center rounded-full overflow-hidden cursor-pointer ${className}`}
+      style={{
+        pointerEvents: "auto",
+        background:
+          "linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0.03) 55%), rgba(10,10,13,0.36)",
+        boxShadow:
+          "inset 0 1px 1px rgba(255,255,255,0.30), inset 0 -1px 1px rgba(255,255,255,0.06), 0 10px 30px rgba(0,0,0,0.35)",
+        backdropFilter: "blur(18px) saturate(1.5)",
+        WebkitBackdropFilter: "blur(18px) saturate(1.5)",
+        border: "1px solid rgba(255,255,255,0.16)",
+      }}
+      animate={{ scale: pressing ? 0.88 : 1 }}
+      transition={{ type: "spring", stiffness: 480, damping: 24 }}
+    >
+      {/* fala po kliknięciu */}
+      {burst > 0 && (
+        <motion.span
+          key={burst}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-full border border-white/50"
+          initial={{ opacity: 0.85, scale: 0.35 }}
+          animate={{ opacity: 0, scale: 1.65 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        />
+      )}
+      {/* błysk na obręczy */}
+      {burst > 0 && (
+        <motion.span
+          key={`sheen-${burst}`}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-full"
+          style={{
+            background:
+              "conic-gradient(from 200deg, transparent 0deg, rgba(255,255,255,0.55) 18deg, transparent 46deg)",
+          }}
+          initial={{ rotate: 0, opacity: 0.9 }}
+          animate={{ rotate: 360, opacity: 0 }}
+          transition={{ duration: 0.75, ease: "easeOut" }}
+        />
+      )}
+      {/* strzałka wysuwa się w kierunku podróży */}
+      <motion.span
+        aria-hidden
+        className="relative z-10 grid place-items-center text-white/70"
+        animate={{ x: pressing ? dir * 5 : 0 }}
+        transition={{ type: "spring", stiffness: 520, damping: 18 }}
+        style={{ filter: "drop-shadow(0 0 8px rgba(255,255,255,0.45))" }}
+      >
+        {dir === 1 ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
+      </motion.span>
+    </motion.button>
+  );
+}
+
 function PlanShowcase({
   isEditing,
   onPick,
@@ -336,21 +418,19 @@ function PlanShowcase({
   return (
     <>
       <div ref={stageRef} className="relative mt-14 flex flex-col lg:block lg:h-[660px]">
-        {/* strzałki obok wybranego planu, nie pod nim */}
-        <button
+        {/* szklane strzałki obok wybranego planu — animowane kliknięciem */}
+        <PlanArrow
+          dir={-1}
           onClick={() => turn(-1)}
-          aria-label="Poprzedni plan"
-          className="hidden lg:grid absolute top-1/2 -translate-y-1/2 left-[24px] z-30 h-12 w-12 place-items-center rounded-full border border-white/15 bg-white/[0.04] backdrop-blur-xl text-white/60 transition-colors duration-300 hover:text-white hover:border-white/45 hover:bg-white/[0.09]"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </button>
-        <button
+          label="Poprzedni plan"
+          className="absolute top-1/2 -translate-y-1/2 left-[24px]"
+        />
+        <PlanArrow
+          dir={1}
           onClick={() => turn(1)}
-          aria-label="Następny plan"
-          className="hidden lg:grid absolute top-1/2 -translate-y-1/2 right-[24px] z-30 h-12 w-12 place-items-center rounded-full border border-white/15 bg-white/[0.04] backdrop-blur-xl text-white/60 transition-colors duration-300 hover:text-white hover:border-white/45 hover:bg-white/[0.09]"
-        >
-          <ArrowRight className="h-4 w-4" />
-        </button>
+          label="Następny plan"
+          className="absolute top-1/2 -translate-y-1/2 right-[24px]"
+        />
         {/* guide rings + floor light (desktop only) */}
         <div
           className="pointer-events-none absolute left-1/2 top-1/2 hidden lg:block"
@@ -1254,7 +1334,7 @@ export default function Landing() {
             <img
               src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=2000&q=80&auto=format&fit=crop"
               alt="Góry o świcie"
-              className="h-full w-full object-cover grayscale contrast-125 brightness-[0.30]"
+              className="h-full w-full object-cover grayscale contrast-110 brightness-[0.42]"
             />
           </motion.div>
 
@@ -1262,14 +1342,14 @@ export default function Landing() {
             <img
               src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2000&q=80&auto=format&fit=crop"
               alt="Grzbiet mgłą"
-              className="h-full w-full object-cover grayscale contrast-125 brightness-[0.22]"
+              className="h-full w-full object-cover grayscale contrast-110 brightness-[0.30]"
             />
           </motion.div>
 
           <motion.div
             className="absolute inset-0"
-            style={{ background: "linear-gradient(to bottom, rgba(5,5,7,0.82) 0%, transparent 30%, transparent 60%, #050507 100%)" }}
-            animate={{ opacity: [0.75, 1, 0.75] }}
+            style={{ background: "linear-gradient(to bottom, rgba(5,5,7,0.50) 0%, transparent 34%, transparent 76%, rgba(5,5,7,0.55) 91%, #050507 100%)" }}
+            animate={{ opacity: [0.55, 0.85, 0.55] }}
             transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
@@ -1280,7 +1360,7 @@ export default function Landing() {
           />
         </div>
 
-        <div className="absolute inset-0 bg-[radial-gradient(130%_100%_at_50%_6%,transparent_0%,rgba(5,5,7,0.62)_58%,#050507_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(130%_100%_at_50%_6%,transparent_0%,rgba(5,5,7,0.30)_64%,rgba(5,5,7,0.88)_100%)]" />
         <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "88px 88px" }} />
 
         {/* pixel trail — ślad kursora w hero, tam gdzie „Precision Builds Brands” */}
