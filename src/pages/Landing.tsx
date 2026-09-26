@@ -578,54 +578,28 @@ function PlanShowcase({
         })}
       </div>
 
-      {/* desktop: spiral controls */}
-      <div className="mt-8 hidden lg:block">
-        <div className="text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-white/30">
-          WYBIERZ PAKIET
-          <span className="mx-2 text-white/15">/</span>
-          {pickedCount > 0 ? (
-            <span className="text-[#7DF0AE]">DOPASOWANE DO {pickedCount} MODUŁÓW</span>
-          ) : (
-            <span className="text-white/20">OD 3 KM W TWOIM MIEŚCIE</span>
-          )}
+      {/* desktop: zamiast przycisków wyboru — typograficzne domknięcie sekcji */}
+      <div className="mt-12 hidden lg:flex flex-col items-center text-center select-none">
+        <div className="flex items-center gap-4">
+          <span className="h-px w-14 bg-gradient-to-r from-transparent to-white/20" />
+          <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.32em] text-white/30">
+            PRECISION BUILDS BRANDS
+          </span>
+          <span className="h-px w-14 bg-gradient-to-l from-transparent to-white/20" />
         </div>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
-          {plans.map((p, i) => (
-            <button
-              key={p.name}
-              onClick={() => setActive(i)}
-              className="h-12 px-6 rounded-full border transition-all duration-300 hover:-translate-y-0.5"
-              style={
-                i === active
-                  ? {
-                      backgroundColor: "#ffffff",
-                      borderColor: "#ffffff",
-                      color: "#0a0a0a",
-                      boxShadow: "0 12px 34px rgba(0,0,0,0.4)",
-                    }
-                  : i === recommended
-                    ? {
-                        borderColor: "rgba(125,240,174,0.55)",
-                        backgroundColor: "rgba(125,240,174,0.07)",
-                        color: "rgba(125,240,174,0.95)",
-                      }
-                    : { borderColor: "rgba(255,255,255,0.14)", color: "rgba(255,255,255,0.5)" }
-              }
-            >
-              <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] flex items-center gap-2">
-                {i === active ? (
-                  <Check className="h-3.5 w-3.5" />
-                ) : (
-                  <PopNumber text={`0${i + 1}`} />
-                )}
-                <span className="opacity-80">{p.name}</span>
-                {i === recommended && i !== active && (
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#7DF0AE]" />
-                )}
-              </span>
-            </button>
-          ))}
-        </div>
+        <p className="mt-5 font-[Cormorant_Garamond] font-light text-[40px] leading-[1.04] tracking-[-0.01em] text-[#F2F2F0]">
+          Perfection{" "}
+          <span className="font-[Instrument_Serif] italic text-white/55">can’t be rushed</span>
+        </p>
+        <p className="mt-4 font-[Cormorant_Garamond] font-light text-[20px] leading-none text-white/50">
+          Cały proces zajmuje{" "}
+          <span className="font-[Instrument_Serif] italic text-[#7DF0AE]">od 90 dni</span>.
+        </p>
+        {pickedCount > 0 && (
+          <p className="mt-4 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.24em] text-white/25">
+            DOPASOWANE DO {pickedCount} MODUŁÓW
+          </p>
+        )}
       </div>
     </>
   );
