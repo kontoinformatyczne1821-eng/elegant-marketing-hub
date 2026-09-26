@@ -283,7 +283,7 @@ function HoverTile({
       }}
       style={{ rotateX: rx, rotateY: ry, scale, transformPerspective: 900 }}
       data-on={active ? "true" : "false"}
-      className={`relative h-full w-full overflow-hidden rounded-[20px] border p-4 text-left outline-none backdrop-blur-2xl transition-colors duration-500 ${className}`}
+      className={`relative h-full w-full overflow-hidden rounded-[16px] sm:rounded-[20px] border p-3 sm:p-4 text-left outline-none backdrop-blur-2xl transition-colors duration-500 ${className}`}
     >
       <motion.span
         aria-hidden
@@ -586,7 +586,7 @@ function PlanShowcase({
 
   return (
     <>
-      <div ref={stageRef} className="relative mt-14 flex flex-col lg:block lg:h-[660px]">
+      <div ref={stageRef} className="relative mt-8 sm:mt-14 flex flex-col lg:block lg:h-[660px]">
         {/* szklane strzałki obok wybranego planu — animowane kliknięciem */}
         <GlassArrow
           dir={-1}
@@ -661,7 +661,7 @@ function PlanShowcase({
                 }}
               />
               <div
-                className={`relative overflow-hidden rounded-[28px] border p-8 flex flex-col h-full transition-colors duration-500 ${
+                className={`relative overflow-hidden rounded-[22px] sm:rounded-[28px] border p-5 sm:p-8 flex flex-col h-full transition-colors duration-500 ${
                   front
                     ? "bg-[#F7F7F5] text-black border-[#F7F7F5]"
                     : "bg-white/[0.07] text-white border-white/[0.14] backdrop-blur-2xl backdrop-saturate-[1.4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.16)]"
@@ -704,7 +704,7 @@ function PlanShowcase({
                     </span>
                   )}
                 </div>
-                <div className="mt-8 flex items-baseline gap-2">
+                <div className="mt-5 sm:mt-8 flex items-baseline gap-2">
                   <span className="font-[Cormorant_Garamond] font-light text-[26px] sm:text-[30px] tracking-[-0.02em]">
                     <EditableText
                       ek={`qraft.plan.${i}.price`}
@@ -877,7 +877,7 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
         </div>
       </div>
 
-      <div className="flex gap-6 sm:gap-10">
+      <div className="flex gap-4 sm:gap-6 lg:gap-10">
         {/* czarna podświetlana kreska z 4 punktami */}
         <div className="relative w-6 shrink-0">
           <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-black/12" />
@@ -913,7 +913,7 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
 
         {/* stos banerów */}
         <div className="relative flex-1">
-          <div ref={stackRef} className="t-stack t-stack--steps absolute inset-x-0 bottom-0 h-[392px]">
+          <div ref={stackRef} className="t-stack t-stack--steps absolute inset-x-0 bottom-0 h-[318px] sm:h-[392px]">
             {processSteps.map((s, i) => {
               const d = mod(active - i);
               const front = d === 0;
@@ -922,7 +922,7 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                   key={s.n}
                   data-step={i}
                   data-depth={d === 3 ? 2 : d}
-                  className={`t-stack-banner h-[292px] w-full rounded-[24px] border p-7 sm:p-8 flex flex-col ${
+                  className={`t-stack-banner h-[236px] sm:h-[292px] w-full rounded-[20px] sm:rounded-[24px] border p-5 sm:p-7 lg:p-8 flex flex-col ${
                     front
                       ? "bg-[#F4F4F1] border-black/12 text-black shadow-[0_24px_60px_rgba(0,0,0,0.14)]"
                       : "bg-[#EDEDE9]/85 border-black/[0.09] text-black/90 backdrop-blur-xl"
@@ -936,7 +936,7 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                       {s.meta}
                     </span>
                   </div>
-                  <h4 className="mt-6 font-[Cormorant_Garamond] font-light text-[20px] sm:text-[23px] lg:text-[38px] leading-[1.02] tracking-[-0.02em]">
+                  <h4 className="mt-3 sm:mt-6 font-[Cormorant_Garamond] font-light text-[20px] sm:text-[23px] lg:text-[38px] leading-[1.02] tracking-[-0.02em]">
                     <EditableText
                       ek={`qraft.process.${i}.title`}
                       def={s.t}
@@ -948,7 +948,7 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                   <EditableText
                     ek={`qraft.process.${i}.desc`}
                     def={s.d}
-                    className="mt-5 block font-[Inter] font-light text-[15px] sm:text-[17px] leading-8 opacity-100"
+                    className="mt-3 sm:mt-5 block font-[Inter] font-light text-[13px] sm:text-[17px] leading-6 sm:leading-8 opacity-100 line-clamp-3 sm:line-clamp-none"
                     isEditing={isEditing}
                     as="p"
                   />
@@ -1533,7 +1533,7 @@ export default function Landing() {
           >
             <button
               onClick={()=>setIsEditing(!isEditing)}
-              className={`hidden md:inline-flex items-center gap-2 px-4 h-9 rounded-full border font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.12em] transition-all duration-500 backdrop-blur ${isEditing ? "bg-white text-black border-white" : "border-white/15 bg-white/[0.02] text-white/60 hover:border-white/45 hover:bg-white/[0.08] hover:text-white"}`}
+              className={`hidden lg:inline-flex items-center gap-2 px-4 h-9 rounded-full border font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.12em] transition-all duration-500 backdrop-blur ${isEditing ? "bg-white text-black border-white" : "border-white/15 bg-white/[0.02] text-white/60 hover:border-white/45 hover:bg-white/[0.08] hover:text-white"}`}
             >
               {isEditing ? <><Save className="h-3.5 w-3.5"/> ZAKOŃCZ EDYCJĘ</> : <><Pencil className="h-3.5 w-3.5"/> EDYTUJ TEKSTY</>}
             </button>
@@ -1542,7 +1542,7 @@ export default function Landing() {
               onClick={() => { const next = !soundOn; setSoundOn(next); setMuted(!next); if (next) sfxTap(); }}
               aria-label={soundOn ? "Wycisz dźwięki" : "Włącz dźwięki"}
               aria-pressed={!soundOn}
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/15 bg-white/[0.02] text-white/55 transition-colors duration-300 hover:border-white/45 hover:text-white"
+              className="hidden sm:grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/15 bg-white/[0.02] text-white/55 transition-colors duration-300 hover:border-white/45 hover:text-white"
             >
               {soundOn ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
             </button>
@@ -1626,7 +1626,7 @@ export default function Landing() {
 
         {/* pixelowy ślad kursora w hero — tylko dla myszy/trackpada */}
         {finePointer && (
-          <div className="absolute inset-0 z-[5] mix-blend-screen">
+          <div className="absolute inset-0 z-[5] hidden sm:block mix-blend-screen">
             <PixelTrail
               gridSize={80}
               trailSize={0.09}
@@ -1642,7 +1642,7 @@ export default function Landing() {
 
         {/* content */}
         <div className="relative z-10 mx-auto max-w-[1280px] px-6 lg:px-8 pointer-events-none">
-          <div className="flex min-h-[calc(100vh-72px)] flex-col justify-center py-24 lg:py-32">
+          <div className="flex min-h-[calc(100svh-72px)] flex-col justify-center py-16 sm:py-24 lg:py-32">
             <motion.div
               initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -1657,14 +1657,14 @@ export default function Landing() {
               </h1>
 
               <motion.div
-                className="mt-12 h-px w-full bg-white origin-left"
+                className="mt-8 sm:mt-12 h-px w-full bg-white origin-left"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 1.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
               />
 
               <motion.div
-                className="mt-10 flex flex-wrap items-center gap-4"
+                className="mt-6 sm:mt-10 flex flex-wrap items-center gap-3 sm:gap-4"
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.9, delay: 0.6 }}
@@ -1720,7 +1720,7 @@ export default function Landing() {
             />
           </div>
         </Reveal>
-        <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+        <div className="mt-6 sm:mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
           {serviceDefaults.map((s,i)=>(
             <motion.div
               key={s.n}
@@ -1728,7 +1728,7 @@ export default function Landing() {
               whileInView={{ opacity:1, y:0 }}
               viewport={{ once:true }}
               transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}}
-              className="h-[330px] sm:h-[348px]"
+              className="h-[296px] sm:h-[348px]"
             >
               <FlipCard
                 fill
@@ -1750,14 +1750,14 @@ export default function Landing() {
                 flipOnClick={!isEditing}
                 draggable={!isEditing}
                 front={(
-                  <div className="relative flex h-full w-full flex-col p-7 sm:p-8">
+                  <div className="relative flex h-full w-full flex-col p-5 sm:p-7 lg:p-8">
                     <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(74% 54% at 50% 0%, rgba(255,255,255,0.08), transparent 72%)" }} />
                     <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.08]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06)" }} />
                     <div className="relative flex items-center justify-between">
                       <PopNumber text={s.n} className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.16em] text-white/25" />
                       <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10 text-white/25"><ArrowUpRight className="h-3.5 w-3.5"/></span>
                     </div>
-                    <h3 className="relative mt-7 font-[Cormorant_Garamond] font-light text-[20px] sm:text-[23px] tracking-[-0.01em] leading-none">
+                    <h3 className="relative mt-4 sm:mt-7 font-[Cormorant_Garamond] font-light text-[20px] sm:text-[23px] tracking-[-0.01em] leading-none">
                       <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
                     </h3>
                     <div className="relative mt-auto space-y-2 pt-6">
@@ -1796,7 +1796,7 @@ export default function Landing() {
                   </div>
                 )}
                 back={(
-                  <div className="relative flex h-full w-full flex-col p-7 sm:p-8">
+                  <div className="relative flex h-full w-full flex-col p-5 sm:p-7 lg:p-8">
                     <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(86% 62% at 50% 108%, rgba(255,255,255,0.10), transparent 70%)" }} />
                     <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.12]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.08)" }} />
                     <div className="relative font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.18em] text-white/30">{s.meta}</div>
@@ -1867,9 +1867,9 @@ export default function Landing() {
         <div className="mt-8 text-center font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.06em] text-white/20"><EditableText ek="qraft.pricing.note2" def="Start bez sesji zdjęciowej — dostępna od Signature. Szczegóły na audycie." className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div>
       </section>
 
-      <section id="promo" className="relative mx-auto max-w-[1280px] px-6 lg:px-8 pb-24 lg:pb-32">
+      <section id="promo" className="relative mx-auto max-w-[1280px] px-5 sm:px-6 lg:px-8 pb-16 sm:pb-24 lg:pb-32">
         <Reveal>
-          <div className="max-w-[620px] border-t border-white/[0.06] pt-16 lg:pt-20">
+          <div className="max-w-[620px] border-t border-white/[0.06] pt-10 sm:pt-16 lg:pt-20">
               <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/20">04 — PROMOCJE</div>
               <h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[27px] sm:text-[50px] leading-[0.98] tracking-[-0.02em] text-white">
                 Pierwsze 90 dni <span className="font-[Instrument_Serif] italic text-white/55">połowa ceny</span>.
@@ -1897,7 +1897,7 @@ export default function Landing() {
               textColor="rgba(242,242,240,0.55)"
               activeTextColor="#0A120E"
               size="sm"
-              gap={6}
+              gap={4}
               radius={14}
               swell={0.16}
               barge={4}
@@ -1908,7 +1908,7 @@ export default function Landing() {
         </Reveal>
 
         <div
-          className={`mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 ${
+          className={`mt-4 sm:mt-6 grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-3 ${
             availableTerms.length === 5 ? "lg:grid-cols-5" : "lg:grid-cols-3"
           }`}
         >
@@ -1960,7 +1960,7 @@ export default function Landing() {
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -14, filter: "blur(8px)" }}
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-6 overflow-hidden rounded-[28px] border border-white/[0.10] bg-white/[0.03] p-7 sm:p-10 backdrop-blur-2xl backdrop-saturate-[1.4]"
+              className="mt-4 sm:mt-6 overflow-hidden rounded-[20px] sm:rounded-[28px] border border-white/[0.10] bg-white/[0.03] p-5 sm:p-7 lg:p-10 backdrop-blur-2xl backdrop-saturate-[1.4]"
               style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 30px 80px rgba(0,0,0,0.35)" }}
             >
               <div className="grid gap-10 lg:grid-cols-[1fr_400px]">
@@ -1985,12 +1985,12 @@ export default function Landing() {
                   </ul>
                 </div>
 
-                <div className="flex flex-col justify-between gap-10 rounded-[28px] border border-white/[0.10] bg-white/[0.03] p-8 sm:p-10 backdrop-blur-2xl">
+                <div className="flex flex-col justify-between gap-6 sm:gap-10 rounded-[20px] sm:rounded-[28px] border border-white/[0.10] bg-white/[0.03] p-5 sm:p-8 lg:p-10 backdrop-blur-2xl">
                   <div>
                     <div className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-white/30">
                       CO OSZCZĘDZASZ
                     </div>
-                    <div className="mt-4 font-[Cormorant_Garamond] font-light leading-[0.92] tracking-[-0.03em] text-[#7DF0AE] text-[clamp(40px,5.4vw,68px)] tabular-nums">
+                    <div className="mt-4 font-[Cormorant_Garamond] font-light leading-[0.92] tracking-[-0.03em] text-[#7DF0AE] text-[clamp(34px,5.4vw,68px)] tabular-nums">
                       <SavingsCount
                         key={`${tier}-${term}`}
                         to={quote.saved}
@@ -2027,7 +2027,7 @@ export default function Landing() {
         <div className="grid lg:grid-cols-[1fr_1fr] gap-6">
           <Reveal><div className="bg-[#0F0F11] border border-white/10 text-white rounded-[32px] p-8 lg:p-10 relative overflow-hidden min-h-[440px] flex flex-col"><div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/[0.04] blur-2xl"/><div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"/><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/30">06 — AUDYT</div><h2 className="mt-6 font-[Cormorant_Garamond] font-light text-[32px] sm:text-[40px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.contact.h1b" def="Zamów bezpłatny" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.contact.h2b" def="audyt." className="block font-[Cormorant_Garamond] font-light italic text-white/50" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.contact.desc2" def="20 minut online. Wybierz usługę, dzień i godzinę — potwierdzimy w ciągu kilku godzin. Nawet jeśli nas nie wybierzesz, zostajesz z planem." className="mt-4 block font-[Inter] font-light text-[13px] sm:text-[14px] leading-7 text-white/60 max-w-[380px]" isEditing={isEditing} as="p" /><div className="mt-8 space-y-3 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.06em] text-white/35"><div className="flex items-center gap-2.5"><Clock className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line1" def="Dwa terminy w tym tygodniu · 20 min" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div><div className="flex items-center gap-2.5"><Terminal className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line2" def="Otwarte dla każdego klienta" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div></div><div className="mt-auto pt-10 flex gap-2 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.1em]"><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge1" def="BEZ OPŁAT" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge2" def="BEZ ZOBOWIĄZAŃ" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div></div></Reveal>
           <Reveal delay={0.06}>
-            <div className="bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.4] border border-white/10 rounded-[32px] p-7 sm:p-8 h-full flex flex-col" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.32)" } as any}>
+            <div className="bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.4] border border-white/10 rounded-[22px] sm:rounded-[32px] p-5 sm:p-7 lg:p-8 h-full flex flex-col" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.32)" } as any}>
               <div className="flex items-center justify-between gap-3">
                 <h3 className="font-[Cormorant_Garamond] font-light text-[19px] sm:text-[22px]">
                   <EditableText ek="qraft.form.h" def="Zamów bezpłatny audyt" className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
