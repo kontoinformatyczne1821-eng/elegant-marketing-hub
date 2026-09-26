@@ -1,6 +1,6 @@
 import { motion, AnimatePresence, useScroll, useTransform, useInView } from "framer-motion";
-import { ArrowUpRight, ArrowRight, ArrowLeft, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save } from "lucide-react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, usePopIn } from "@/components/transitions";
 
@@ -47,9 +47,17 @@ const serviceDefaults = [
 ];
 
 const plans = [
-  { name: "Start", price: "1 900 zł", sub: "/ mies.", line: "Fundamenty, by dać się znaleźć.", pts: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"], featured: false, cta: "Wybierz Start" },
-  { name: "Skala", price: "3 800 zł", sub: "/ mies.", line: "Pełny system. Wypełnia kalendarz.", pts: ["Wszystko ze Startu", "Zasięg + płatne w promieniu", "Silnik treści + lista"], featured: true, cta: "Wybierz Skalę" },
-  { name: "Lab", price: "Wycena", sub: "", line: "Starty, rebrandingi, wiele lokalizacji.", pts: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"], featured: false, cta: "Zapytaj o Lab" },
+  { name: "ESSENCE", price: "1 900 zł", sub: "/ mies.", line: "Fundamenty, by dać się znaleźć.", pts: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"], featured: false, cta: "Wybierz Essence" },
+  { name: "SIGNATURE", price: "3 800 zł", sub: "/ mies.", line: "Pełny system. Wypełnia kalendarz.", pts: ["Wszystko z Essence", "Zasięg + płatne w promieniu", "Silnik treści + lista"], featured: true, cta: "Wybierz Signature" },
+  { name: "PRESTIGE", price: "Wycena", sub: "", line: "Starty, rebrandingi, wiele lokalizacji.", pts: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"], featured: false, cta: "Zapytaj o Prestige" },
+];
+
+/* 1 baner = 1 etap procesu */
+const processSteps = [
+  { n: "01", t: "Audyt — 20 min", d: "Oglądamy Twoją firmę z zewnątrza i wskazujemy pierwszą największą dźwignię.", meta: "Dzień 1" },
+  { n: "02", t: "Blueprint — 1 strona", d: "Pozycjonowanie dla Twojej okolicy, oferta i plan na 90 dni.", meta: "Dzień 7" },
+  { n: "03", t: "Budowa — 2–3 tyg.", d: "Tożsamość, strona i materiały — wszystko mówi tym samym głosem.", meta: "Dzień 10–28" },
+  { n: "04", t: "Skalowanie — co tydzień", d: "Raport w złotówkach. Co działa, dostajemy więcej.", meta: "Co poniedziałek" },
 ];
 
 function CursorAura() {
@@ -451,7 +459,7 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
             : { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, filter: "blur(0px)", zIndex: 1 };
           const cta = (
             <EditableText
-              ek={`qraft.plan.${i}.cta`}
+              ek={`qraft.plan.${i}.cta2`}
               def={p.cta}
               className="font-[JetBrains_Mono] font-light tracking-[0.14em]"
               isEditing={isEditing}
@@ -488,8 +496,8 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
                     }`}
                   >
                     <EditableText
-                      ek={`qraft.plan.${i}.name`}
-                      def={p.name.toUpperCase()}
+                      ek={`qraft.plan.${i}.name2`}
+                      def={p.name}
                       className="font-[JetBrains_Mono] font-light"
                       isEditing={isEditing}
                       as="span"
@@ -608,6 +616,163 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
         </div>
       </div>
     </>
+  );
+}
+
+/* --------- proces: banery zawieszone na podświetlanej linii -------- */
+/* transitions.dev "Banner stacking" — 1 baner = 1 etap. Nowy baner    */
+/* wjeżdża ruchem tostownika (rise + blur + scale), starsze cofają się  */
+/* w głąb, czwarty wychodzi. Sterowanie: strzałki góra/dół + kropki.    */
+
+function ProcessStack({ isEditing }: { isEditing: boolean }) {
+  const n = processSteps.length;
+  const [active, setActive] = useState(0);
+  const [entering, setEntering] = useState<number | null>(null);
+  const stackRef = useRef<HTMLDivElement>(null);
+  const mod = (i: number) => ((i % n) + n) % n;
+
+  const step = (target: number, dir: 1 | -1) => {
+    const next = mod(target);
+    if (next === active) return;
+    setEntering(dir === 1 ? next : null);
+    setActive(next);
+  };
+
+  /* wypłukaj stan spoczynkowy, potem puść go w tym samym ticku —
+     rAF zostałby pominięty przy throttlowaniu zegara i baner wjechałby bez ruchu */
+  useLayoutEffect(() => {
+    if (entering === null) return;
+    const el = stackRef.current?.querySelector<HTMLElement>(`[data-step="${entering}"]`);
+    if (!el) return;
+    el.classList.add("is-enter");
+    void el.offsetWidth;
+    el.classList.remove("is-enter");
+  }, [entering, active]);
+
+  return (
+    <div className="grid lg:grid-cols-[360px_1fr] gap-12">
+      <div className="lg:sticky lg:top-28 self-start">
+        <div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-black/30">02 — PROCES</div>
+        <h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[36px] leading-[0.9] tracking-[-0.02em]">
+          <EditableText ek="qraft.process.h1" def="Cztery tygodnie" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
+          <EditableText ek="qraft.process.h2" def="do rozpędu." className="block font-[Cormorant_Garamond] font-light italic text-black/30" isEditing={isEditing} as="span" />
+        </h3>
+        <EditableText ek="qraft.process.desc" def="Otwarty proces. Cotygodniowe dowody. Bez teatru." className="mt-4 block font-[Inter] font-light text-[15px] leading-7 text-black/40" isEditing={isEditing} as="p" />
+
+        <div className="mt-10 flex items-center gap-3">
+          <button
+            onClick={() => step(active - 1, -1)}
+            aria-label="Poprzedni etap"
+            className="h-12 w-12 grid place-items-center rounded-full border border-black/15 text-black/55 transition-colors duration-300 hover:text-black hover:border-black/45"
+          >
+            <ArrowUp className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => step(active + 1, 1)}
+            aria-label="Następny etap"
+            className="h-12 w-12 grid place-items-center rounded-full border border-black/15 text-black/55 transition-colors duration-300 hover:text-black hover:border-black/45"
+          >
+            <ArrowDown className="h-4 w-4" />
+          </button>
+          <div className="ml-1 flex items-baseline gap-2 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-black/30">
+            ETAP
+            <PopNumber text={`0${active + 1}`} className="text-black/70" />
+            <span className="opacity-50">/ 0{n}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex gap-6 sm:gap-10">
+        {/* czarna podświetlana kreska z 4 punktami */}
+        <div className="relative w-6 shrink-0">
+          <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-black/12" />
+          <motion.div
+            className="absolute left-1/2 top-0 w-[2px] -translate-x-1/2 rounded-full bg-black"
+            initial={false}
+            animate={{ height: `${(active / (n - 1)) * 100}%` }}
+            transition={{ type: "spring", stiffness: 110, damping: 18 }}
+            style={{ boxShadow: "0 0 16px 3px rgba(0,0,0,0.30)" }}
+          />
+          <div className="relative flex h-full flex-col items-center justify-between py-[7px]">
+            {processSteps.map((s, i) => (
+              <button
+                key={s.n}
+                onClick={() => step(i, mod(i - active) <= n / 2 ? 1 : -1)}
+                aria-label={`Etap ${s.n}`}
+                className="grid place-items-center outline-none"
+              >
+                <span
+                  className="block rounded-full transition-all duration-500"
+                  style={{
+                    width: i === active ? 13 : 8,
+                    height: i === active ? 13 : 8,
+                    backgroundColor: i <= active ? "#0a0a0a" : "#F7F7F5",
+                    border: `1px solid ${i <= active ? "#0a0a0a" : "rgba(0,0,0,0.28)"}`,
+                    boxShadow: i === active ? "0 0 18px 4px rgba(0,0,0,0.30)" : "none",
+                  }}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* stos banerów */}
+        <div className="relative flex-1">
+          <div ref={stackRef} className="t-stack t-stack--steps absolute inset-x-0 bottom-0 h-[340px]">
+            {processSteps.map((s, i) => {
+              const d = mod(active - i);
+              const front = d === 0;
+              return (
+                <div
+                  key={s.n}
+                  data-step={i}
+                  data-depth={d === 3 ? 2 : d}
+                  className={`t-stack-banner h-[250px] w-full rounded-[24px] border p-7 flex flex-col ${
+                    front
+                      ? "bg-white border-black/10 text-black shadow-[0_24px_60px_rgba(0,0,0,0.12)]"
+                      : "bg-white/60 border-black/[0.07] text-black/55 backdrop-blur-xl"
+                  } ${d === 3 ? "is-leaving" : ""}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em]">
+                      {s.n}
+                    </span>
+                    <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.12em] opacity-60">
+                      {s.meta}
+                    </span>
+                  </div>
+                  <h4 className="mt-6 font-[Cormorant_Garamond] font-light text-[26px] lg:text-[30px] leading-none tracking-[-0.02em]">
+                    <EditableText
+                      ek={`qraft.process.${i}.title`}
+                      def={s.t}
+                      className="font-[Cormorant_Garamond] font-light"
+                      isEditing={isEditing}
+                      as="span"
+                    />
+                  </h4>
+                  <EditableText
+                    ek={`qraft.process.${i}.desc`}
+                    def={s.d}
+                    className="mt-4 block font-[Inter] font-light text-[15px] leading-7 opacity-75"
+                    isEditing={isEditing}
+                    as="p"
+                  />
+                  <div className="mt-auto flex gap-2">
+                    {processSteps.map((_, k) => (
+                      <span
+                        key={k}
+                        className="h-[3px] flex-1 rounded-full transition-colors duration-500"
+                        style={{ backgroundColor: k <= active ? "#0a0a0a" : "rgba(0,0,0,0.12)" }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -774,12 +939,7 @@ export default function Landing() {
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="flex items-center gap-4 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.26em] text-white/50">
-                <span className="h-px w-14 bg-white/50" />
-                QRAFT — MANIFEST
-              </div>
-
-              <h1 className="mt-10 font-[Space_Grotesk] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[52px] sm:text-[92px] lg:text-[152px]">
+              <h1 className="font-[Space_Grotesk] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[52px] sm:text-[92px] lg:text-[152px]">
                 <span className="block text-white">Precision</span>
                 <span className="block text-white">Builds</span>
                 <span className="block text-transparent" style={{ WebkitTextStroke: "1.2px rgba(255,255,255,0.6)" }}>
@@ -887,14 +1047,14 @@ export default function Landing() {
 
       <section className="bg-[#F7F7F5] text-[#0A0A0A] border-t border-white/5">
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-24">
-          <Reveal><div className="grid lg:grid-cols-[360px_1fr] gap-12"><div className="lg:sticky lg:top-28 self-start"><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-black/30">02 — PROCES</div><h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[36px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.process.h1" def="Cztery tygodnie" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.process.h2" def="do rozpędu." className="block font-[Cormorant_Garamond] font-light italic text-black/30" isEditing={isEditing} as="span" /></h3><EditableText ek="qraft.process.desc" def="Otwarty proces. Cotygodniowe dowody. Bez teatru." className="mt-4 block font-[Inter] font-light text-[15px] leading-7 text-black/40" isEditing={isEditing} as="p" /></div><div className="relative"><motion.div initial={{ scaleY:0 }} whileInView={{ scaleY:1 }} viewport={{ once:true }} transition={{ duration:1.1, ease:[0.22,1,0.36,1] }} className="absolute left-[11px] top-2 bottom-2 w-px bg-black/10 origin-top hidden sm:block"/><div className="space-y-5">{[["01","Audyt — 20 min","Ocena + pierwsza dźwignia."],["02","Blueprint — 1 strona","Pozycjonowanie dla Twojej okolicy."],["03","Budowa — 2–3 tyg.","Tożsamość, strona, materiały."],["04","Skalowanie — co tydzień","Raport w złotówkach."]].map(([n,t,d],i)=>(<motion.div key={n} initial={{ opacity:0, x:10 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ delay:i*0.06, duration:0.6 }} className="flex gap-4 group"><div className="hidden sm:grid h-6 w-6 shrink-0 place-items-center rounded-full bg-black text-white font-[JetBrains_Mono] font-light text-[10px]"><PopNumber text={n} /></div><div className="flex-1 bg-white border border-black/5 rounded-2xl px-6 py-5 group-hover:border-black/10 transition"><div className="font-[Cormorant_Garamond] font-light text-[17px]"><EditableText ek={`qraft.process.${i}.title`} def={t} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></div><div className="font-[Inter] font-light text-[13px] text-black/45 mt-1"><EditableText ek={`qraft.process.${i}.desc`} def={d} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></div></div></motion.div>))}</div></div></div></Reveal>
+          <Reveal><ProcessStack isEditing={isEditing} /></Reveal>
         </div>
       </section>
 
       <section id="pricing" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-24 lg:py-32">
         <Reveal><div className="text-center max-w-xl mx-auto"><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.2em] text-white/30">03 — PLANY</div><h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[42px] sm:text-[50px] tracking-[-0.02em] leading-none"><EditableText ek="qraft.pricing.h" def="Jasne ceny." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.pricing.sub" def="Miesiąc do miesiąca po 90 dniach. Bez zobowiązań. W odcieniach czerni — wyrafinowane." className="mt-4 block font-[Inter] font-light text-[15px] leading-7 text-white/30 max-w-[480px] mx-auto" isEditing={isEditing} as="p" /></div></Reveal>
         <Reveal><PlanShowcase isEditing={isEditing} onPick={()=>go("contact")} /></Reveal>
-        <div className="mt-8 text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.06em] text-white/20"><EditableText ek="qraft.pricing.note" def="Start bez sesji zdjęciowej — dostępna od Skali. Szczegóły na audycie." className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div>
+        <div className="mt-8 text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.06em] text-white/20"><EditableText ek="qraft.pricing.note2" def="Start bez sesji zdjęciowej — dostępna od Signature. Szczegóły na audycie." className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div>
       </section>
 
       <section className="mx-auto max-w-[1280px] px-6 lg:px-8 pb-12">
@@ -918,9 +1078,9 @@ export default function Landing() {
               <span className="block font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">USŁUGA</span>
               <select name="service" value={form.service} onChange={(e)=>setForm({...form, service:e.target.value})} className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm text-white [color-scheme:dark] focus:outline-none focus:border-white/20">
                 <option className="bg-[#0F0F11]" value="audyt">Audyt 20 min</option>
-                <option className="bg-[#0F0F11]" value="start">Start</option>
-                <option className="bg-[#0F0F11]" value="skala">Skala</option>
-                <option className="bg-[#0F0F11]" value="lab">Lab / warsztat</option>
+                <option className="bg-[#0F0F11]" value="essence">Essence</option>
+                <option className="bg-[#0F0F11]" value="signature">Signature</option>
+                <option className="bg-[#0F0F11]" value="prestige">Prestige / warsztat</option>
               </select>
             </label>
             <label className="block space-y-2">
