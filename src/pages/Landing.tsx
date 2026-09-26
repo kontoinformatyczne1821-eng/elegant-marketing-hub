@@ -1760,7 +1760,6 @@ export default function Landing() {
               )}
             </div>
             <div className="flex flex-col items-start gap-4">
-              <div className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-white/30">POZIOM WSPÓŁPRACY</div>
               <JellyRadio
                 items={[
                   { value: "standard", label: "Standard" },
@@ -1834,13 +1833,11 @@ export default function Landing() {
                     <span className="font-[JetBrains_Mono] font-light text-[9px] tracking-[0.12em] text-white/35">−{Math.round(t.discount * 100)}%</span>
                   )}
                 </span>
-                <span className="font-[Cormorant_Garamond] font-light text-[20px] sm:text-[24px] leading-none text-white">
-                  {zl(q.monthly)}
-                </span>
                 <span className="font-[Inter] font-light text-[12px] leading-5 text-white/45">
-                  <span className="text-[#7DF0AE]">oszczędzasz {zl(q.saved)}</span>
-                  <br />
-                  z {zl(tierData.amount)}
+                  oszczędzasz
+                </span>
+                <span className="font-[Cormorant_Garamond] font-light text-[20px] sm:text-[26px] leading-none text-[#7DF0AE]">
+                  {zl(q.saved)}
                 </span>
               </motion.button>
             );
@@ -1862,11 +1859,10 @@ export default function Landing() {
                 <div>
                   <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
                     <span className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.24em] text-white/35">
-                      {tierData.name} · {termData.label.toUpperCase()}
+                      OSZCZĘDNOŚĆ · {tierData.name} · {termData.label.toUpperCase()}
                     </span>
-                    <span className="font-[Cormorant_Garamond] font-light text-[34px] sm:text-[58px] leading-none tracking-[-0.02em] text-white">
-                      <PopNumber text={zl(quote.monthly)} className="font-[Cormorant_Garamond] font-light" />
-                      <span className="font-[JetBrains_Mono] font-light text-[12px] sm:text-[13px] tracking-[0.14em] text-white/35"> / mies.</span>
+                    <span className="font-[Cormorant_Garamond] font-light text-[34px] sm:text-[58px] leading-none tracking-[-0.02em] text-[#7DF0AE]">
+                      <PopNumber text={zl(quote.saved)} className="font-[Cormorant_Garamond] font-light" />
                     </span>
                   </div>
                   <p className="mt-6 font-[Inter] font-light text-[14px] sm:text-[16px] leading-7 text-white/60">{tierData.desc}</p>
@@ -1888,25 +1884,17 @@ export default function Landing() {
 
                 <div className="flex flex-col justify-between gap-8 rounded-[22px] border border-white/[0.08] bg-white/[0.02] p-7">
                   <div>
-                    <div className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-[#7DF0AE]">
-                      OSZCZĘDNOŚĆ {zl(quote.saved)}
+                    <div className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-white/30">
+                      CO W TYM JEST
                     </div>
                     <div className="mt-6 font-[Inter] font-light text-[13px] sm:text-[14px] leading-6 text-white/50">
                       <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] py-3">
-                        <span>Cena katalogowa</span>
-                        <span className="text-white/80">{zl(quote.total)}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] py-3">
-                        <span>−50% przez 90 dni</span>
-                        <span className="text-[#7DF0AE]">−{zl(quote.promoSaving)}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] py-3">
-                        <span>Rabat za {termData.label.toLowerCase()}</span>
-                        <span className="text-[#7DF0AE]">−{zl(quote.termSaving)}</span>
+                        <span>−50% przez pierwsze 90 dni</span>
+                        <span className="text-[#7DF0AE]">{zl(quote.promoSaving)}</span>
                       </div>
                       <div className="flex items-center justify-between gap-4 py-3">
-                        <span>Do zapłaty</span>
-                        <span className="text-white">{zl(quote.total - quote.saved)}</span>
+                        <span>Rabat za {termData.label.toLowerCase()}</span>
+                        <span className="text-[#7DF0AE]">{zl(quote.termSaving)}</span>
                       </div>
                     </div>
                   </div>
