@@ -92,7 +92,7 @@ const serviceDefaults = [
 const plans = [
   { name: "ESSENCE", price: "1 900 zł", sub: "/ mies.", line: "Fundamenty, by dać się znaleźć.", pts: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"], featured: false, cta: "Wybierz Essence" },
   { name: "SIGNATURE", price: "3 800 zł", sub: "/ mies.", line: "Pełny system. Wypełnia kalendarz.", pts: ["Wszystko z Essence", "Zasięg + płatne w promieniu", "Silnik treści + lista"], featured: true, cta: "Wybierz Signature" },
-  { name: "PRESTIGE", price: "Wycena", sub: "", line: "Starty, rebrandingi, wiele lokalizacji.", pts: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"], featured: false, cta: "Zapytaj o Prestige" },
+  { name: "PRESTIGE", price: "5 000 zł", sub: "/ mies.", line: "Starty, rebrandingi, wiele lokalizacji.", pts: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"], featured: false, cta: "Zapytaj o Prestige" },
 ];
 
 /* okienko audytu — wybór usługi przesuwa pasek */
@@ -1051,8 +1051,8 @@ const TIERS = [
   {
     value: "max",
     name: "MAX",
-    amount: 19600,
-    price: "19 600 zł",
+    amount: 5000,
+    price: "5 000 zł",
     cycle: "/ mies.",
     lead: "DEDYKOWANY ZESPÓŁ",
     desc: "Nieograniczone sesje, produkcja wideo i podcast oraz kierownik projektu, który zna markę na pamięć.",
@@ -1203,7 +1203,9 @@ export default function Landing() {
   /* poziom wynika z wybranego planu: ESSENCE → Standard, SIGNATURE → Pro, PRESTIGE → Max */
   const tier = TIERS[chosenPlan === null ? 1 : Math.min(2, chosenPlan)].value;
   const tierData = TIERS.find((x) => x.value === tier) ?? TIERS[1];
-  const termData = TERMS.find((x) => x.value === term) ?? TERMS[1];
+  /* MAX (PRESTIGE) sprzedajemy tylko na 2 lata — poza tym poziom nie ma dłuższych okresów */
+  const availableTerms = tier === "max" ? TERMS.slice(0, 3) : TERMS;
+  const termData = availableTerms.find((x) => x.value === term) ?? availableTerms[0];
   const quote = calc(tierData.amount, termData.months, termData.discount);
   const atPageEnd = useAtPageEnd();
   /* ślad pikselowy w hero ma sens tylko dla myszy/trackpada */
@@ -1766,7 +1768,7 @@ export default function Landing() {
           <div className="mt-10 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-white/30">OKRES</div>
             <JellyRadio
-              items={TERMS.map((t) => ({ value: t.value, label: t.label }))}
+              items={availableTerms.map((t) => ({ value: t.value, label: t.label }))}
               value={term}
               onChange={(v) => setTerm(v)}
               chipColor="rgba(255,255,255,0.045)"
@@ -1784,8 +1786,12 @@ export default function Landing() {
           </div>
         </Reveal>
 
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {TERMS.map((t, k) => {
+        <div
+          className={`mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 ${
+            availableTerms.length === 5 ? "lg:grid-cols-5" : "lg:grid-cols-3"
+          }`}
+        >
+          {availableTerms.map((t, k) => {
             const q = calc(tierData.amount, t.months, t.discount);
             const on = t.value === term;
             return (
