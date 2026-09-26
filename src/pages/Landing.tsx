@@ -242,38 +242,6 @@ function BtnDark({ children, onClick, className = "" }: { children: React.ReactN
   );
 }
 
-function SynapseBG() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <svg viewBox="0 0 1200 560" className="absolute inset-0 w-full h-full opacity-[0.18]" preserveAspectRatio="xMidYMid slice">
-        <defs>
-          <radialGradient id="q1" cx="50%" cy="50%"><stop offset="0%" stopColor="white" stopOpacity="0.9"/><stop offset="100%" stopColor="white" stopOpacity="0"/></radialGradient>
-          <filter id="qglow"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        </defs>
-        <g fill="none" stroke="white" strokeOpacity="0.045" strokeWidth="1">
-          <path d="M90 280 C 250 170, 380 210, 500 280" />
-          <path d="M500 280 C 620 360, 760 330, 880 280" />
-          <path d="M200 400 C 320 360, 410 340, 500 280" />
-          <path d="M170 185 C 280 220, 380 250, 500 280" />
-          <path d="M500 280 C 640 230, 730 195, 860 185" />
-          <path d="M880 280 C 960 245, 1020 210, 1100 165" />
-        </g>
-        {["M90 280 C 250 170, 380 210, 500 280","M500 280 C 620 360, 760 330, 880 280","M200 400 C 320 360, 410 340, 500 280","M170 185 C 280 220, 380 250, 500 280"].map((d,i)=>(
-          <motion.path key={d} d={d} fill="none" stroke="white" strokeWidth="1" strokeLinecap="round" strokeOpacity="0.55" filter="url(#qglow)" initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: [0,1,0], opacity: [0,0.5,0] }} transition={{ duration: 4.6, delay: i*0.7, repeat: Infinity, repeatDelay: 2.2, ease: "easeInOut" }} />
-        ))}
-        {[[90,280],[200,400],[170,185],[500,280],[880,280],[1100,165],[860,185]].map(([x,y],i)=>(
-          <g key={String(i)}>
-            <circle cx={x} cy={y} r={i===3?6:3.5} fill="white" fillOpacity={i===3?0.95:0.55}/>
-            <motion.circle cx={x} cy={y} r={i===3?14:9} fill="url(#q1)" animate={{ scale: [1,1.18,1], opacity: [0.22,0.06,0.22] }} transition={{ duration: 3.6, delay: i*0.22, repeat: Infinity, ease:"easeInOut" }}/>
-          </g>
-        ))}
-      </svg>
-      {/* wędrująca drobina */}
-      <motion.div className="absolute h-[3px] w-[3px] rounded-full bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.7)] blur-[0.3px]" animate={{ x: [90,500,880,1100], y: [280,280,280,165] }} transition={{ duration: 7.5, repeat: Infinity, ease:"easeInOut", times:[0,0.36,0.7,1] }}/>
-    </div>
-  );
-}
-
 function FloatingField() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -386,7 +354,6 @@ export default function Landing() {
   const cinemaY = useTransform(cinemaProgress, [0, 1], ["-14%", "14%"]);
   const cinemaY2 = useTransform(cinemaProgress, [0, 1], ["6%", "-10%"]);
   const cinemaText = useTransform(cinemaProgress, [0, 0.5], ["-40px", "0px"]);
-  const heroY = useTransform(scrollYProgress, [0,0.22], [0,-40]);
   const progress = useTransform(scrollYProgress, [0,1], [0,1]);
 
   const go = (id: string) => {
@@ -467,77 +434,124 @@ export default function Landing() {
         </div>
       )}
 
-      <section className="relative overflow-hidden">
-        <SynapseBG />
-        <motion.div style={{ y: heroY }} className="mx-auto max-w-[1280px] px-6 lg:px-8">
-          <div className="pt-20 lg:pt-32 pb-14 lg:pb-20 min-h-[calc(100vh-72px)] flex flex-col justify-center max-w-[1100px]">
-            <div>
+      <section ref={cinemaRef} className="relative overflow-hidden">
+        {/* deep layered mountains */}
+        <div className="absolute inset-0">
+          <motion.div style={{ y: cinemaY }} className="absolute inset-0 scale-[1.2]">
+            <img
+              src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=2000&q=80&auto=format&fit=crop"
+              alt="Góry o świcie"
+              className="h-full w-full object-cover grayscale contrast-125 brightness-[0.30]"
+            />
+          </motion.div>
 
-              <motion.h1 initial={{ opacity:0, y:16, filter:"blur(10px)" }} animate={{ opacity:1, y:0, filter:"blur(0px)" }} transition={{ duration:1, delay:0.08, ease:[0.22,1,0.36,1] }} className="mt-8 leading-[0.88] tracking-[-0.03em]">
-                <EditableText ek="qraft.hero.kicker" def="PERFEKCJA BUDUJE MARKI" className="block font-[JetBrains_Mono] font-light text-[11px] tracking-[0.24em] text-white/35 mb-4" isEditing={isEditing} as="span" />
-                <span className="block font-[Cormorant_Garamond] font-light text-[58px] sm:text-[78px] lg:text-[108px] leading-[0.88]"><EditableText ek="qraft.hero.title1" def="Perfekcja" className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span>
-                <span className="block font-[Cormorant_Garamond] font-light italic text-[58px] sm:text-[78px] lg:text-[108px] leading-[0.88] flex items-baseline gap-4 text-white/60">
-                  <EditableText ek="qraft.hero.title2a" def="buduje" className="font-[Cormorant_Garamond] font-light italic" isEditing={isEditing} as="span" />
-                  <EditableText ek="qraft.hero.title2b" def="marki." className="font-[Cormorant_Garamond] not-italic font-light text-white" isEditing={isEditing} as="span" />
-                </span>
-                <span className="block mt-7 h-px w-[88px] bg-white/10"/>
-                <span className="block mt-7 w-fit">
-                  <EditableText
-                    ek="qraft.hero.desc"
-                    def="Techniczny Atelier"
-                    className="block font-[Instrument_Serif] italic text-[40px] sm:text-[54px] leading-[1.02] tracking-[-0.015em] text-white/85 hover:text-white transition-colors duration-500 ease-out cursor-default"
-                    isEditing={isEditing}
-                    as="span"
-                  />
-                </span>
-              </motion.h1>
+          <motion.div style={{ y: cinemaY2 }} className="absolute inset-x-0 bottom-0 h-[62%] scale-[1.15]">
+            <img
+              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2000&q=80&auto=format&fit=crop"
+              alt="Grzbiet mgłą"
+              className="h-full w-full object-cover grayscale contrast-125 brightness-[0.22]"
+            />
+          </motion.div>
 
-              <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.45 }} className="mt-10 flex flex-wrap items-center gap-4">
-                <BtnPrimary onClick={()=>go("contact")} className="pl-7 pr-6 h-[48px] text-[11px]">
-                  <EditableText ek="qraft.hero.cta1" def="DARMOWY AUDYT" className="font-[JetBrains_Mono] font-light tracking-[0.14em]" isEditing={isEditing} as="span" />
-                  <ArrowRight className="h-3.5 w-3.5 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+          <motion.div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(to bottom, rgba(5,5,7,0.82) 0%, transparent 30%, transparent 60%, #050507 100%)" }}
+            animate={{ opacity: [0.75, 1, 0.75] }}
+            transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute -left-1/4 top-1/3 h-[46vh] w-[160%] opacity-40"
+            style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.10), transparent 72%)", filter: "blur(30px)" }}
+            animate={{ x: ["-8%", "8%", "-8%"] }}
+            transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
+
+        <div className="absolute inset-0 bg-[radial-gradient(130%_100%_at_50%_6%,transparent_0%,rgba(5,5,7,0.62)_58%,#050507_100%)]" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "88px 88px" }} />
+
+        {/* vertical light streak */}
+        <div className="absolute inset-0">
+          <div className="absolute left-1/2 top-[-10%] h-[120%] w-px -translate-x-1/2 bg-white/90 shadow-[0_0_30px_5px_rgba(255,255,255,0.6),0_0_110px_24px_rgba(255,255,255,0.24)]" />
+          <motion.div
+            className="absolute left-1/2 top-0 h-full w-[420px] -translate-x-1/2"
+            style={{ background: "linear-gradient(to right, transparent, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.24) 50%, rgba(255,255,255,0.08) 60%, transparent)" }}
+            animate={{ opacity: [0.28, 0.8, 0.28] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute left-1/2 top-0 h-[32%] w-[680px] -translate-x-1/2"
+            style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.18), transparent)" }}
+            animate={{ y: ["0%", "212%"] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
+
+        {/* content */}
+        <div className="relative mx-auto max-w-[1280px] px-6 lg:px-8">
+          <div className="flex min-h-[calc(100vh-72px)] flex-col justify-center py-24 lg:py-32">
+            <motion.div
+              initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="flex items-center gap-4 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.26em] text-white/50">
+                <span className="h-px w-14 bg-white/50" />
+                QRAFT — MANIFEST
+              </div>
+
+              <h1 className="mt-10 font-[Space_Grotesk] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[52px] sm:text-[92px] lg:text-[152px]">
+                <span className="block text-white">Precision</span>
+                <span className="block text-white">Builds</span>
+                <span className="block text-transparent" style={{ WebkitTextStroke: "1.2px rgba(255,255,255,0.6)" }}>
+                  Brands
+                </span>
+              </h1>
+
+              <motion.div
+                className="mt-12 h-px w-full bg-white origin-left"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 1.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              />
+
+              <motion.div
+                className="mt-10 flex flex-wrap items-center gap-4"
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, delay: 0.6 }}
+              >
+                <BtnPrimary onClick={() => go("contact")} className="h-[52px] px-8 text-[11px]">
+                  ZAMÓW DARMOWY AUDYT <ArrowRight className="h-3.5 w-3.5 opacity-60" />
                 </BtnPrimary>
-                <BtnGhost onClick={()=>go("pricing")} className="h-[48px] pl-2 pr-6 text-[11px]">
-                  <span className="h-9 w-9 grid place-items-center rounded-full border border-white/15 transition-all duration-500 group-hover:border-white/45 group-hover:bg-white/10"><ArrowUpRight className="h-3.5 w-3.5" /></span>
-                  PLANY
+                <BtnGhost onClick={() => go("services")} className="h-[52px] pl-2 pr-6 text-[11px]">
+                  <span className="h-9 w-9 grid place-items-center rounded-full border border-white/15 transition-colors duration-300 group-hover:bg-white/10">
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </span>
+                  ZOBACZ SYSTEM
                 </BtnGhost>
               </motion.div>
 
-              <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.65 }} className="mt-14 flex gap-10 border-t border-white/[0.06] pt-8 max-w-[420px]">
+              <motion.div
+                className="mt-14 flex flex-wrap gap-x-10 gap-y-4 border-t border-white/10 pt-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.9, delay: 0.8 }}
+              >
                 {[
                   { v: <CountUp to={340} suffix="+" />, l: "Zbudowanych" },
                   { v: <CountUp to={4.9} decimals={1} />, l: "Ocena" },
                   { v: <CountUp to={14} suffix=" mies." />, l: "Średnio" },
                 ].map((s, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.7 + i * 0.09, duration: 0.7 }}
-                  >
+                  <div key={i}>
                     <div className="font-[Cormorant_Garamond] font-light text-[26px] leading-none">{s.v}</div>
-                    <div className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.14em] text-white/25 mt-2">{s.l}</div>
-                  </motion.div>
+                    <div className="mt-2 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.14em] text-white/40">{s.l}</div>
+                  </div>
                 ))}
               </motion.div>
-            </div>
-
+            </motion.div>
           </div>
-          <Reveal><div className="border-y border-white/[0.05] py-5 flex items-center gap-6 overflow-hidden"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.16em] text-white/20 shrink-0">ZBUDOWANE DLA</span><div className="relative flex-1 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-              <div className="flex w-max items-center font-[Space_Grotesk] font-light text-white/35 text-[12px] tracking-[0.14em] whitespace-nowrap" style={{ animation: "qmarquee 34s linear infinite" }}>
-                {[0, 1].map((dup) => (
-                  <span key={dup} className="flex items-center">
-                    {["LUMIÈRE", "FORM", "MARLOWE", "FLEUR ATELIER", "GOOD ROOM", "PILATES & CO", "OSTEOPATHICA"].map((n, i) => (
-                      <span key={i} className="flex items-center">
-                        <span>{n}</span>
-                        <span className="h-3 w-px bg-white/8 mx-8" />
-                      </span>
-                    ))}
-                  </span>
-                ))}
-              </div>
-            </div></div></Reveal>
-        </motion.div>
+        </div>
       </section>
 
       <section id="services" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-28 lg:py-36">
@@ -576,105 +590,6 @@ export default function Landing() {
             <EditableText ek="qraft.system.footerR" def="DIAGNOSTYKA →" className="font-[JetBrains_Mono] font-light tracking-[0.14em]" isEditing={isEditing} as="span" />
           </BtnGhost>
         </div>
-      </section>
-
-      <section ref={cinemaRef} className="relative overflow-hidden">
-        {/* deep layered mountains */}
-        <div className="absolute inset-0">
-          <motion.div style={{ y: cinemaY }} className="absolute inset-0 scale-[1.2]">
-            <img
-              src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=2000&q=80&auto=format&fit=crop"
-              alt="Góry o świcie"
-              className="h-full w-full object-cover grayscale contrast-125 brightness-[0.30]"
-            />
-          </motion.div>
-
-          {/* second ridge — depth */}
-          <motion.div style={{ y: cinemaY2 }} className="absolute inset-x-0 bottom-0 h-[62%] scale-[1.15]">
-            <img
-              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2000&q=80&auto=format&fit=crop"
-              alt="Grzbiet mgłą"
-              className="h-full w-full object-cover grayscale contrast-125 brightness-[0.22]"
-            />
-          </motion.div>
-
-          {/* drifting fog */}
-          <motion.div
-            className="absolute inset-0"
-            style={{ background: "linear-gradient(to bottom, rgba(5,5,7,0.85) 0%, transparent 28%, transparent 62%, #050507 100%)" }}
-            animate={{ opacity: [0.75, 1, 0.75] }}
-            transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute -left-1/4 top-1/3 h-[46vh] w-[160%] opacity-40"
-            style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.10), transparent 72%)", filter: "blur(30px)" }}
-            animate={{ x: ["-8%", "8%", "-8%"] }}
-            transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </div>
-
-        {/* grading */}
-        <div className="absolute inset-0 bg-[radial-gradient(130%_100%_at_50%_6%,transparent_0%,rgba(5,5,7,0.62)_58%,#050507_100%)]" />
-        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "88px 88px" }} />
-
-        {/* vertical light streak */}
-        <div className="absolute inset-0">
-          <div className="absolute left-1/2 top-[-10%] h-[120%] w-px -translate-x-1/2 bg-white/90 shadow-[0_0_30px_5px_rgba(255,255,255,0.6),0_0_110px_24px_rgba(255,255,255,0.24)]" />
-          <motion.div
-            className="absolute left-1/2 top-0 h-full w-[420px] -translate-x-1/2"
-            style={{ background: "linear-gradient(to right, transparent, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.24) 50%, rgba(255,255,255,0.08) 60%, transparent)" }}
-            animate={{ opacity: [0.28, 0.8, 0.28] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute left-1/2 top-0 h-[32%] w-[680px] -translate-x-1/2"
-            style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.18), transparent)" }}
-            animate={{ y: ["0%", "212%"] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </div>
-
-        {/* content */}
-        <motion.div style={{ y: cinemaText }} className="relative mx-auto max-w-[1280px] px-6 lg:px-8">
-          <div className="flex min-h-[88vh] flex-col justify-center py-28 lg:py-40">
-            <motion.div
-              initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              viewport={{ once: true, margin: "-15%" }}
-              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <div className="flex items-center gap-4 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.26em] text-white/50">
-                <span className="h-px w-14 bg-white/50" />
-                MANIFEST
-              </div>
-
-              <h2 className="mt-10 font-[Space_Grotesk] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[52px] sm:text-[92px] lg:text-[156px]">
-                <span className="block text-white">Precision</span>
-                <span className="block text-white">Builds</span>
-                <span className="block text-transparent" style={{ WebkitTextStroke: "1.2px rgba(255,255,255,0.6)" }}>
-                  Brands
-                </span>
-              </h2>
-
-              <motion.div
-                className="mt-12 h-px w-full bg-white origin-left"
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: true, margin: "-15%" }}
-                transition={{ duration: 1.5, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              />
-              <motion.div
-                className="mt-6 max-w-[520px] font-[Inter] font-light text-[15px] leading-7 text-white/45"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true, margin: "-15%" }}
-                transition={{ duration: 1, delay: 0.6 }}
-              >
-                Jeden system. Zero kompromisów. Budujemy marki, które widać z drugiej strony ulicy.
-              </motion.div>
-            </motion.div>
-          </div>
-        </motion.div>
       </section>
 
       <section className="bg-[#F7F7F5] text-[#0A0A0A] border-t border-white/5">
