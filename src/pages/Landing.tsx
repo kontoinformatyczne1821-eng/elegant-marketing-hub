@@ -3,6 +3,7 @@ import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Menu, X, Check
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
+import GlowCursor from "@/components/GlowCursor";
 
 function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, popKey }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean; popKey?: string }) {
   const [val, setVal] = useState(def);
@@ -67,130 +68,6 @@ const processSteps = [
   { n: "03", t: "Budowa — 2–3 tyg.", d: "Tożsamość, strona i materiały — wszystko mówi tym samym głosem.", meta: "Dzień 10–28" },
   { n: "04", t: "Skalowanie — co tydzień", d: "Raport w złotówkach. Co działa, dostajemy więcej.", meta: "Co poniedziałek" },
 ];
-
-function CursorAura() {
-  const [mouse, setMouse] = useState({ x: -400, y: -400 });
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const fine = window.matchMedia("(pointer: fine)").matches;
-    if (!fine) return;
-    let raf = 0;
-    const onMove = (e: MouseEvent) => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => setMouse({ x: e.clientX, y: e.clientY }));
-      if (!visible) setVisible(true);
-    };
-    const onLeave = () => setVisible(false);
-    const onEnter = () => setVisible(true);
-    window.addEventListener("mousemove", onMove);
-    document.addEventListener("mouseleave", onLeave);
-    document.addEventListener("mouseenter", onEnter);
-    const t = setTimeout(() => setVisible(true), 200);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      document.removeEventListener("mouseleave", onLeave);
-      document.removeEventListener("mouseenter", onEnter);
-      cancelAnimationFrame(raf);
-      clearTimeout(t);
-    };
-  }, [visible]);
-  if (!visible) return null;
-  return (
-    <div className="pointer-events-none fixed inset-0 z-[80] hidden lg:block overflow-hidden">
-      {/* outer soft aura */}
-      <motion.div
-        className="absolute rounded-full"
-        style={{
-          left: mouse.x,
-          top: mouse.y,
-          width: 820,
-          height: 820,
-          x: "-50%",
-          y: "-50%",
-          background: "radial-gradient(circle at center, rgba(255,255,255,0.095) 0%, rgba(255,255,255,0.035) 28%, rgba(255,255,255,0.012) 50%, transparent 72%)",
-          filter: "blur(32px)",
-        }}
-        animate={{ left: mouse.x, top: mouse.y }}
-        transition={{ type: "spring", damping: 32, stiffness: 140, mass: 0.9 }}
-      />
-      {/* APPLE LIQUID GLASS ORB — blurs content behind */}
-      <motion.div
-        className="absolute rounded-full"
-        style={{
-          left: mouse.x,
-          top: mouse.y,
-          width: 220,
-          height: 220,
-          x: "-50%",
-          y: "-50%",
-          background: "rgba(255,255,255,0.055)",
-          border: "1px solid rgba(255,255,255,0.14)",
-          boxShadow: "inset 0 1px 1px rgba(255,255,255,0.22), inset 0 -1px 1px rgba(0,0,0,0.15), 0 8px 32px rgba(0,0,0,0.35), 0 1px 1px rgba(255,255,255,0.08)",
-          backdropFilter: "blur(22px) saturate(1.4)",
-          WebkitBackdropFilter: "blur(22px) saturate(1.4)",
-        }}
-        animate={{ left: mouse.x, top: mouse.y }}
-        transition={{ type: "spring", damping: 28, stiffness: 200, mass: 0.6 }}
-      >
-        {/* top highlight like iOS glass */}
-        <div className="absolute inset-[1px] rounded-full" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.16) 0%, transparent 45%)" }} />
-        {/* inner glow */}
-        <div className="absolute inset-0 rounded-full" style={{ background: "radial-gradient(circle at 30% 28%, rgba(255,255,255,0.18) 0%, transparent 55%)" }} />
-      </motion.div>
-      {/* mid glow inside glass */}
-      <motion.div
-        className="absolute rounded-full"
-        style={{
-          left: mouse.x,
-          top: mouse.y,
-          width: 120,
-          height: 120,
-          x: "-50%",
-          y: "-50%",
-          background: "radial-gradient(circle at center, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 60%, transparent 72%)",
-          filter: "blur(10px)",
-        }}
-        animate={{ left: mouse.x, top: mouse.y }}
-        transition={{ type: "spring", damping: 26, stiffness: 260, mass: 0.5 }}
-      />
-      {/* subtle breathing ring */}
-      <motion.div
-        className="absolute rounded-full border border-white/12"
-        style={{
-          left: mouse.x,
-          top: mouse.y,
-          width: 220,
-          height: 220,
-          x: "-50%",
-          y: "-50%",
-          borderColor: "rgba(255,255,255,0.10)",
-        }}
-        animate={{ left: mouse.x, top: mouse.y, scale: [1, 1.04, 1], opacity: [0.22, 0.08, 0.22] }}
-        transition={{
-          left: { type: "spring", damping: 28, stiffness: 200 },
-          top: { type: "spring", damping: 28, stiffness: 200 },
-          scale: { duration: 3.2, repeat: Infinity, ease: "easeInOut" },
-          opacity: { duration: 3.2, repeat: Infinity, ease: "easeInOut" },
-        }}
-      />
-      {/* center dot with glow */}
-      <motion.div
-        className="absolute rounded-full bg-white"
-        style={{
-          left: mouse.x,
-          top: mouse.y,
-          width: 3,
-          height: 3,
-          x: "-50%",
-          y: "-50%",
-          boxShadow: "0 0 10px rgba(255,255,255,0.9), 0 0 22px rgba(255,255,255,0.45)",
-        }}
-        animate={{ left: mouse.x, top: mouse.y }}
-        transition={{ type: "spring", damping: 34, stiffness: 480 }}
-      />
-    </div>
-  );
-}
 
 function BtnPrimary({ children, onClick, className = "", type = "button" }: { children: React.ReactNode; onClick?: () => void; className?: string; type?: "button" | "submit" }) {
   const [hover, setHover] = useState(false);
@@ -792,6 +669,11 @@ function ProcessStack({ isEditing }: { isEditing: boolean }) {
 
 const FLOW_BG_SRC = "";
 
+/* użytkownik poprosił system o mniej animacji — kursor gasną */
+const REDUCE_MOTION =
+  typeof window !== "undefined" &&
+  !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
 function FlowArt() {
   return (
     <svg
@@ -939,9 +821,38 @@ export default function Landing() {
   return (
     <div className="min-h-screen text-[#F2F2F0] antialiased selection:bg-white selection:text-black">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&family=Space+Grotesk:wght@300;400&display=swap'); html{scroll-behavior:smooth} @keyframes qmarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}} @keyframes qmsheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}} @keyframes qmbreathe{0%,100%{opacity:.35}50%{opacity:.9}}`}</style>
-      <CursorAura />
       <motion.div className="fixed top-0 inset-x-0 h-[1px] bg-white/80 z-50 origin-left" style={{ scaleX: progress }} />
       <FlowBackdrop />
+      <GlowCursor
+        globalPointer
+        enabled={!REDUCE_MOTION}
+        color="#ffffff"
+        secondaryColor="#c9c9cf"
+        trailLength={38}
+        trailWidth={6}
+        trailTaper={0.82}
+        followSpeed={0.16}
+        glowIntensity={1.7}
+        glowSpread={1.15}
+        hotspot={0.7}
+        brightness={1.2}
+        opacity={0.5}
+        pulseSpeed={1.1}
+        noiseStrength={0.03}
+        idleFade
+        idleTimeout={700}
+        fadeDuration={600}
+        blendMode="screen"
+        maxDevicePixelRatio={1.25}
+        style={{
+          position: "fixed",
+          inset: 0,
+          width: "100vw",
+          height: "100vh",
+          zIndex: 60,
+          pointerEvents: "none",
+        }}
+      />
       <FloatingField />
 
       <header className="sticky top-0 z-40 bg-[#050507]/28 backdrop-blur-[28px] backdrop-saturate-[1.5] border-b border-white/[0.08] supports-[backdrop-filter]:bg-[#050507]/20" style={{ WebkitBackdropFilter: "blur(28px) saturate(1.5)" } as any}>
