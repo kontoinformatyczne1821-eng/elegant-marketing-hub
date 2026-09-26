@@ -263,7 +263,6 @@ function HoverTile({
   return (
     <motion.button
       type="button"
-      onClick={onClick}
       onPointerMove={(e) => {
         if (e.pointerType === "touch") return;
         const r = e.currentTarget.getBoundingClientRect();

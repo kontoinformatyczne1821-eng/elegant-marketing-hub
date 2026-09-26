@@ -1,7 +1,6 @@
 import Stripe from "stripe";
 import { v } from "convex/values";
-import { action, internalMutation, query } from "./_generated/server";
-import { api } from "./_generated/api";
+import { action, internalMutation, query } from "./_generated/server";import { api } from "./_generated/api";
 
 
 /* plan → kwota w groszach (PLN) */
@@ -68,7 +67,7 @@ export const recordPurchase = action({
   },
   handler: async (ctx, args) => {
     const amount = PRICES[args.plan] ?? 0;
-    await ctx.runMutation(api.payments.savePurchase, {
+    await ctx.runMutation(internal.payments.addPurchase, {
       sessionId: args.sessionId,
       plan: args.plan,
       term: args.term,
@@ -79,7 +78,7 @@ export const recordPurchase = action({
   },
 });
 
-export const savePurchase = internalMutation({
+export const addPurchase = internalMutation({
   args: {
     sessionId: v.string(),
     plan: v.string(),
