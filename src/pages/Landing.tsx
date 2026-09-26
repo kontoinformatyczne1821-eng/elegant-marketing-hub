@@ -1,12 +1,37 @@
 import { motion, AnimatePresence, useScroll, useSpring, useTransform, useInView, useMotionValue, useMotionValueEvent } from "framer-motion";
 import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save, RefreshCw } from "lucide-react";
-import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from "react";
 import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
 import GradualBlur from "@/components/GradualBlur";
 import FlipCard from "@/components/FlipCard";
 import LineSidebar from "@/components/LineSidebar";
 import QraftMark from "@/components/QraftMark";
+import GlowCursor from "@/components/GlowCursor";
+import GlareHover from "@/components/GlareHover";
+import PixelTrail from "@/components/PixelTrail";
+
+const REDUCE_MOTION =
+  typeof window !== "undefined" &&
+  typeof window.matchMedia === "function" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* PixelTrail (WebGL) ma sens tylko przy myszy/trackpadzie — na dotyku nie */
+function useFinePointer() {
+  return useSyncExternalStore(
+    (onChange) => {
+      if (typeof window === "undefined" || !window.matchMedia) return () => {};
+      const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+      mq.addEventListener("change", onChange);
+      return () => mq.removeEventListener("change", onChange);
+    },
+    () =>
+      typeof window !== "undefined" &&
+      !!window.matchMedia &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches,
+    () => false,
+  );
+}
 
 function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, popKey }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean; popKey?: string }) {
   const [val, setVal] = useState(def);
@@ -550,6 +575,19 @@ function PlanShowcase({
                   ))}
                 </motion.div>
               )}
+              <GlareHover
+                width="100%"
+                height="100%"
+                background="transparent"
+                borderRadius="28px"
+                borderColor="transparent"
+                glareColor="#ffffff"
+                glareOpacity={front ? 0.18 : 0}
+                glareAngle={-30}
+                glareSize={320}
+                transitionDuration={850}
+                style={{ display: "block", border: "none", outline: "none" }}
+              >
               <div
                 className={`relative overflow-hidden rounded-[28px] border p-8 flex flex-col h-full transition-colors duration-500 ${
                   front
@@ -666,6 +704,7 @@ function PlanShowcase({
                   )}
                 </div>
               </div>
+              </GlareHover>
             </motion.div>
           );
         })}
@@ -1061,6 +1100,8 @@ export default function Landing() {
   /* w sekcji PROCES tło jest jasne — kursor przechodzi na czarne światło */
   const [inProcess, setInProcess] = useState(false);
   const atPageEnd = useAtPageEnd();
+  /* ślad pikselowy w hero ma sens tylko dla myszy/trackpada */
+  const finePointer = useFinePointer();
   const spy = useSectionSpy(SIDEBAR_IDS);
   /* zaznaczone moduły w SYSTEM napędzają rekomendowany pakiet */
   const [picked, setPicked] = useState<number[]>([]);
@@ -1130,6 +1171,38 @@ export default function Landing() {
         style={{ zIndex: 30 }}
       />
 
+      {/* globalny, świecący kursor — zmienia barwę przy sekcji procesu */}
+      <GlowCursor
+        globalPointer
+        enabled={!REDUCE_MOTION}
+        color={inProcess ? "#0a0a0a" : "#ffffff"}
+        secondaryColor={inProcess ? "#3c3e3d" : "#c9c9cf"}
+        trailLength={38}
+        trailWidth={6}
+        trailTaper={0.82}
+        followSpeed={0.16}
+        glowIntensity={1.7}
+        glowSpread={1.15}
+        hotspot={inProcess ? 0.05 : 0.7}
+        brightness={inProcess ? 0.9 : 1.2}
+        opacity={inProcess ? 0.42 : 0.5}
+        pulseSpeed={1.1}
+        noiseStrength={0.03}
+        idleFade
+        idleTimeout={700}
+        fadeDuration={600}
+        blendMode={inProcess ? "normal" : "screen"}
+        maxDevicePixelRatio={1.25}
+        style={{
+          position: "fixed",
+          inset: 0,
+          width: "100vw",
+          height: "100vh",
+          zIndex: 60,
+          pointerEvents: "none",
+        }}
+      />
+
       {/* boczny pasek nawigacji (LineSidebar) — otwiera go kliknięcie Q w nagłówku */}
       <div className="hidden min-[1640px]:block fixed left-3 top-1/2 z-40 -translate-y-1/2">
         <motion.aside
@@ -1174,7 +1247,6 @@ export default function Landing() {
           <LineSidebar
             items={SIDEBAR.map((x) => x.label)}
             active={spy}
-            followPointer={false}
             onItemClick={(i) => go(SIDEBAR[i].id)}
             accentColor="#FF3E0A"
             textColor={inProcess ? "rgba(10,10,10,0.45)" : "rgba(242,242,240,0.42)"}
@@ -1323,6 +1395,22 @@ export default function Landing() {
           />
         </div>
 
+        {/* pixelowy ślad kursora w hero — tylko dla myszy/trackpada */}
+        {finePointer && (
+          <div className="absolute inset-0 z-[5] mix-blend-screen">
+            <PixelTrail
+              gridSize={80}
+              trailSize={0.09}
+              maxAge={520}
+              interpolate={5}
+              color="#ffffff"
+              gooeyFilter={{ id: "qraft-goo", strength: 2.4 }}
+              canvasProps={{ dpr: [1, 1.25] }}
+              style={{ touchAction: "auto" }}
+            />
+          </div>
+        )}
+
         {/* content */}
         <div className="relative z-10 mx-auto max-w-[1280px] px-6 lg:px-8 pointer-events-none">
           <div className="flex min-h-[calc(100vh-72px)] flex-col justify-center py-24 lg:py-32">
@@ -1426,9 +1514,9 @@ export default function Landing() {
                 width={420}
                 height={348}
                 perspective={1200}
-                tiltMax={0}
+                tiltMax={9}
                 hoverScale={1.02}
-                glareOpacity={0}
+                glareOpacity={0.13}
                 shadowColor="#000000"
                 shadowOpacity={0.55}
                 flipOnClick={!isEditing}
