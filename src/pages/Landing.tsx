@@ -61,8 +61,7 @@ function CursorAura() {
     window.addEventListener("mousemove", onMove);
     document.addEventListener("mouseleave", onLeave);
     document.addEventListener("mouseenter", onEnter);
-    // start visible after first move
-    const t = setTimeout(() => setVisible(true), 300);
+    const t = setTimeout(() => setVisible(true), 200);
     return () => {
       window.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseleave", onLeave);
@@ -73,60 +72,84 @@ function CursorAura() {
   }, [visible]);
   if (!visible) return null;
   return (
-    <div className="pointer-events-none fixed inset-0 z-[80] hidden lg:block">
-      {/* outer — large subtle aura, black-theme */}
+    <div className="pointer-events-none fixed inset-0 z-[80] hidden lg:block overflow-hidden">
+      {/* outer soft aura */}
       <motion.div
         className="absolute rounded-full"
         style={{
           left: mouse.x,
           top: mouse.y,
-          width: 760,
-          height: 760,
+          width: 820,
+          height: 820,
           x: "-50%",
           y: "-50%",
-          background: "radial-gradient(circle at center, rgba(255,255,255,0.085) 0%, rgba(255,255,255,0.03) 32%, rgba(255,255,255,0.01) 52%, transparent 72%)",
-          filter: "blur(28px)",
+          background: "radial-gradient(circle at center, rgba(255,255,255,0.095) 0%, rgba(255,255,255,0.035) 28%, rgba(255,255,255,0.012) 50%, transparent 72%)",
+          filter: "blur(32px)",
         }}
         animate={{ left: mouse.x, top: mouse.y }}
-        transition={{ type: "spring", damping: 30, stiffness: 160, mass: 0.8 }}
+        transition={{ type: "spring", damping: 32, stiffness: 140, mass: 0.9 }}
       />
-      {/* mid — tighter glow */}
+      {/* APPLE LIQUID GLASS ORB — blurs content behind */}
       <motion.div
         className="absolute rounded-full"
         style={{
           left: mouse.x,
           top: mouse.y,
-          width: 240,
-          height: 240,
+          width: 220,
+          height: 220,
           x: "-50%",
           y: "-50%",
-          background: "radial-gradient(circle at center, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.045) 42%, transparent 72%)",
-          filter: "blur(14px)",
+          background: "rgba(255,255,255,0.055)",
+          border: "1px solid rgba(255,255,255,0.14)",
+          boxShadow: "inset 0 1px 1px rgba(255,255,255,0.22), inset 0 -1px 1px rgba(0,0,0,0.15), 0 8px 32px rgba(0,0,0,0.35), 0 1px 1px rgba(255,255,255,0.08)",
+          backdropFilter: "blur(22px) saturate(1.4)",
+          WebkitBackdropFilter: "blur(22px) saturate(1.4)",
         }}
         animate={{ left: mouse.x, top: mouse.y }}
-        transition={{ type: "spring", damping: 26, stiffness: 240, mass: 0.5 }}
-      />
-      {/* inner core */}
+        transition={{ type: "spring", damping: 28, stiffness: 200, mass: 0.6 }}
+      >
+        {/* top highlight like iOS glass */}
+        <div className="absolute inset-[1px] rounded-full" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.16) 0%, transparent 45%)" }} />
+        {/* inner glow */}
+        <div className="absolute inset-0 rounded-full" style={{ background: "radial-gradient(circle at 30% 28%, rgba(255,255,255,0.18) 0%, transparent 55%)" }} />
+      </motion.div>
+      {/* mid glow inside glass */}
       <motion.div
         className="absolute rounded-full"
         style={{
           left: mouse.x,
           top: mouse.y,
-          width: 36,
-          height: 36,
+          width: 120,
+          height: 120,
           x: "-50%",
           y: "-50%",
-          background: "radial-gradient(circle at center, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 38%, transparent 70%)",
-          filter: "blur(8px)",
+          background: "radial-gradient(circle at center, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 60%, transparent 72%)",
+          filter: "blur(10px)",
         }}
-        animate={{ left: mouse.x, top: mouse.y, scale: [1, 1.08, 1] }}
+        animate={{ left: mouse.x, top: mouse.y }}
+        transition={{ type: "spring", damping: 26, stiffness: 260, mass: 0.5 }}
+      />
+      {/* subtle breathing ring */}
+      <motion.div
+        className="absolute rounded-full border border-white/12"
+        style={{
+          left: mouse.x,
+          top: mouse.y,
+          width: 220,
+          height: 220,
+          x: "-50%",
+          y: "-50%",
+          borderColor: "rgba(255,255,255,0.10)",
+        }}
+        animate={{ left: mouse.x, top: mouse.y, scale: [1, 1.04, 1], opacity: [0.22, 0.08, 0.22] }}
         transition={{
-          left: { type: "spring", damping: 26, stiffness: 320 },
-          top: { type: "spring", damping: 26, stiffness: 320 },
-          scale: { duration: 2.2, repeat: Infinity, ease: "easeInOut" },
+          left: { type: "spring", damping: 28, stiffness: 200 },
+          top: { type: "spring", damping: 28, stiffness: 200 },
+          scale: { duration: 3.2, repeat: Infinity, ease: "easeInOut" },
+          opacity: { duration: 3.2, repeat: Infinity, ease: "easeInOut" },
         }}
       />
-      {/* dot */}
+      {/* center dot with glow */}
       <motion.div
         className="absolute rounded-full bg-white"
         style={{
@@ -136,29 +159,10 @@ function CursorAura() {
           height: 3,
           x: "-50%",
           y: "-50%",
-          boxShadow: "0 0 12px rgba(255,255,255,0.95), 0 0 24px rgba(255,255,255,0.4)",
+          boxShadow: "0 0 10px rgba(255,255,255,0.9), 0 0 22px rgba(255,255,255,0.45)",
         }}
         animate={{ left: mouse.x, top: mouse.y }}
-        transition={{ type: "spring", damping: 34, stiffness: 460 }}
-      />
-      {/* subtle ring */}
-      <motion.div
-        className="absolute rounded-full border border-white/10"
-        style={{
-          left: mouse.x,
-          top: mouse.y,
-          width: 48,
-          height: 48,
-          x: "-50%",
-          y: "-50%",
-        }}
-        animate={{ left: mouse.x, top: mouse.y, scale: [1, 1.12, 1], opacity: [0.18, 0.08, 0.18] }}
-        transition={{
-          left: { type: "spring", damping: 28, stiffness: 220 },
-          top: { type: "spring", damping: 28, stiffness: 220 },
-          scale: { duration: 2.8, repeat: Infinity, ease: "easeInOut" },
-          opacity: { duration: 2.8, repeat: Infinity, ease: "easeInOut" },
-        }}
+        transition={{ type: "spring", damping: 34, stiffness: 480 }}
       />
     </div>
   );
@@ -309,7 +313,7 @@ export default function Landing() {
       </div>
       <FloatingField />
 
-      <header className="sticky top-0 z-40 bg-[#050507]/35 backdrop-blur-2xl border-b border-white/[0.06]">
+      <header className="sticky top-0 z-40 bg-[#050507]/28 backdrop-blur-[28px] backdrop-saturate-[1.5] border-b border-white/[0.08] supports-[backdrop-filter]:bg-[#050507]/20" style={{ WebkitBackdropFilter: "blur(28px) saturate(1.5)" } as any}>
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 h-[72px] flex items-center justify-between">
           <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} className="flex items-center gap-4">
             <div className="h-[32px] w-[32px] rounded-[10px] border border-white/15 bg-white/[0.02] grid place-items-center">
@@ -399,7 +403,7 @@ export default function Landing() {
             </div>
 
             <motion.div style={{ y: cardY, rotate: cardRotate }} initial={{ opacity:0, y:20, scale:0.99 }} animate={{ opacity:1, y:0, scale:1 }} transition={{ duration:1, delay:0.2, ease:[0.22,1,0.36,1]}} className="relative hidden lg:block">
-              <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-[32px] p-4 shadow-[0_40px_100px_rgba(0,0,0,0.5)]">
+              <div className="bg-white/[0.03] backdrop-blur-[32px] backdrop-saturate-[1.5] border border-white/12 rounded-[32px] p-4" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.08), 0 24px 64px rgba(0,0,0,0.45)", WebkitBackdropFilter: "blur(32px) saturate(1.5)" } as any}>
                 <div className="flex items-center justify-between px-3 pb-4 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.16em] text-white/25">
                   <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-white/60"/> QRAFT — LIVE</span>
                   <span className="flex gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-white/12"/><span className="h-1.5 w-1.5 rounded-full bg-white/12"/><span className="h-1.5 w-1.5 rounded-full bg-white/70"/></span>
@@ -460,7 +464,7 @@ export default function Landing() {
         </Reveal>
         <div className="mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {serviceDefaults.map((s,i)=>(
-            <motion.div key={s.n} initial={{ opacity:0, y:14 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}} className="group bg-[#0D0D0F] border border-white/[0.06] rounded-[28px] p-10 lg:p-10 hover:bg-[#111113] hover:border-white/10 transition-colors relative overflow-hidden">
+            <motion.div key={s.n} initial={{ opacity:0, y:14 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}} className="group bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.2] border border-white/[0.08] rounded-[28px] p-10 lg:p-10 hover:bg-white/[0.05] hover:border-white/15 transition-colors relative overflow-hidden" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 8px 32px rgba(0,0,0,0.35)" } as any}>
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/0 to-transparent group-hover:via-white/10 transition duration-700"/>
               <div className="flex items-center justify-between">
                 <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-white/20">{s.n}</span>
@@ -490,7 +494,7 @@ export default function Landing() {
         <Reveal><div className="text-center max-w-xl mx-auto"><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.2em] text-white/30">03 — PLANY</div><h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[42px] sm:text-[50px] tracking-[-0.02em] leading-none"><EditableText ek="qraft.pricing.h" def="Jasne ceny." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.pricing.sub" def="Miesiąc do miesiąca po 90 dniach. Bez zobowiązań. W odcieniach czerni — wyrafinowane." className="mt-4 block font-[Inter] font-light text-[15px] leading-7 text-white/30 max-w-[480px] mx-auto" isEditing={isEditing} as="p" /></div></Reveal>
         <div className="mt-14 grid lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
           {plans.map((p,i)=>(
-            <motion.div key={p.name} initial={{ opacity:0, y:14 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.6, delay:i*0.05, ease:[0.22,1,0.36,1]}} className={`rounded-[28px] border p-8 lg:p-9 flex flex-col ${p.featured?"bg-[#F7F7F5] text-black border-[#F7F7F5] shadow-[0_24px_64px_rgba(0,0,0,0.18)] lg:scale-[1.02]":"bg-white/[0.03] border-white/10 backdrop-blur"}`}>
+            <motion.div key={p.name} initial={{ opacity:0, y:14 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.6, delay:i*0.05, ease:[0.22,1,0.36,1]}} className={`rounded-[28px] border p-8 lg:p-9 flex flex-col ${p.featured?"bg-[#F7F7F5] text-black border-[#F7F7F5] shadow-[0_24px_64px_rgba(0,0,0,0.18)] lg:scale-[1.02]":"bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.3] border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_12px_40px_rgba(0,0,0,0.3)]"}`}>
               <div className="flex items-center justify-between"><span className={`font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] ${p.featured?"text-black/35":"text-white/25"}`}><EditableText ek={`qraft.plan.${i}.name`} def={p.name.toUpperCase()} className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span>{p.featured&&<span className="font-[JetBrains_Mono] font-light text-[10px] bg-black text-white rounded-full px-3 py-1">WYRÓŻNIONY</span>}</div>
               <div className="mt-8 flex items-baseline gap-2"><span className="font-[Cormorant_Garamond] font-light text-[36px] tracking-[-0.02em]"><EditableText ek={`qraft.plan.${i}.price`} def={p.price} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span><span className={`font-[JetBrains_Mono] font-light text-[11px] ${p.featured?"text-black/35":"text-white/25"}`}><EditableText ek={`qraft.plan.${i}.sub`} def={p.sub} className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div>
               <EditableText ek={`qraft.plan.${i}.line`} def={p.line} className={`mt-2 block font-[Inter] font-light text-[14px] ${p.featured?"text-black/45":"text-white/30"}`} isEditing={isEditing} as="div" />
@@ -507,13 +511,13 @@ export default function Landing() {
       </section>
 
       <section className="mx-auto max-w-[1280px] px-6 lg:px-8 pb-12">
-        <Reveal><div className="grid lg:grid-cols-[320px_1fr] gap-10 border-t border-white/[0.06] pt-12"><div><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/20">04 — FAQ</div><h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[30px] leading-none"><EditableText ek="qraft.faq.h" def="Szybkie odpowiedzi." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><EditableText ek="qraft.faq.desc" def="Jasno i bez żargonu. Resztę dopowiemy na audycie." className="mt-3 block font-[Inter] font-light text-[14px] leading-6 text-white/30" isEditing={isEditing} as="p" /></div><div className="divide-y divide-white/5 border border-white/10 rounded-[20px] overflow-hidden bg-white/[0.02] backdrop-blur">{[["Dla kogo jest QRAFT?","Dla firm, gdzie liczy się miejsce i reputacja. Kawiarnie, studia, butiki, kliniki."],["Jak szybko widać efekty?","2–4 tygodnie by dać się znaleźć. 30–60 dni by urosnąć w środku tygodnia."],["Czy jest zobowiązanie?","Nie. Miesiąc do miesiąca po 90 dniach."],["Czego potrzebujecie na start?","90 minut + dostęp do profilu. Resztą zajmujemy się my."]].map(([q,a],i)=>(<div key={q}><button onClick={()=>setFaqOpen(faqOpen===i?null:i)} className="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition"><span className="font-[Cormorant_Garamond] font-light text-[17px] pr-6"><EditableText ek={`qraft.faq.${i}.q`} def={q} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span><span className={`h-7 w-7 grid place-items-center rounded-full border shrink-0 transition ${faqOpen===i?"bg-white text-black border-white":"border-white/10 text-white/20"}`}>{faqOpen===i?<Minus className="h-3.5 w-3.5"/>:<Plus className="h-3.5 w-3.5"/>}</span></button><AnimatePresence>{faqOpen===i && (<motion.div initial={{ height:0, opacity:0 }} animate={{ height:"auto", opacity:1 }} exit={{ height:0, opacity:0 }} className="overflow-hidden"><div className="px-6 pb-6 font-[Inter] font-light text-[14px] leading-7 text-white/30 max-w-[560px]"><EditableText ek={`qraft.faq.${i}.a`} def={a} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></div></motion.div>)}</AnimatePresence></div>))}</div></div></Reveal>
+        <Reveal><div className="grid lg:grid-cols-[320px_1fr] gap-10 border-t border-white/[0.06] pt-12"><div><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/20">04 — FAQ</div><h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[30px] leading-none"><EditableText ek="qraft.faq.h" def="Szybkie odpowiedzi." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><EditableText ek="qraft.faq.desc" def="Jasno i bez żargonu. Resztę dopowiemy na audycie." className="mt-3 block font-[Inter] font-light text-[14px] leading-6 text-white/30" isEditing={isEditing} as="p" /></div><div className="divide-y divide-white/5 border border-white/10 rounded-[20px] overflow-hidden bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.3]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.25)" } as any}>{[["Dla kogo jest QRAFT?","Dla firm, gdzie liczy się miejsce i reputacja. Kawiarnie, studia, butiki, kliniki."],["Jak szybko widać efekty?","2–4 tygodnie by dać się znaleźć. 30–60 dni by urosnąć w środku tygodnia."],["Czy jest zobowiązanie?","Nie. Miesiąc do miesiąca po 90 dniach."],["Czego potrzebujecie na start?","90 minut + dostęp do profilu. Resztą zajmujemy się my."]].map(([q,a],i)=>(<div key={q}><button onClick={()=>setFaqOpen(faqOpen===i?null:i)} className="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition"><span className="font-[Cormorant_Garamond] font-light text-[17px] pr-6"><EditableText ek={`qraft.faq.${i}.q`} def={q} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span><span className={`h-7 w-7 grid place-items-center rounded-full border shrink-0 transition ${faqOpen===i?"bg-white text-black border-white":"border-white/10 text-white/20"}`}>{faqOpen===i?<Minus className="h-3.5 w-3.5"/>:<Plus className="h-3.5 w-3.5"/>}</span></button><AnimatePresence>{faqOpen===i && (<motion.div initial={{ height:0, opacity:0 }} animate={{ height:"auto", opacity:1 }} exit={{ height:0, opacity:0 }} className="overflow-hidden"><div className="px-6 pb-6 font-[Inter] font-light text-[14px] leading-7 text-white/30 max-w-[560px]"><EditableText ek={`qraft.faq.${i}.a`} def={a} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></div></motion.div>)}</AnimatePresence></div>))}</div></div></Reveal>
       </section>
 
       <section id="contact" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-12 lg:py-20">
         <div className="grid lg:grid-cols-[1fr_1fr] gap-6">
           <Reveal><div className="bg-[#0F0F11] border border-white/10 text-white rounded-[32px] p-8 lg:p-10 relative overflow-hidden min-h-[440px] flex flex-col"><div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/[0.04] blur-2xl"/><div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"/><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/30">05 — BUDOWA</div><h2 className="mt-6 font-[Cormorant_Garamond] font-light text-[40px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.contact.h1" def="Spraw, by każdy" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.contact.h2" def="klient się liczył." className="block font-[Cormorant_Garamond] font-light italic text-white/50" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.contact.desc" def="20 minut. Znajdziemy lukę i zostawimy Ci plan — nawet jeśli nas nie wybierzesz. Otwarte dla wszystkich." className="mt-4 block font-[Inter] font-light text-[14px] leading-7 text-white/40 max-w-[380px]" isEditing={isEditing} as="p" /><div className="mt-8 space-y-3 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.06em] text-white/35"><div className="flex items-center gap-2.5"><Clock className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line1" def="Dwa terminy w tym tygodniu · 20 min" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div><div className="flex items-center gap-2.5"><Terminal className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line2" def="Otwarte dla każdego klienta" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div></div><div className="mt-auto pt-10 flex gap-2 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.1em]"><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge1" def="BEZ PREZENTACJI" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge2" def="BEZ ŻARGONU" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div></div></Reveal>
-          <Reveal delay={0.06}><div className="bg-white/[0.02] backdrop-blur border border-white/10 rounded-[32px] p-7 sm:p-8"><div className="flex items-center justify-between"><h3 className="font-[Cormorant_Garamond] font-light text-[22px]"><EditableText ek="qraft.form.h" def="Rozpocznij budowę" className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/20 border border-white/10 rounded-full px-3 py-1">2 MIN</span></div>{sent ? (<motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} className="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-8 text-center"><div className="h-10 w-10 mx-auto grid place-items-center rounded-full bg-white text-black"><Check className="h-5 w-5"/></div><div className="mt-4 font-[Cormorant_Garamond] font-light text-[18px]">Zgłoszenie otrzymane.</div><div className="mt-2 font-[Inter] font-light text-[13px] text-white/30">Wyślemy terminy w ciągu kilku godzin.</div><button onClick={()=>setSent(false)} className="mt-5 font-[JetBrains_Mono] font-light text-xs underline decoration-white/20 text-white/40">Wyślij kolejne</button></motion.div>) : (<form onSubmit={submit} className="mt-8 space-y-5"><div className="grid sm:grid-cols-2 gap-4"><label className="space-y-2"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">IMIĘ I NAZWISKO</span><input required value={form.name} onChange={e=>setForm({...form, name:e.target.value})} placeholder="Alex Kowalski" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label><label className="space-y-2"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">FIRMA</span><input value={form.business} onChange={e=>setForm({...form, business:e.target.value})} placeholder="Lumière" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label></div><label className="space-y-2 block"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">EMAIL</span><input required type="email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} placeholder="alex@firma.pl" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label><button type="submit" className="w-full h-[48px] rounded-full bg-white text-black font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] hover:bg-white/90 transition flex items-center justify-center gap-2">ZAMÓW AUDYT — ZA DARMO <ArrowRight className="h-4 w-4 opacity-60"/></button><div className="text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.04em] text-white/20">Lub <button type="button" onClick={()=>navigate("/auth")} className="underline decoration-white/15 text-white/30 hover:text-white/60">zaloguj się</button> by zarządzać budową</div></form>)}</div></Reveal>
+          <Reveal delay={0.06}><div className="bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.4] border border-white/10 rounded-[32px] p-7 sm:p-8" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.32)" } as any}><div className="flex items-center justify-between"><h3 className="font-[Cormorant_Garamond] font-light text-[22px]"><EditableText ek="qraft.form.h" def="Rozpocznij budowę" className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/20 border border-white/10 rounded-full px-3 py-1">2 MIN</span></div>{sent ? (<motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} className="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-8 text-center"><div className="h-10 w-10 mx-auto grid place-items-center rounded-full bg-white text-black"><Check className="h-5 w-5"/></div><div className="mt-4 font-[Cormorant_Garamond] font-light text-[18px]">Zgłoszenie otrzymane.</div><div className="mt-2 font-[Inter] font-light text-[13px] text-white/30">Wyślemy terminy w ciągu kilku godzin.</div><button onClick={()=>setSent(false)} className="mt-5 font-[JetBrains_Mono] font-light text-xs underline decoration-white/20 text-white/40">Wyślij kolejne</button></motion.div>) : (<form onSubmit={submit} className="mt-8 space-y-5"><div className="grid sm:grid-cols-2 gap-4"><label className="space-y-2"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">IMIĘ I NAZWISKO</span><input required value={form.name} onChange={e=>setForm({...form, name:e.target.value})} placeholder="Alex Kowalski" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label><label className="space-y-2"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">FIRMA</span><input value={form.business} onChange={e=>setForm({...form, business:e.target.value})} placeholder="Lumière" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label></div><label className="space-y-2 block"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">EMAIL</span><input required type="email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} placeholder="alex@firma.pl" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label><button type="submit" className="w-full h-[48px] rounded-full bg-white text-black font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] hover:bg-white/90 transition flex items-center justify-center gap-2">ZAMÓW AUDYT — ZA DARMO <ArrowRight className="h-4 w-4 opacity-60"/></button><div className="text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.04em] text-white/20">Lub <button type="button" onClick={()=>navigate("/auth")} className="underline decoration-white/15 text-white/30 hover:text-white/60">zaloguj się</button> by zarządzać budową</div></form>)}</div></Reveal>
         </div>
       </section>
 
