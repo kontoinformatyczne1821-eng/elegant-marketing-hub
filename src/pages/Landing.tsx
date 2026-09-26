@@ -403,8 +403,14 @@ export default function Landing() {
                   <EditableText ek="qraft.hero.title2a" def="buduje" className="font-[Cormorant_Garamond] font-light italic" isEditing={isEditing} as="span" />
                   <EditableText ek="qraft.hero.title2b" def="marki." className="font-[Cormorant_Garamond] not-italic font-light text-white" isEditing={isEditing} as="span" />
                 </span>
-                <span className="block mt-6 h-px w-[88px] bg-white/10"/>
-                <EditableText ek="qraft.hero.desc" def="Techniczne atelier marketingu. Jeden system — od marki po retencję. Mniej chaosu. Więcej klientów." className="block mt-6 font-[Inter] font-light text-[14px] tracking-[0.02em] text-white/30 max-w-[460px] leading-7" isEditing={isEditing} as="span" />
+                <span className="block mt-7 h-px w-[88px] bg-white/10"/>
+                <EditableText
+                  ek="qraft.hero.desc"
+                  def="Techniczny Atelier"
+                  className="block mt-7 font-[Instrument_Serif] italic text-[30px] sm:text-[38px] leading-[1.05] tracking-[-0.01em] text-white/55"
+                  isEditing={isEditing}
+                  as="span"
+                />
               </motion.h1>
 
               <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.45 }} className="mt-10 flex flex-wrap items-center gap-4">
