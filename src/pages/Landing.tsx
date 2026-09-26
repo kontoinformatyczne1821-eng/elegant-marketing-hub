@@ -92,7 +92,7 @@ const serviceDefaults = [
 const plans = [
   { name: "ESSENCE", price: "1 900 zł", sub: "/ mies.", line: "Fundamenty, by dać się znaleźć.", pts: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"], featured: false, cta: "Wybierz Essence" },
   { name: "SIGNATURE", price: "3 800 zł", sub: "/ mies.", line: "Pełny system. Wypełnia kalendarz.", pts: ["Wszystko z Essence", "Zasięg + płatne w promieniu", "Silnik treści + lista"], featured: true, cta: "Wybierz Signature" },
-  { name: "PRESTIGE", price: "5 000 zł", sub: "/ mies.", line: "Starty, rebrandingi, wiele lokalizacji.", pts: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"], featured: false, cta: "Zapytaj o Prestige" },
+  { name: "PRESTIGE", price: "5 000 zł", sub: "/ mies.", line: "Starty, rebrandingi, wiele lokalizacji.", pts: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"], featured: false, cta: "Wybierz Prestige" },
 ];
 
 /* okienko audytu — wybór usługi przesuwa pasek */
