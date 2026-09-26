@@ -613,7 +613,7 @@ function PlanShowcase({
                   )}
                 </div>
                 <div className="mt-8 flex items-baseline gap-2">
-                  <span className="font-[Cormorant_Garamond] font-light text-[36px] tracking-[-0.02em]">
+                  <span className="font-[Cormorant_Garamond] font-light text-[30px] tracking-[-0.02em]">
                     <EditableText
                       ek={`qraft.plan.${i}.price`}
                       def={p.price}
@@ -1428,7 +1428,7 @@ export default function Landing() {
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              <h1 className="font-[Space_Grotesk] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[clamp(40px,7.8vw,100px)]">
+              <h1 className="font-[Space_Grotesk] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[clamp(30px,7.4vw,100px)]">
                 <span className="block text-white">Precision</span>
                 <span className="block text-white">Builds</span>
                 <span className="block text-transparent" style={{ WebkitTextStroke: "1.2px rgba(255,255,255,0.6)" }}>
@@ -1488,7 +1488,7 @@ export default function Landing() {
             <div>
               <div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.2em] text-white/50">01 — SYSTEM</div>
               <h2 className="mt-5 leading-[0.9] tracking-[-0.02em]">
-                <EditableText ek="qraft.system.h1" def="Jeden system. Sześć modułów." className="block font-[Cormorant_Garamond] font-light text-[40px] sm:text-[52px]" isEditing={isEditing} as="span" />
+                <EditableText ek="qraft.system.h1" def="Jeden system. Sześć modułów." className="block font-[Cormorant_Garamond] font-light text-[31px] sm:text-[52px]" isEditing={isEditing} as="span" />
               </h2>
             </div>
             <EditableText
@@ -1637,7 +1637,7 @@ export default function Landing() {
       </section>
 
       <section id="pricing" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-24 lg:py-32">
-        <Reveal><div className="text-center max-w-xl mx-auto"><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.2em] text-white/30">03 — PLANY</div><h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[42px] sm:text-[50px] tracking-[-0.02em] leading-none"><EditableText ek="qraft.pricing.h" def="Jasne ceny." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.pricing.sub" def="Miesiąc do miesiąca po 90 dniach. Bez zobowiązań. W odcieniach czerni — wyrafinowane." className="mt-4 block font-[Inter] font-light text-[15px] leading-7 text-white/50 max-w-[480px] mx-auto" isEditing={isEditing} as="p" /></div></Reveal>
+        <Reveal><div className="text-center max-w-xl mx-auto"><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.2em] text-white/30">03 — PLANY</div><h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[34px] sm:text-[50px] tracking-[-0.02em] leading-none"><EditableText ek="qraft.pricing.h" def="Jasne ceny." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.pricing.sub" def="Miesiąc do miesiąca po 90 dniach. Bez zobowiązań. W odcieniach czerni — wyrafinowane." className="mt-4 block font-[Inter] font-light text-[15px] leading-7 text-white/50 max-w-[480px] mx-auto" isEditing={isEditing} as="p" /></div></Reveal>
         <Reveal><PlanShowcase
           isEditing={isEditing}
           onPick={()=>go("contact")}
