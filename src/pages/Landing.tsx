@@ -1,159 +1,9 @@
-import { motion, AnimatePresence, useInView } from "framer-motion";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Check,
-  Clock,
-  Mail,
-  Menu,
-  Minus,
-  Pencil,
-  Plus,
-  Save,
-  X,
-} from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence, useScroll, useTransform, useInView } from "framer-motion";
+import { ArrowUpRight, ArrowRight, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 
-/* ------------------------------------------------------------------ */
-/*  amp system — one orange (#ff6105), one sans, hairline structure    */
-/* ------------------------------------------------------------------ */
-
-const AMP = "#ff6105";
-const AMP_HOVER = "#e25704";
-const AMP_SHADOW =
-  "rgba(255, 97, 5, 0.6) 1px 6px 14px 0px, rgba(0, 0, 0, 0.06) 0px 1px 4px 0px";
-
-function Eyebrow({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`text-[12px] uppercase tracking-[0.16em] text-ash font-medium ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
-
-/** The 2–3px orange punctuation mark, one third of the heading width. */
-function Accent({ w = 120, className = "" }: { w?: number; className?: string }) {
-  return (
-    <div
-      className={`h-[3px] ${className}`}
-      style={{ width: w, backgroundColor: AMP }}
-    />
-  );
-}
-
-/* ----------------------------- buttons ----------------------------- */
-
-function BtnPrimary({
-  children,
-  onClick,
-  className = "",
-  type = "button",
-}: {
-  children: React.ReactNode;
-  onClick?: () => void;
-  className?: string;
-  type?: "button" | "submit";
-}) {
-  const [hover, setHover] = useState(false);
-  return (
-    <button
-      type={type}
-      onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
-      className={`inline-flex items-center justify-center gap-2 rounded-[50px] font-amp font-medium text-[15px] tracking-[-0.01em] text-white outline-none focus-visible:ring-2 focus-visible:ring-[#ff6105]/40 transition-transform duration-300 ${
-        hover ? "-translate-y-[1px]" : "translate-y-0"
-      } ${className}`}
-      style={{ backgroundColor: hover ? AMP_HOVER : AMP, boxShadow: AMP_SHADOW }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function NavLink({
-  children,
-  onClick,
-  className = "",
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  className?: string;
-}) {
-  const [hover, setHover] = useState(false);
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
-      className={`text-[14px] transition-colors duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#ff6105]/40 rounded-[4px] ${className}`}
-      style={{ color: hover ? "#0a0a0a" : "#292b2a" }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function BtnSecondary({
-  children,
-  onClick,
-  className = "",
-  type = "button",
-}: {
-  children: React.ReactNode;
-  onClick?: () => void;
-  className?: string;
-  type?: "button" | "submit";
-}) {
-  const [hover, setHover] = useState(false);
-  return (
-    <button
-      type={type}
-      onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
-      className={`inline-flex items-center justify-center gap-2 rounded-[24px] font-amp text-[15px] tracking-[-0.01em] outline-none focus-visible:ring-2 focus-visible:ring-[#ff6105]/40 transition-colors duration-300 ${className}`}
-      style={{
-        backgroundColor: hover ? "#f3f4f3" : "#ffffff",
-        borderColor: hover ? "#a2a3a2" : "#e5e5e5",
-        color: "#292b2a",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-/* --------------------------- edit support -------------------------- */
-
-function EditableText({
-  ek,
-  def,
-  className,
-  as: Tag = "span",
-  isEditing,
-}: {
-  ek: string;
-  def: string;
-  className?: string;
-  as?: any;
-  isEditing: boolean;
-}) {
+function EditableText({ ek, def, className, as: Tag = "span", isEditing }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean }) {
   const [val, setVal] = useState(def);
   useEffect(() => {
     try {
@@ -164,56 +14,309 @@ function EditableText({
   const handleBlur = (e: React.FocusEvent<HTMLElement>) => {
     const t = e.currentTarget.textContent || "";
     setVal(t);
-    try {
-      localStorage.setItem(ek, t);
-    } catch {}
+    try { localStorage.setItem(ek, t); } catch {}
   };
-  if (!isEditing)
-    return <Tag className={className}>{val}</Tag>;
+  if (!isEditing) return <Tag className={className}>{val}</Tag>;
   return (
     <Tag
       contentEditable
       suppressContentEditableWarning
       onBlur={handleBlur}
-      className={`${className || ""} outline-dashed outline-1 outline-[#ff6105]/60 hover:outline-[#ff6105] cursor-text rounded-[3px] px-1 -mx-1 focus:outline-solid focus:outline-[#ff6105] focus:bg-[#ffdfcd]/50 transition-colors`}
+      className={`${className || ""} outline-dashed outline-1 outline-white/30 hover:outline-white/50 cursor-text rounded-[6px] px-1 -mx-1 focus:outline-solid focus:outline-white/60 focus:bg-white/[0.06] transition-colors`}
     >
       {val}
     </Tag>
   );
 }
 
-/* --------------------------- motion bits --------------------------- */
+const serviceDefaults = [
+  { n: "01", title: "System Marki", dostajesz: "spójny system wizualny, hasło i szyld.", cel: "rozpoznają Cię zanim ktoś się dowie." },
+  { n: "02", title: "Strona i Wydajność", dostajesz: "szybką stronę z rezerwacją i formularzem.", cel: "każdy klik kończy się zamówieniem." },
+  { n: "03", title: "Pozyskiwanie", dostajesz: "widoczność w Mapach i wyszukiwaniu do 3 km.", cel: "trafiają do Ciebie ludzie z okolicy." },
+  { n: "04", title: "Silnik Treści", dostajesz: "zdjęcia, wideo i teksty o Twoim rzemiośle.", cel: "klient widzi jakość jeszcze przed wizytą." },
+  { n: "05", title: "Kampanie", dostajesz: "kalendarz ofert i mailingi, które wracają.", cel: "puste godziny w tygodniu się zapełniają." },
+  { n: "06", title: "Retencja", dostajesz: "system opinii, lojalności i raport tygodniowy.", cel: "klienci wracają i polecają Cię znajomym." },
+];
 
-function Reveal({
-  children,
-  delay = 0,
-  y = 16,
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  y?: number;
-}) {
+const plans = [
+  { name: "Start", price: "1 900 zł", sub: "/ mies.", line: "Fundamenty, by dać się znaleźć.", pts: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"], featured: false, cta: "Wybierz Start" },
+  { name: "Skala", price: "3 800 zł", sub: "/ mies.", line: "Pełny system. Wypełnia kalendarz.", pts: ["Wszystko ze Startu", "Zasięg + płatne w promieniu", "Silnik treści + lista"], featured: true, cta: "Wybierz Skalę" },
+  { name: "Lab", price: "Wycena", sub: "", line: "Starty, rebrandingi, wiele lokalizacji.", pts: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"], featured: false, cta: "Zapytaj o Lab" },
+];
+
+function CursorAura() {
+  const [mouse, setMouse] = useState({ x: -400, y: -400 });
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const fine = window.matchMedia("(pointer: fine)").matches;
+    if (!fine) return;
+    let raf = 0;
+    const onMove = (e: MouseEvent) => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setMouse({ x: e.clientX, y: e.clientY }));
+      if (!visible) setVisible(true);
+    };
+    const onLeave = () => setVisible(false);
+    const onEnter = () => setVisible(true);
+    window.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseleave", onLeave);
+    document.addEventListener("mouseenter", onEnter);
+    const t = setTimeout(() => setVisible(true), 200);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseleave", onLeave);
+      document.removeEventListener("mouseenter", onEnter);
+      cancelAnimationFrame(raf);
+      clearTimeout(t);
+    };
+  }, [visible]);
+  if (!visible) return null;
   return (
-    <motion.div
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-10%" }}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {children}
-    </motion.div>
+    <div className="pointer-events-none fixed inset-0 z-[80] hidden lg:block overflow-hidden">
+      {/* outer soft aura */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          left: mouse.x,
+          top: mouse.y,
+          width: 820,
+          height: 820,
+          x: "-50%",
+          y: "-50%",
+          background: "radial-gradient(circle at center, rgba(255,255,255,0.095) 0%, rgba(255,255,255,0.035) 28%, rgba(255,255,255,0.012) 50%, transparent 72%)",
+          filter: "blur(32px)",
+        }}
+        animate={{ left: mouse.x, top: mouse.y }}
+        transition={{ type: "spring", damping: 32, stiffness: 140, mass: 0.9 }}
+      />
+      {/* APPLE LIQUID GLASS ORB — blurs content behind */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          left: mouse.x,
+          top: mouse.y,
+          width: 220,
+          height: 220,
+          x: "-50%",
+          y: "-50%",
+          background: "rgba(255,255,255,0.055)",
+          border: "1px solid rgba(255,255,255,0.14)",
+          boxShadow: "inset 0 1px 1px rgba(255,255,255,0.22), inset 0 -1px 1px rgba(0,0,0,0.15), 0 8px 32px rgba(0,0,0,0.35), 0 1px 1px rgba(255,255,255,0.08)",
+          backdropFilter: "blur(22px) saturate(1.4)",
+          WebkitBackdropFilter: "blur(22px) saturate(1.4)",
+        }}
+        animate={{ left: mouse.x, top: mouse.y }}
+        transition={{ type: "spring", damping: 28, stiffness: 200, mass: 0.6 }}
+      >
+        {/* top highlight like iOS glass */}
+        <div className="absolute inset-[1px] rounded-full" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.16) 0%, transparent 45%)" }} />
+        {/* inner glow */}
+        <div className="absolute inset-0 rounded-full" style={{ background: "radial-gradient(circle at 30% 28%, rgba(255,255,255,0.18) 0%, transparent 55%)" }} />
+      </motion.div>
+      {/* mid glow inside glass */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          left: mouse.x,
+          top: mouse.y,
+          width: 120,
+          height: 120,
+          x: "-50%",
+          y: "-50%",
+          background: "radial-gradient(circle at center, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 60%, transparent 72%)",
+          filter: "blur(10px)",
+        }}
+        animate={{ left: mouse.x, top: mouse.y }}
+        transition={{ type: "spring", damping: 26, stiffness: 260, mass: 0.5 }}
+      />
+      {/* subtle breathing ring */}
+      <motion.div
+        className="absolute rounded-full border border-white/12"
+        style={{
+          left: mouse.x,
+          top: mouse.y,
+          width: 220,
+          height: 220,
+          x: "-50%",
+          y: "-50%",
+          borderColor: "rgba(255,255,255,0.10)",
+        }}
+        animate={{ left: mouse.x, top: mouse.y, scale: [1, 1.04, 1], opacity: [0.22, 0.08, 0.22] }}
+        transition={{
+          left: { type: "spring", damping: 28, stiffness: 200 },
+          top: { type: "spring", damping: 28, stiffness: 200 },
+          scale: { duration: 3.2, repeat: Infinity, ease: "easeInOut" },
+          opacity: { duration: 3.2, repeat: Infinity, ease: "easeInOut" },
+        }}
+      />
+      {/* center dot with glow */}
+      <motion.div
+        className="absolute rounded-full bg-white"
+        style={{
+          left: mouse.x,
+          top: mouse.y,
+          width: 3,
+          height: 3,
+          x: "-50%",
+          y: "-50%",
+          boxShadow: "0 0 10px rgba(255,255,255,0.9), 0 0 22px rgba(255,255,255,0.45)",
+        }}
+        animate={{ left: mouse.x, top: mouse.y }}
+        transition={{ type: "spring", damping: 34, stiffness: 480 }}
+      />
+    </div>
   );
 }
 
-function CountUp({
-  to,
-  suffix = "",
-  decimals = 0,
-}: {
-  to: number;
-  suffix?: string;
-  decimals?: number;
-}) {
+function BtnPrimary({ children, onClick, className = "", type = "button" }: { children: React.ReactNode; onClick?: () => void; className?: string; type?: "button" | "submit" }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+      className={`relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-full border font-[JetBrains_Mono] font-light tracking-[0.14em] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-white/50 ${className}`}
+      style={{ borderColor: hover ? "#ffffff" : "rgba(255,255,255,0.32)", color: hover ? "#000000" : "#ffffff" }}
+    >
+      <motion.span
+        aria-hidden
+        className="absolute inset-0 bg-white origin-left"
+        initial={false}
+        animate={{ scaleX: hover ? 1 : 0 }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        style={{ originX: 0 }}
+      />
+      <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
+    </button>
+  );
+}
+
+function BtnGhost({ children, onClick, className = "" }: { children: React.ReactNode; onClick?: () => void; className?: string }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+      className={`group relative inline-flex items-center justify-center gap-2 rounded-full border backdrop-blur font-[JetBrains_Mono] font-light tracking-[0.14em] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-white/50 transition-colors duration-300 ${className}`}
+      style={{
+        borderColor: hover ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.16)",
+        backgroundColor: hover ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.02)",
+        color: hover ? "#ffffff" : "rgba(255,255,255,0.62)",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function BtnDark({ children, onClick, className = "" }: { children: React.ReactNode; onClick?: () => void; className?: string }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+      className={`relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-full border font-[JetBrains_Mono] font-light tracking-[0.14em] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-black/40 ${className}`}
+      style={{ borderColor: hover ? "#000000" : "rgba(0,0,0,0.22)", color: hover ? "#ffffff" : "#000000" }}
+    >
+      <motion.span
+        aria-hidden
+        className="absolute inset-0 bg-black origin-left"
+        initial={false}
+        animate={{ scaleX: hover ? 1 : 0 }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        style={{ originX: 0 }}
+      />
+      <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
+    </button>
+  );
+}
+
+function FloatingField() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* miękkie orb-y w odcieniach czerni/szarości */}
+      {[
+        { left: "6%", top: "14%", size: 420, dur: 16 },
+        { left: "62%", top: "8%", size: 360, dur: 18 },
+        { left: "38%", top: "42%", size: 520, dur: 20 },
+        { left: "78%", top: "48%", size: 300, dur: 15 },
+      ].map((o,i)=>(
+        <motion.div key={i} className="absolute rounded-full"
+          style={{
+            left: o.left, top: o.top, width: o.size, height: o.size,
+            background: "radial-gradient(circle at center, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.015) 35%, transparent 70%)",
+            filter: "blur(28px)",
+          }}
+          animate={{ y: [0, -20, 0], x: [0, 10, 0], opacity: [0.6, 0.9, 0.6] }}
+          transition={{ duration: o.dur, repeat: Infinity, ease: "easeInOut", delay: i*0.6 }}
+        />
+      ))}
+      {/* latający pył — 12 drobin */}
+      {Array.from({ length: 12 }).map((_, i) => (
+        <motion.div
+          key={"dust"+i}
+          className="absolute rounded-full bg-white"
+          style={{
+            left: `${8 + (i * 7.8) % 84}%`,
+            top: `${12 + (i % 4) * 18 + (i % 3)*6}%`,
+            width: i % 3 === 0 ? 2 : 1.2,
+            height: i % 3 === 0 ? 2 : 1.2,
+            opacity: 0.18 + (i % 4)*0.06,
+            boxShadow: i % 4 === 0 ? "0 0 6px rgba(255,255,255,0.5)" : "none",
+          }}
+          animate={{
+            y: [0, -22 - (i % 5)*4, 0],
+            x: [0, 8 - (i % 3)*4, -6, 0],
+            opacity: [0.18, 0.38, 0.18],
+          }}
+          transition={{ duration: 10 + i*0.7, repeat: Infinity, ease: "easeInOut", delay: i*0.35 }}
+        />
+      ))}
+      {/* cienkie latające pierścienie */}
+      {[
+        { l: "14%", t: "22%", s: 44 },
+        { l: "82%", t: "18%", s: 32 },
+        { l: "68%", t: "62%", s: 56 },
+      ].map((r,i)=>(
+        <motion.div key={"ring"+i} className="absolute rounded-full border border-white/[0.06]"
+          style={{ left: r.l, top: r.t, width: r.s, height: r.s }}
+          animate={{ y: [0, -14, 0], rotate: [0, 12, 0], opacity: [0.12, 0.2, 0.12] }}
+          transition={{ duration: 13 + i*2, repeat: Infinity, ease: "easeInOut", delay: i*0.7 }}
+        />
+      ))}
+      {/* subtelne kreski */}
+      {[
+        { l: "22%", t: "68%", w: 28 },
+        { l: "74%", t: "28%", w: 36 },
+      ].map((k,i)=>(
+        <motion.div key={"line"+i} className="absolute h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"
+          style={{ left: k.l, top: k.t, width: k.w }}
+          animate={{ x: [0, 10, 0], opacity: [0.18, 0.32, 0.18] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: i*1.1 }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function Reveal({ children, delay=0, y=18 }: { children: React.ReactNode; delay?: number; y?: number }) {
+  return (
+    <motion.div initial={{ opacity: 0, y, filter: "blur(6px)" }} whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} viewport={{ once: true, margin: "-12%" }} transition={{ duration: 0.9, delay, ease: [0.22,1,0.36,1] }}>{children}</motion.div>
+  );
+}
+
+function CountUp({ to, suffix = "", decimals = 0 }: { to: number; suffix?: string; decimals?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-15%" });
   const [v, setV] = useState(0);
@@ -221,7 +324,7 @@ function CountUp({
     if (!inView) return;
     let raf = 0;
     const start = performance.now();
-    const dur = 1400;
+    const dur = 1500;
     const tick = (now: number) => {
       const pr = Math.min(1, (now - start) / dur);
       setV(to * (1 - Math.pow(1 - pr, 3)));
@@ -232,207 +335,26 @@ function CountUp({
   }, [inView, to]);
   return (
     <span ref={ref}>
-      {v.toLocaleString("pl-PL", {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals,
-      })}
+      {v.toLocaleString("pl-PL", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}
       {suffix}
     </span>
   );
 }
 
-/** Flat hairline card — the default surface. No shadow, 5px corners. */
-function ModuleCard({
-  n,
-  title,
-  dostajesz,
-  cel,
-  isEditing,
-}: {
-  n: string;
-  title: string;
-  dostajesz: string;
-  cel: string;
-  isEditing: boolean;
-}) {
-  const [hover, setHover] = useState(false);
-  return (
-    <div
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      className="rounded-[5px] border bg-white p-6 transition-colors duration-300"
-      style={{ borderColor: hover ? "#a2a3a2" : "#e5e5e5" }}
-    >
-      <div className="flex items-center justify-between">
-        <span
-          className="text-[12px] tracking-[0.12em] transition-colors duration-300"
-          style={{ color: hover ? AMP : "#a2a3a2" }}
-        >
-          {n}
-        </span>
-        <ArrowUpRight
-          className="h-4 w-4 transition-colors duration-300"
-          style={{ color: hover ? "#0a0a0a" : "#a2a3a2" }}
-        />
-      </div>
-      <h3 className="mt-6 font-amp text-[20px] font-medium leading-[1.33] tracking-[-0.02em] text-ink">
-        <EditableText
-          ek={`qraft.service.${n}.title`}
-          def={title}
-          className="font-amp font-medium"
-          isEditing={isEditing}
-          as="span"
-        />
-      </h3>
-      <div className="mt-5 space-y-3 border-t border-hairline pt-5">
-        <div>
-          <div className="text-[11px] uppercase tracking-[0.12em] text-ash font-medium">
-            Dostajesz
-          </div>
-          <EditableText
-            ek={`qraft.service.${n}.d`}
-            def={dostajesz}
-            className="mt-1 block font-amp text-[14px] leading-[1.5] text-carbon"
-            isEditing={isEditing}
-            as="p"
-          />
-        </div>
-        <div>
-          <div className="text-[11px] uppercase tracking-[0.12em] text-ash font-medium">
-            Cel
-          </div>
-          <EditableText
-            ek={`qraft.service.${n}.c`}
-            def={cel}
-            className="mt-1 block font-amp text-[14px] leading-[1.5] text-ink"
-            isEditing={isEditing}
-            as="p"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------ content ---------------------------- */
-
-const serviceDefaults = [
-  {
-    n: "01",
-    title: "System Marki",
-    dostajesz: "spójny system wizualny, hasło i szyld.",
-    cel: "rozpoznają Cię zanim ktoś się dowie.",
-  },
-  {
-    n: "02",
-    title: "Strona i Wydajność",
-    dostajesz: "szybką stronę z rezerwacją i formularzem.",
-    cel: "każdy klik kończy się zamówieniem.",
-  },
-  {
-    n: "03",
-    title: "Pozyskiwanie",
-    dostajesz: "widoczność w Mapach i wyszukiwaniu do 3 km.",
-    cel: "trafiają do Ciebie ludzie z okolicy.",
-  },
-  {
-    n: "04",
-    title: "Silnik Treści",
-    dostajesz: "zdjęcia, wideo i teksty o Twoim rzemiośle.",
-    cel: "klient widzi jakość jeszcze przed wizytą.",
-  },
-  {
-    n: "05",
-    title: "Kampanie",
-    dostajesz: "kalendarz ofert i mailingi, które wracają.",
-    cel: "puste godziny w tygodniu się zapełniają.",
-  },
-  {
-    n: "06",
-    title: "Retencja",
-    dostajesz: "system opinii, lojalności i raport tygodniowy.",
-    cel: "klienci wracają i polecają Cię znajomym.",
-  },
-];
-
-const processSteps = [
-  {
-    t: "Audyt",
-    d: "20 minut oglądania Twojej firmy z zewnątrza: strona, Mapy, wizualne, opinie. Bez slajdów i bez presji.",
-    pts: ["Ocena w 3 punktach", "Pierwsza największa dźwignia", "Lista rzeczy do naprawy"],
-    when: "Dzień 1",
-  },
-  {
-    t: "Blueprint",
-    d: "Jedna strona, na której widać całą strategię: pozycjonowanie, oferta, kolejność kroków i budżet miesięczny.",
-    pts: ["Pozycjonowanie dla Twojej okolicy", "Oferta i cennik", "Plan na 90 dni"],
-    when: "Dzień 7",
-  },
-  {
-    t: "Budowa",
-    d: "Tożsamość, strona, zdjęcia i wideo powstają razem — tak, żeby wszystko mówiło tym samym głosem.",
-    pts: ["Identyfikacja wizualna", "Strona z rezerwacją", "Materiały zdjęciowe"],
-    when: "Dzień 10–28",
-  },
-  {
-    t: "Skalowanie",
-    d: "Co poniedziałek liczby zamiast opowieści. Co działa, dostajemy więcej. Co nie działa, wycinamy.",
-    pts: ["Raport w złotówkach", "Kampanie lokalne", "Opinie i powroty"],
-    when: "Co tydzień",
-  },
-];
-
-const industries = [
-  "Kawiarnie",
-  "Studia",
-  "Butiki",
-  "Kliniki",
-  "Gabinety",
-  "Warsztaty",
-  "Restauracje",
-  "Fryzjerzy",
-];
-
-const plans = [
-  {
-    name: "Start",
-    price: "1 900 zł",
-    sub: "/ mies.",
-    line: "Fundamenty, by dać się znaleźć.",
-    pts: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"],
-    featured: false,
-    cta: "Wybierz Start",
-  },
-  {
-    name: "Skala",
-    price: "3 800 zł",
-    sub: "/ mies.",
-    line: "Pełny system. Wypełnia kalendarz.",
-    pts: ["Wszystko ze Startu", "Zasięg + płatne w promieniu", "Silnik treści + lista"],
-    featured: true,
-    cta: "Wybierz Skalę",
-  },
-  {
-    name: "Lab",
-    price: "Wycena",
-    sub: "",
-    line: "Starty, rebrandingi, wiele lokalizacji.",
-    pts: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"],
-    featured: false,
-    cta: "Zapytaj o Lab",
-  },
-];
-
-/* ------------------------------- page ------------------------------ */
-
 export default function Landing() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
-  const [step, setStep] = useState(0);
   const [form, setForm] = useState({ name: "", business: "", email: "" });
   const [sent, setSent] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const cinemaRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll();
+  const { scrollYProgress: cinemaProgress } = useScroll({ target: cinemaRef, offset: ["start end", "end start"] });
+  const cinemaY = useTransform(cinemaProgress, [0, 1], ["-14%", "14%"]);
+  const cinemaY2 = useTransform(cinemaProgress, [0, 1], ["6%", "-10%"]);
+  const cinemaText = useTransform(cinemaProgress, [0, 0.5], ["-40px", "0px"]);
+  const progress = useTransform(scrollYProgress, [0,1], [0,1]);
 
   const go = (id: string) => {
     setMobileOpen(false);
@@ -442,147 +364,59 @@ export default function Landing() {
     e.preventDefault();
     if (!form.email || !form.name) return;
     setSent(true);
-    setTimeout(() => setSent(false), 3800);
+    setTimeout(()=>setSent(false), 3800);
   };
 
   return (
-    <div className="min-h-screen bg-white text-ink antialiased selection:bg-[#ffdfcd] selection:text-ink">
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap'); html{scroll-behavior:smooth}`}</style>
-
-      {/* ---------------------------- announcement bar ----------------------- */}
-      <div className="bg-linen border-b border-hairline">
-        <div className="mx-auto max-w-[1200px] px-6 h-11 flex items-center justify-center gap-3 text-[13px] text-carbon">
-          <EditableText
-            ek="qraft.announce"
-            def="Starty w listopadzie — zostały 2 miejsca w miesiącu."
-            isEditing={isEditing}
-            as="span"
-          />
-          <button
-            onClick={() => go("contact")}
-            className="hidden sm:inline-flex items-center gap-1 font-medium text-ink transition-colors"
-            style={{ color: AMP }}
-          >
-            Zamów audyt <ArrowRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
+    <div className="min-h-screen bg-[#050507] text-[#F2F2F0] antialiased selection:bg-white selection:text-black">
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&family=Space+Grotesk:wght@300;400&display=swap'); html{scroll-behavior:smooth} @keyframes qmarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}} @keyframes qmsheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}} @keyframes qmbreathe{0%,100%{opacity:.35}50%{opacity:.9}}`}</style>
+      <CursorAura />
+      <motion.div className="fixed top-0 inset-x-0 h-[1px] bg-white/80 z-50 origin-left" style={{ scaleX: progress }} />
+      <div className="pointer-events-none fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-[#050507]" />
+        {/* odcienie czerni — subtelne winiety */}
+        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "88px 88px" }} />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[720px] w-[1200px] -translate-y-1/2 rounded-full opacity-[0.09] blur-[140px]" style={{ background: "radial-gradient(ellipse at center, white 0%, #2A2A2E 32%, transparent 70%)" }} />
+        <div className="absolute top-[38%] right-[-6%] h-[560px] w-[560px] rounded-full opacity-[0.045] blur-[90px]" style={{ background: "radial-gradient(ellipse at center, #1A1A1E 0%, transparent 68%)" }} />
+        <div className="absolute bottom-0 left-[-8%] h-[520px] w-[700px] rounded-full opacity-[0.035] blur-[100px]" style={{ background: "radial-gradient(ellipse at center, #0F0F12 0%, transparent 70%)" }} />
       </div>
+      <FloatingField />
 
-      {/* ------------------------------- top nav ------------------------------ */}
-      <header className="sticky top-0 z-40 bg-white border-b border-hairline">
-        <div className="mx-auto max-w-[1200px] px-6 h-[68px] flex items-center justify-between gap-6">
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="flex items-center gap-3 outline-none"
-          >
-            <span className="h-7 w-7 rounded-[5px] bg-charcoal grid place-items-center">
-              <span className="font-amp font-medium text-[13px] text-white">Q</span>
-            </span>
-            <span className="relative font-amp font-medium text-[15px] tracking-[0.16em] text-ink">
-              QRAFT
-              <span
-                className="absolute -bottom-[5px] left-0 h-[2px] w-6"
-                style={{ backgroundColor: AMP }}
-              />
-            </span>
+      <header className="sticky top-0 z-40 bg-[#050507]/28 backdrop-blur-[28px] backdrop-saturate-[1.5] border-b border-white/[0.08] supports-[backdrop-filter]:bg-[#050507]/20" style={{ WebkitBackdropFilter: "blur(28px) saturate(1.5)" } as any}>
+        <div className="mx-auto max-w-[1280px] px-6 lg:px-8 h-[72px] flex items-center justify-between">
+          <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} className="flex items-center gap-4">
+            <div className="h-[32px] w-[32px] rounded-[10px] border border-white/15 bg-white/[0.02] grid place-items-center">
+              <span className="font-[Instrument_Serif] text-[16px]">Q</span>
+            </div>
+            <span className="font-[Space_Grotesk] font-light tracking-[0.28em] text-[12px]">QRAFT</span>
+            <span className="hidden lg:inline font-[JetBrains_Mono] font-light text-[10px] tracking-[0.18em] text-white/25 border-l border-white/10 pl-4 ml-1">PERFEKCJA BUDUJE MARKI</span>
           </button>
-
-          <nav className="hidden lg:flex items-center gap-9">
-            {[
-              ["services", "System"],
-              ["process", "Proces"],
-              ["pricing", "Plany"],
-              ["contact", "Kontakt"],
-            ].map(([id, label]) => (
-              <NavLink key={id} onClick={() => go(id)}>
-                {label}
-              </NavLink>
-            ))}
+          <nav className="hidden lg:flex gap-8 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/30">
+            <button onClick={()=>go("services")} className="hover:text-white/80 transition">— SYSTEM</button>
+            <button onClick={()=>go("pricing")} className="hover:text-white/80 transition">— PLANY</button>
+            <button onClick={()=>go("contact")} className="hover:text-white/80 transition">— KONTAKT</button>
           </nav>
-
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => setIsEditing(!isEditing)}
-              className="hidden lg:inline-flex items-center gap-2 h-10 px-4 rounded-[24px] border text-[13px] transition-colors"
-              style={{
-                borderColor: isEditing ? AMP : "#e5e5e5",
-                backgroundColor: isEditing ? "#ffdfcd" : "#ffffff",
-                color: isEditing ? "#0a0a0a" : "#7a7b7b",
-              }}
+              onClick={()=>setIsEditing(!isEditing)}
+              className={`hidden md:inline-flex items-center gap-2 px-4 h-9 rounded-full border font-[JetBrains_Mono] font-light text-[11px] tracking-[0.12em] transition-all duration-500 backdrop-blur ${isEditing ? "bg-white text-black border-white" : "border-white/15 bg-white/[0.02] text-white/60 hover:border-white/45 hover:bg-white/[0.08] hover:text-white"}`}
             >
-              {isEditing ? (
-                <>
-                  <Save className="h-3.5 w-3.5" /> ZAKOŃCZ
-                </>
-              ) : (
-                <>
-                  <Pencil className="h-3.5 w-3.5" /> EDYTUJ TEKSTY
-                </>
-              )}
+              {isEditing ? <><Save className="h-3.5 w-3.5"/> ZAKOŃCZ EDYCJĘ</> : <><Pencil className="h-3.5 w-3.5"/> EDYTUJ TEKSTY</>}
             </button>
-            <NavLink onClick={() => navigate("/auth")} className="hidden sm:inline-flex h-10 px-3">
-              Zaloguj się
-            </NavLink>
-            <BtnPrimary
-              onClick={() => go("contact")}
-              className="h-10 px-5 text-[14px] hidden sm:inline-flex"
-            >
-              Zamów audyt
-            </BtnPrimary>
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="lg:hidden h-10 w-10 grid place-items-center rounded-[24px] border border-hairline"
-              aria-label="Menu"
-            >
-              {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-            </button>
+            <span className="hidden md:inline-flex items-center gap-1.5 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] text-white/20"><Terminal className="h-3 w-3 opacity-60"/> qraft.build</span>
+            <BtnPrimary onClick={()=>go("contact")} className="hidden sm:inline-flex text-[11px] tracking-[0.16em] px-6 h-9">ROZPOCZNIJ</BtnPrimary>
+            <button onClick={()=>setMobileOpen(!mobileOpen)} className="lg:hidden h-9 w-9 grid place-items-center rounded-full border border-white/10 bg-white/[0.03]">{mobileOpen?<X className="h-4 w-4"/>:<Menu className="h-4 w-4"/>}</button>
           </div>
         </div>
-
         <AnimatePresence>
           {mobileOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="lg:hidden border-t border-hairline bg-white overflow-hidden"
-            >
-              <div className="px-6 py-2">
-                {[
-                  ["services", "System"],
-                  ["process", "Proces"],
-                  ["pricing", "Plany"],
-                  ["contact", "Kontakt"],
-                ].map(([id, label]) => (
-                  <button
-                    key={id}
-                    onClick={() => go(id)}
-                    className="w-full text-left py-4 border-b border-hairline text-[16px] text-carbon"
-                  >
-                    {label}
-                  </button>
-                ))}
-                <div className="py-4 flex flex-col gap-3">
-                  <button
-                    onClick={() => setIsEditing(!isEditing)}
-                    className="w-full h-12 rounded-[24px] border border-hairline text-[14px] text-slate"
-                  >
-                    {isEditing ? "ZAKOŃCZ EDYCJĘ" : "EDYTUJ TEKSTY"}
-                  </button>
-                  <button
-                    onClick={() => navigate("/auth")}
-                    className="w-full h-12 rounded-[24px] border border-hairline text-[14px] text-carbon"
-                  >
-                    Zaloguj się
-                  </button>
-                  <BtnPrimary
-                    onClick={() => go("contact")}
-                    className="w-full h-12 text-[15px]"
-                  >
-                    Zamów audyt
-                  </BtnPrimary>
-                </div>
+            <motion.div initial={{ height:0, opacity:0 }} animate={{ height:"auto", opacity:1 }} exit={{ height:0, opacity:0 }} className="lg:hidden border-t border-white/5 bg-[#0A0A0C]">
+              <div className="px-6 py-6 space-y-1 font-[JetBrains_Mono] font-light text-xs tracking-[0.14em]">
+                <button onClick={()=>go("services")} className="w-full text-left py-3 border-b border-white/[0.04] text-white/60">— SYSTEM</button>
+                <button onClick={()=>go("pricing")} className="w-full text-left py-3 border-b border-white/[0.04] text-white/60">— PLANY</button>
+                <button onClick={()=>go("contact")} className="w-full text-left py-3 border-b border-white/[0.04] text-white/60">— KONTAKT</button>
+                <button onClick={()=>setIsEditing(!isEditing)} className={`mt-4 w-full py-3.5 rounded-full font-[JetBrains_Mono] font-light tracking-[0.1em] text-xs transition-colors duration-500 ${isEditing ? "bg-white text-black" : "border border-white/15 bg-white/[0.02] text-white/60 hover:bg-white/[0.08] hover:text-white"}`}>{isEditing ? "ZAKOŃCZ EDYCJĘ" : "EDYTUJ TEKSTY"}</button>
+                <button onClick={()=>navigate("/auth")} className="mt-3 w-full py-3.5 rounded-full font-[JetBrains_Mono] font-light tracking-[0.1em] text-xs border border-white/30 text-white transition-colors duration-500 hover:bg-white hover:text-black">ZALOGUJ SIĘ</button>
               </div>
             </motion.div>
           )}
@@ -590,914 +424,234 @@ export default function Landing() {
       </header>
 
       {isEditing && (
-        <div className="sticky top-[68px] z-30 bg-peach-wash border-b border-hairline">
-          <div className="mx-auto max-w-[1200px] px-6 py-2.5 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5 text-[12px] text-carbon">
-              <Pencil className="h-3.5 w-3.5" /> Tryb edycji — kliknij w
-              dowolny tekst, aby go zmienić. Zapis jest automatyczny.
+        <div className="sticky top-[72px] z-30 bg-[#111113] border-y border-white/10 text-white">
+          <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-2.5 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.04em] text-white/70">
+              <Pencil className="h-3.5 w-3.5 text-white/50"/> Tryb edycji — kliknij w dowolny tekst, aby go zmienić. Zapis automatyczny w przeglądarce.
             </div>
-            <button
-              onClick={() => setIsEditing(false)}
-              className="hidden sm:inline-flex h-8 px-4 rounded-[24px] text-[12px] font-medium text-white"
-              style={{ backgroundColor: AMP }}
-            >
-              GOTOWE
-            </button>
+            <button onClick={()=>setIsEditing(false)} className="hidden sm:inline-flex bg-white text-black font-[JetBrains_Mono] font-light text-[11px] tracking-[0.08em] px-4 h-7 rounded-full">GOTOWE</button>
           </div>
         </div>
       )}
 
-      {/* --------------------------------- hero ------------------------------- */}
-      <section>
-        <div className="mx-auto max-w-[1200px] px-6 pt-16 lg:pt-24 pb-16 lg:pb-20">
-          <div className="max-w-[860px]">
-            <Eyebrow>Marketing dla firm lokalnych</Eyebrow>
-            <h1 className="mt-7 font-amp font-light text-[44px] sm:text-[62px] lg:text-[78px] leading-[1.05] tracking-[-0.036em] text-ink">
-              <EditableText
-                ek="qraft.hero.t1"
-                def="Precyzja buduje"
-                className="block font-amp font-light"
-                isEditing={isEditing}
-                as="span"
-              />
-              <EditableText
-                ek="qraft.hero.t2"
-                def="marki."
-                className="block font-amp font-light"
-                isEditing={isEditing}
-                as="span"
-              />
-            </h1>
-            <Accent className="mt-8" />
-            <EditableText
-              ek="qraft.hero.sub"
-              def="Jeden system. Sześć modułów. Cotygodniowe dowody. Budujemy marki dla firm, które liczą każdego klienta — od kawiarni po klinikę."
-              className="mt-8 block font-amp text-[17px] leading-[1.56] text-carbon max-w-[600px]"
-              isEditing={isEditing}
-              as="p"
+      <section ref={cinemaRef} className="relative overflow-hidden">
+        {/* deep layered mountains */}
+        <div className="absolute inset-0">
+          <motion.div style={{ y: cinemaY }} className="absolute inset-0 scale-[1.2]">
+            <img
+              src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=2000&q=80&auto=format&fit=crop"
+              alt="Góry o świcie"
+              className="h-full w-full object-cover grayscale contrast-125 brightness-[0.30]"
             />
-            <div className="mt-10 flex flex-wrap items-center gap-3.5">
-              <BtnPrimary onClick={() => go("contact")} className="h-[56px] px-8 text-[16px]">
-                Zamów darmowy audyt <ArrowRight className="h-4 w-4" />
-              </BtnPrimary>
-              <BtnSecondary
-                onClick={() => go("services")}
-                className="h-[56px] px-7 border text-[15px]"
-              >
-                Zobacz system
-              </BtnSecondary>
-            </div>
-          </div>
+          </motion.div>
+
+          <motion.div style={{ y: cinemaY2 }} className="absolute inset-x-0 bottom-0 h-[62%] scale-[1.15]">
+            <img
+              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2000&q=80&auto=format&fit=crop"
+              alt="Grzbiet mgłą"
+              className="h-full w-full object-cover grayscale contrast-125 brightness-[0.22]"
+            />
+          </motion.div>
+
+          <motion.div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(to bottom, rgba(5,5,7,0.82) 0%, transparent 30%, transparent 60%, #050507 100%)" }}
+            animate={{ opacity: [0.75, 1, 0.75] }}
+            transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute -left-1/4 top-1/3 h-[46vh] w-[160%] opacity-40"
+            style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.10), transparent 72%)", filter: "blur(30px)" }}
+            animate={{ x: ["-8%", "8%", "-8%"] }}
+            transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+          />
         </div>
 
-        {/* the object IS the product: the brand, photographed */}
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="relative rounded-[8px] overflow-hidden border border-hairline">
-            <img
-              src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=2000&q=80&auto=format&fit=crop"
-              alt="Wnętrze kawiarni w ciepłym świetle"
-              className="h-[280px] sm:h-[420px] lg:h-[540px] w-full object-cover"
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(to top, rgba(32,33,32,0.28) 0%, transparent 42%)",
-              }}
-            />
+        <div className="absolute inset-0 bg-[radial-gradient(130%_100%_at_50%_6%,transparent_0%,rgba(5,5,7,0.62)_58%,#050507_100%)]" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "88px 88px" }} />
+
+        {/* vertical light streak */}
+        <div className="absolute inset-0">
+          <div className="absolute left-1/2 top-[-10%] h-[120%] w-px -translate-x-1/2 bg-white/90 shadow-[0_0_30px_5px_rgba(255,255,255,0.6),0_0_110px_24px_rgba(255,255,255,0.24)]" />
+          <motion.div
+            className="absolute left-1/2 top-0 h-full w-[420px] -translate-x-1/2"
+            style={{ background: "linear-gradient(to right, transparent, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.24) 50%, rgba(255,255,255,0.08) 60%, transparent)" }}
+            animate={{ opacity: [0.28, 0.8, 0.28] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute left-1/2 top-0 h-[32%] w-[680px] -translate-x-1/2"
+            style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.18), transparent)" }}
+            animate={{ y: ["0%", "212%"] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
+
+        {/* content */}
+        <div className="relative mx-auto max-w-[1280px] px-6 lg:px-8">
+          <div className="flex min-h-[calc(100vh-72px)] flex-col justify-center py-24 lg:py-32">
             <motion.div
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute bottom-4 left-4 right-4 sm:left-6 sm:right-auto sm:w-[340px] rounded-[5px] border border-hairline bg-white p-5"
+              initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="flex items-center justify-between">
-                <span
-                  className="rounded-[8px] px-2.5 py-1 text-[11px] font-medium text-white"
-                  style={{ backgroundColor: AMP }}
-                >
-                  Ostatnia budowa
+              <div className="flex items-center gap-4 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.26em] text-white/50">
+                <span className="h-px w-14 bg-white/50" />
+                QRAFT — MANIFEST
+              </div>
+
+              <h1 className="mt-10 font-[Space_Grotesk] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[52px] sm:text-[92px] lg:text-[152px]">
+                <span className="block text-white">Precision</span>
+                <span className="block text-white">Builds</span>
+                <span className="block text-transparent" style={{ WebkitTextStroke: "1.2px rgba(255,255,255,0.6)" }}>
+                  Brands
                 </span>
-                <span className="text-[12px] text-ash">6 tygodni</span>
-              </div>
-              <EditableText
-                ek="qraft.hero.cardTitle"
-                def="Kawiarnia Młyn — Kraków"
-                className="mt-4 block font-amp text-[20px] font-medium tracking-[-0.02em] text-ink"
-                isEditing={isEditing}
-                as="div"
+              </h1>
+
+              <motion.div
+                className="mt-12 h-px w-full bg-white origin-left"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 1.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
               />
-              <EditableText
-                ek="qraft.hero.cardDesc"
-                def="Identyfikacja, strona z rezerwacją i kampania w promieniu 3 km."
-                className="mt-1.5 block font-amp text-[14px] leading-[1.5] text-slate"
-                isEditing={isEditing}
-                as="p"
-              />
-              <div className="mt-5 flex items-end justify-between border-t border-hairline pt-4">
-                <div>
-                  <div className="font-amp font-light text-[28px] leading-none tracking-[-0.03em] text-ink">
-                    <CountUp to={64} suffix="%" />
+
+              <motion.div
+                className="mt-10 flex flex-wrap items-center gap-4"
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, delay: 0.6 }}
+              >
+                <BtnPrimary onClick={() => go("contact")} className="h-[52px] px-8 text-[11px]">
+                  ZAMÓW DARMOWY AUDYT <ArrowRight className="h-3.5 w-3.5 opacity-60" />
+                </BtnPrimary>
+                <BtnGhost onClick={() => go("services")} className="h-[52px] pl-2 pr-6 text-[11px]">
+                  <span className="h-9 w-9 grid place-items-center rounded-full border border-white/15 transition-colors duration-300 group-hover:bg-white/10">
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </span>
+                  ZOBACZ SYSTEM
+                </BtnGhost>
+              </motion.div>
+
+              <motion.div
+                className="mt-14 flex flex-wrap gap-x-10 gap-y-4 border-t border-white/10 pt-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.9, delay: 0.8 }}
+              >
+                {[
+                  { v: <CountUp to={340} suffix="+" />, l: "Zbudowanych" },
+                  { v: <CountUp to={4.9} decimals={1} />, l: "Ocena" },
+                  { v: <CountUp to={14} suffix=" mies." />, l: "Średnio" },
+                ].map((s, i) => (
+                  <div key={i}>
+                    <div className="font-[Cormorant_Garamond] font-light text-[26px] leading-none">{s.v}</div>
+                    <div className="mt-2 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.14em] text-white/40">{s.l}</div>
                   </div>
-                  <div className="mt-1.5 text-[12px] text-slate">
-                    wzrost zapytań
-                  </div>
-                </div>
-                <div className="flex gap-1.5 items-end h-10">
-                  {[18, 26, 22, 34, 30, 44, 58, 74].map((h, i) => (
-                    <span
-                      key={i}
-                      className="w-[6px] rounded-[2px]"
-                      style={{
-                        height: h,
-                        backgroundColor:
-                          i === 7 ? AMP : i > 4 ? "#ffdfcd" : "#e5e5e5",
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
+                ))}
+              </motion.div>
             </motion.div>
           </div>
         </div>
-
-        {/* proof row */}
-        <div className="mx-auto max-w-[1200px] px-6 pt-14">
-          <div className="flex flex-wrap gap-x-16 gap-y-8 border-t border-hairline pt-10">
-            {[
-              { v: <CountUp to={340} suffix="+" />, l: "Zbudowanych marek" },
-              { v: <CountUp to={4.9} decimals={1} />, l: "Średnia ocena" },
-              { v: <CountUp to={14} suffix=" dni" />, l: "Do pierwszych efektów" },
-            ].map((s, i) => (
-              <div key={i}>
-                <div className="font-amp font-light text-[40px] leading-none tracking-[-0.03em] text-ink">
-                  {s.v}
-                </div>
-                <div className="mt-3 text-[13px] text-slate">{s.l}</div>
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
 
-      {/* ------------------------- press logo strip ------------------------- */}
-      <section className="mt-20 lg:mt-28 border-y border-hairline">
-        <div className="mx-auto max-w-[1200px] px-6 py-10">
-          <div className="text-center text-[12px] uppercase tracking-[0.16em] text-ash font-medium">
-            Gdzie pracujemy
-          </div>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 sm:gap-x-14">
-            {industries.map((x) => (
-              <span
-                key={x}
-                className="font-amp font-light text-[17px] tracking-[-0.01em] text-ink"
-              >
-                {x}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* -------------------------------- system ----------------------------- */}
-      <section
-        id="services"
-        className="mx-auto max-w-[1200px] px-6 py-20 lg:py-28 scroll-mt-24"
-      >
+      <section id="services" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-28">
         <Reveal>
-          <div className="grid lg:grid-cols-[1fr_360px] gap-10 lg:gap-16 items-end">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 border-b border-white/[0.06] pb-12 lg:pb-16">
             <div>
-              <Eyebrow>01 — System</Eyebrow>
-              <h2 className="mt-6 font-amp font-light text-[36px] sm:text-[48px] leading-[1.1] tracking-[-0.03em] text-ink">
-                <EditableText
-                  ek="qraft.system.h1"
-                  def="Jeden system."
-                  className="block font-amp font-light"
-                  isEditing={isEditing}
-                  as="span"
-                />
-                <EditableText
-                  ek="qraft.system.h2"
-                  def="Sześć modułów."
-                  className="block font-amp font-light"
-                  isEditing={isEditing}
-                  as="span"
-                />
+              <div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.2em] text-white/35">01 — SYSTEM</div>
+              <h2 className="mt-5 leading-[0.9] tracking-[-0.02em]">
+                <EditableText ek="qraft.system.h1" def="Jeden system. Sześć modułów." className="block font-[Cormorant_Garamond] font-light text-[40px] sm:text-[52px]" isEditing={isEditing} as="span" />
               </h2>
-              <Accent className="mt-7" />
             </div>
             <EditableText
               ek="qraft.system.subtitle"
               def="System prowadzi klienta od pierwszego wyszukania aż do powtórnych zakupów. Włączasz moduły po kolei albo wszystkie naraz — każdy działa sam, a razem działają lepiej."
-              className="font-amp text-[15px] leading-[1.56] text-slate"
+              className="max-w-[460px] font-[Inter] font-light text-[16px] leading-8 text-white/45"
               isEditing={isEditing}
               as="p"
             />
           </div>
         </Reveal>
+        <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+          {serviceDefaults.map((s,i)=>(
+            <motion.div key={s.n} initial={{ opacity:0, y:14 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}} className="group bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.2] border border-white/[0.08] rounded-[24px] p-8 hover:bg-white/[0.06] hover:border-white/20 hover:-translate-y-2 transition-all duration-500 relative overflow-hidden" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 8px 32px rgba(0,0,0,0.35)" } as any}>
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/0 to-transparent group-hover:via-white/10 transition duration-700"/>
+              <div className="pointer-events-none absolute -inset-20 opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ background: "radial-gradient(55% 45% at 50% 0%, rgba(255,255,255,0.10), transparent 70%)" }} />
+              <div className="flex items-center justify-between">
+                <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-white/20">{s.n}</span>
+                <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10 text-white/20 group-hover:border-white/30 group-hover:text-white group-hover:rotate-45 group-hover:bg-white/5 transition-all duration-500"><ArrowUpRight className="h-3.5 w-3.5"/></span>
+              </div>
+              <h3 className="mt-7 font-[Cormorant_Garamond] font-light text-[23px] tracking-[-0.01em] leading-none">
+                <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
+              </h3>
 
-        <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {serviceDefaults.map((s) => (
-            <ModuleCard
-              key={s.n}
-              n={s.n}
-              title={s.title}
-              dostajesz={s.dostajesz}
-              cel={s.cel}
-              isEditing={isEditing}
-            />
+              <div className="mt-5 space-y-2">
+                <p className="font-[Inter] font-light text-[14.5px] leading-6 text-white/50">
+                  <span className="font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.14em] text-white/30 mr-2">DOSTAJESZ</span>
+                  <EditableText ek={`qraft.service.${i}.d`} def={s.dostajesz} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
+                </p>
+                <p className="font-[Inter] font-light text-[14.5px] leading-6 text-white/80">
+                  <span className="font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.14em] text-white/45 mr-2">CEL</span>
+                  <EditableText ek={`qraft.service.${i}.c`} def={s.cel} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
+                </p>
+              </div>
+            </motion.div>
           ))}
         </div>
-
-        <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <EditableText
-            ek="qraft.system.footerL"
-            def="Otwarte dla każdego klienta."
-            className="text-[13px] text-ash"
-            isEditing={isEditing}
-            as="span"
-          />
-          <BtnSecondary onClick={() => go("contact")} className="h-12 px-6 border text-[14px]">
-            <EditableText
-              ek="qraft.system.footerR"
-              def="Umów bezpłatną diagnozę"
-              className="font-amp text-[14px]"
-              isEditing={isEditing}
-              as="span"
-            />
-            <ArrowRight className="h-4 w-4" />
-          </BtnSecondary>
+        <div className="mt-10 flex flex-col sm:flex-row justify-between gap-4 font-[JetBrains_Mono] font-light text-[11px]">
+          <EditableText ek="qraft.system.footerL" def="OTWARTE DLA KAŻDEGO KLIENTA." className="text-white/20 tracking-[0.08em]" isEditing={isEditing} as="span" />
+          <BtnGhost onClick={()=>go("contact")} className="h-11 px-6 text-[11px]">
+            <EditableText ek="qraft.system.footerR" def="DIAGNOSTYKA →" className="font-[JetBrains_Mono] font-light tracking-[0.14em]" isEditing={isEditing} as="span" />
+          </BtnGhost>
         </div>
       </section>
 
-      {/* ---------------------------- dark band ----------------------------- */}
-      <section className="relative overflow-hidden bg-charcoal">
-        <img
-          src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=2000&q=80&auto=format&fit=crop"
-          alt=""
-          aria-hidden
-          className="absolute inset-0 h-full w-full object-cover grayscale opacity-[0.4]"
-        />
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: "rgba(32,33,32,0.65)" }}
-        />
-        <div className="relative mx-auto max-w-[1200px] px-6 py-24 lg:py-[120px] text-center">
-          <Reveal>
-            <Eyebrow className="text-white/50">Manifest</Eyebrow>
-            <h2 className="mx-auto mt-6 max-w-[820px] font-amp font-light text-[32px] sm:text-[44px] lg:text-[48px] leading-[1.15] tracking-[-0.03em] text-white">
-              <EditableText
-                ek="qraft.band.h1"
-                def="Dwa tygodnie do pierwszych efektów."
-                className="block font-amp font-light"
-                isEditing={isEditing}
-                as="span"
-              />
-              <EditableText
-                ek="qraft.band.h2"
-                def="Potem tylko tydzień po tygodniu."
-                className="block font-amp font-light text-white/55"
-                isEditing={isEditing}
-                as="span"
-              />
-            </h2>
-            <div className="flex justify-center">
-              <Accent w={60} className="mt-8" />
-            </div>
-            <EditableText
-              ek="qraft.band.desc"
-              def="Nie sprzedajemy obietnic. Sprzedajemy cotygodniowe liczby: zapytania, rezerwacje i powracających klientów."
-              className="mx-auto mt-8 block max-w-[540px] font-amp text-[15px] leading-[1.56] text-white/60"
-              isEditing={isEditing}
-              as="p"
-            />
-          </Reveal>
+      <section className="bg-[#F7F7F5] text-[#0A0A0A] border-t border-white/5">
+        <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-24">
+          <Reveal><div className="grid lg:grid-cols-[360px_1fr] gap-12"><div className="lg:sticky lg:top-28 self-start"><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-black/30">02 — PROCES</div><h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[36px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.process.h1" def="Cztery tygodnie" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.process.h2" def="do rozpędu." className="block font-[Cormorant_Garamond] font-light italic text-black/30" isEditing={isEditing} as="span" /></h3><EditableText ek="qraft.process.desc" def="Otwarty proces. Cotygodniowe dowody. Bez teatru." className="mt-4 block font-[Inter] font-light text-[15px] leading-7 text-black/40" isEditing={isEditing} as="p" /></div><div className="relative"><motion.div initial={{ scaleY:0 }} whileInView={{ scaleY:1 }} viewport={{ once:true }} transition={{ duration:1.1, ease:[0.22,1,0.36,1] }} className="absolute left-[11px] top-2 bottom-2 w-px bg-black/10 origin-top hidden sm:block"/><div className="space-y-5">{[["01","Audyt — 20 min","Ocena + pierwsza dźwignia."],["02","Blueprint — 1 strona","Pozycjonowanie dla Twojej okolicy."],["03","Budowa — 2–3 tyg.","Tożsamość, strona, materiały."],["04","Skalowanie — co tydzień","Raport w złotówkach."]].map(([n,t,d],i)=>(<motion.div key={n} initial={{ opacity:0, x:10 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ delay:i*0.06, duration:0.6 }} className="flex gap-4 group"><div className="hidden sm:grid h-6 w-6 shrink-0 place-items-center rounded-full bg-black text-white font-[JetBrains_Mono] font-light text-[10px]">{n}</div><div className="flex-1 bg-white border border-black/5 rounded-2xl px-6 py-5 group-hover:border-black/10 transition"><div className="font-[Cormorant_Garamond] font-light text-[17px]"><EditableText ek={`qraft.process.${i}.title`} def={t} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></div><div className="font-[Inter] font-light text-[13px] text-black/45 mt-1"><EditableText ek={`qraft.process.${i}.desc`} def={d} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></div></div></motion.div>))}</div></div></div></Reveal>
         </div>
       </section>
 
-      {/* ------------------------------ proces ------------------------------ */}
-      <section
-        id="process"
-        className="bg-linen border-b border-hairline scroll-mt-24"
-      >
-        <div className="mx-auto max-w-[1200px] px-6 py-20 lg:py-28">
-          <Reveal>
-            <div className="max-w-[720px]">
-              <Eyebrow>02 — Proces</Eyebrow>
-              <h2 className="mt-6 font-amp font-light text-[36px] sm:text-[48px] leading-[1.1] tracking-[-0.03em] text-ink">
-                <EditableText
-                  ek="qraft.process.h1"
-                  def="Cztery tygodnie"
-                  className="block font-amp font-light"
-                  isEditing={isEditing}
-                  as="span"
-                />
-                <EditableText
-                  ek="qraft.process.h2"
-                  def="do rozpędu."
-                  className="block font-amp font-light"
-                  isEditing={isEditing}
-                  as="span"
-                />
-              </h2>
-              <Accent className="mt-7" />
-            </div>
-          </Reveal>
+      <section id="pricing" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-24 lg:py-32">
+        <Reveal><div className="text-center max-w-xl mx-auto"><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.2em] text-white/30">03 — PLANY</div><h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[42px] sm:text-[50px] tracking-[-0.02em] leading-none"><EditableText ek="qraft.pricing.h" def="Jasne ceny." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.pricing.sub" def="Miesiąc do miesiąca po 90 dniach. Bez zobowiązań. W odcieniach czerni — wyrafinowane." className="mt-4 block font-[Inter] font-light text-[15px] leading-7 text-white/30 max-w-[480px] mx-auto" isEditing={isEditing} as="p" /></div></Reveal>
+        <div className="mt-14 grid lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+          {plans.map((p,i)=>(
+            <motion.div key={p.name} initial={{ opacity:0, y:14 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.6, delay:i*0.05, ease:[0.22,1,0.36,1]}} className={`rounded-[28px] border p-8 lg:p-9 flex flex-col ${p.featured?"bg-[#F7F7F5] text-black border-[#F7F7F5] shadow-[0_24px_64px_rgba(0,0,0,0.18)] lg:scale-[1.02]":"bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.3] border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_12px_40px_rgba(0,0,0,0.3)]"}`}>
+              <div className="flex items-center justify-between"><span className={`font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] ${p.featured?"text-black/35":"text-white/25"}`}><EditableText ek={`qraft.plan.${i}.name`} def={p.name.toUpperCase()} className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span>{p.featured&&<span className="font-[JetBrains_Mono] font-light text-[10px] bg-black text-white rounded-full px-3 py-1">WYRÓŻNIONY</span>}</div>
+              <div className="mt-8 flex items-baseline gap-2"><span className="font-[Cormorant_Garamond] font-light text-[36px] tracking-[-0.02em]"><EditableText ek={`qraft.plan.${i}.price`} def={p.price} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span><span className={`font-[JetBrains_Mono] font-light text-[11px] ${p.featured?"text-black/35":"text-white/25"}`}><EditableText ek={`qraft.plan.${i}.sub`} def={p.sub} className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div>
+              <EditableText ek={`qraft.plan.${i}.line`} def={p.line} className={`mt-2 block font-[Inter] font-light text-[14px] ${p.featured?"text-black/45":"text-white/30"}`} isEditing={isEditing} as="div" />
+              <ul className="mt-8 space-y-3 flex-1">
+                {p.pts.map((x, idx)=>(
+                  <li key={x} className={`flex gap-3 font-[Inter] font-light text-[14px] ${p.featured?"text-black/65":"text-white/55"}`}><Check className={`h-4 w-4 mt-0.5 shrink-0 ${p.featured?"text-black/20":"text-white/40"}`}/><EditableText ek={`qraft.plan.${i}.pt${idx}`} def={x} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></li>
+                ))}
+              </ul>
+              {(() => { const inner = <EditableText ek={`qraft.plan.${i}.cta`} def={p.cta} className="font-[JetBrains_Mono] font-light tracking-[0.14em]" isEditing={isEditing} as="span" />; return p.featured ? <BtnDark onClick={()=>go("contact")} className="mt-10 w-full h-11 text-[11px]">{inner}</BtnDark> : <BtnPrimary onClick={()=>go("contact")} className="mt-10 w-full h-11 text-[11px]">{inner}</BtnPrimary>; })()}
+            </motion.div>
+          ))}
+        </div>
+        <div className="mt-8 text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.06em] text-white/20"><EditableText ek="qraft.pricing.note" def="Start bez sesji zdjęciowej — dostępna od Skali. Szczegóły na audycie." className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div>
+      </section>
 
-          <div className="mt-14 grid lg:grid-cols-2 gap-8 lg:gap-14 items-start">
-            {/* step indicator row */}
-            <div className="space-y-2">
-              {processSteps.map((s, i) => {
-                const active = step === i;
-                return (
-                  <button
-                    key={s.t}
-                    onClick={() => setStep(i)}
-                    onMouseEnter={() => setStep(i)}
-                    className="w-full text-left rounded-[5px] border px-5 py-4 transition-colors duration-300"
-                    style={{
-                      borderColor: active ? "#e5e5e5" : "transparent",
-                      backgroundColor: active ? "#ffffff" : "transparent",
-                    }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <span
-                        className="shrink-0 rounded-[8px] px-3 py-1 text-[12px] font-medium transition-colors duration-300"
-                        style={{
-                          backgroundColor: active ? AMP : "transparent",
-                          color: active ? "#ffffff" : "#a2a3a2",
-                        }}
-                      >
-                        Krok {i + 1}
-                      </span>
-                      <span
-                        className="font-amp text-[18px] transition-colors duration-300"
-                        style={{
-                          color: active ? "#0a0a0a" : "#292b2a",
-                          fontWeight: active ? 500 : 400,
-                        }}
-                      >
-                        <EditableText
-                          ek={`qraft.step.${i}.t`}
-                          def={s.t}
-                          className="font-amp"
-                          isEditing={isEditing}
-                          as="span"
-                        />
-                      </span>
-                    </div>
-                    <div className="mt-3.5 h-[2px] w-full bg-hairline" />
-                  </button>
-                );
-              })}
-            </div>
+      <section className="mx-auto max-w-[1280px] px-6 lg:px-8 pb-12">
+        <Reveal><div className="grid lg:grid-cols-[320px_1fr] gap-10 border-t border-white/[0.06] pt-12"><div><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/20">04 — FAQ</div><h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[30px] leading-none"><EditableText ek="qraft.faq.h" def="Szybkie odpowiedzi." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><EditableText ek="qraft.faq.desc" def="Jasno i bez żargonu. Resztę dopowiemy na audycie." className="mt-3 block font-[Inter] font-light text-[14px] leading-6 text-white/30" isEditing={isEditing} as="p" /></div><div className="divide-y divide-white/5 border border-white/10 rounded-[20px] overflow-hidden bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.3]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.25)" } as any}>{[["Dla kogo jest QRAFT?","Dla firm, gdzie liczy się miejsce i reputacja. Kawiarnie, studia, butiki, kliniki."],["Jak szybko widać efekty?","2–4 tygodnie by dać się znaleźć. 30–60 dni by urosnąć w środku tygodnia."],["Czy jest zobowiązanie?","Nie. Miesiąc do miesiąca po 90 dniach."],["Czego potrzebujecie na start?","90 minut + dostęp do profilu. Resztą zajmujemy się my."]].map(([q,a],i)=>(<div key={q}><button onClick={()=>setFaqOpen(faqOpen===i?null:i)} className="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition"><span className="font-[Cormorant_Garamond] font-light text-[17px] pr-6"><EditableText ek={`qraft.faq.${i}.q`} def={q} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span><span className={`h-7 w-7 grid place-items-center rounded-full border shrink-0 transition ${faqOpen===i?"bg-white text-black border-white":"border-white/10 text-white/20"}`}>{faqOpen===i?<Minus className="h-3.5 w-3.5"/>:<Plus className="h-3.5 w-3.5"/>}</span></button><AnimatePresence>{faqOpen===i && (<motion.div initial={{ height:0, opacity:0 }} animate={{ height:"auto", opacity:1 }} exit={{ height:0, opacity:0 }} className="overflow-hidden"><div className="px-6 pb-6 font-[Inter] font-light text-[14px] leading-7 text-white/30 max-w-[560px]"><EditableText ek={`qraft.faq.${i}.a`} def={a} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></div></motion.div>)}</AnimatePresence></div>))}</div></div></Reveal>
+      </section>
 
-            {/* peach featured card — the "mockup" panel */}
-            <div
-              className="rounded-[5px] p-6 lg:p-8"
-              style={{ backgroundColor: "#ffdfcd" }}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[12px] uppercase tracking-[0.16em] font-medium text-ink/55">
-                  {processSteps[step].when}
-                </span>
-                <span className="text-[12px] text-ink/45">
-                  Krok {step + 1} / 4
-                </span>
-              </div>
-              <h3 className="mt-5 font-amp text-[24px] font-medium tracking-[-0.02em] text-ink pb-4 border-b-2 border-white/60">
-                <EditableText
-                  ek={`qraft.step.${step}.h`}
-                  def={processSteps[step].t}
-                  className="font-amp font-medium"
-                  isEditing={isEditing}
-                  as="span"
-                />
-              </h3>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={step}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <EditableText
-                    ek={`qraft.step.${step}.d`}
-                    def={processSteps[step].d}
-                    className="mt-5 block font-amp text-[15px] leading-[1.56] text-ink/70"
-                    isEditing={isEditing}
-                    as="p"
-                  />
-                  <ul className="mt-6 space-y-3">
-                    {processSteps[step].pts.map((p) => (
-                      <li
-                        key={p}
-                        className="flex gap-3 font-amp text-[14px] text-ink/80"
-                      >
-                        <Check className="h-4 w-4 mt-[3px] shrink-0" style={{ color: AMP }} />
-                        {p}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              </AnimatePresence>
-              <div className="mt-8">
-                <div className="h-[3px] w-full rounded-full bg-white/60 overflow-hidden">
-                  <motion.div
-                    className="h-full"
-                    style={{ backgroundColor: AMP }}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${((step + 1) / processSteps.length) * 100}%` }}
-                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  />
-                </div>
-                <BtnSecondary
-                  onClick={() => go("contact")}
-                  className="mt-6 h-12 px-6 border border-white/70 bg-transparent text-[14px] w-full"
-                >
-                  Zacznij od audytu <ArrowRight className="h-4 w-4" />
-                </BtnSecondary>
-              </div>
-            </div>
-          </div>
+      <section id="contact" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-12 lg:py-20">
+        <div className="grid lg:grid-cols-[1fr_1fr] gap-6">
+          <Reveal><div className="bg-[#0F0F11] border border-white/10 text-white rounded-[32px] p-8 lg:p-10 relative overflow-hidden min-h-[440px] flex flex-col"><div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/[0.04] blur-2xl"/><div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"/><div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.18em] text-white/30">05 — BUDOWA</div><h2 className="mt-6 font-[Cormorant_Garamond] font-light text-[40px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.contact.h1" def="Spraw, by każdy" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.contact.h2" def="klient się liczył." className="block font-[Cormorant_Garamond] font-light italic text-white/50" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.contact.desc" def="20 minut. Znajdziemy lukę i zostawimy Ci plan — nawet jeśli nas nie wybierzesz. Otwarte dla wszystkich." className="mt-4 block font-[Inter] font-light text-[14px] leading-7 text-white/40 max-w-[380px]" isEditing={isEditing} as="p" /><div className="mt-8 space-y-3 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.06em] text-white/35"><div className="flex items-center gap-2.5"><Clock className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line1" def="Dwa terminy w tym tygodniu · 20 min" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div><div className="flex items-center gap-2.5"><Terminal className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line2" def="Otwarte dla każdego klienta" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div></div><div className="mt-auto pt-10 flex gap-2 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.1em]"><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge1" def="BEZ PREZENTACJI" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge2" def="BEZ ŻARGONU" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div></div></Reveal>
+          <Reveal delay={0.06}><div className="bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.4] border border-white/10 rounded-[32px] p-7 sm:p-8" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.32)" } as any}><div className="flex items-center justify-between"><h3 className="font-[Cormorant_Garamond] font-light text-[22px]"><EditableText ek="qraft.form.h" def="Rozpocznij budowę" className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/20 border border-white/10 rounded-full px-3 py-1">2 MIN</span></div>{sent ? (<motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} className="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-8 text-center"><div className="h-10 w-10 mx-auto grid place-items-center rounded-full bg-white text-black"><Check className="h-5 w-5"/></div><div className="mt-4 font-[Cormorant_Garamond] font-light text-[18px]">Zgłoszenie otrzymane.</div><div className="mt-2 font-[Inter] font-light text-[13px] text-white/30">Wyślemy terminy w ciągu kilku godzin.</div><button onClick={()=>setSent(false)} className="mt-5 font-[JetBrains_Mono] font-light text-xs underline decoration-white/20 text-white/40">Wyślij kolejne</button></motion.div>) : (<form onSubmit={submit} className="mt-8 space-y-5"><div className="grid sm:grid-cols-2 gap-4"><label className="space-y-2"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">IMIĘ I NAZWISKO</span><input required value={form.name} onChange={e=>setForm({...form, name:e.target.value})} placeholder="Alex Kowalski" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label><label className="space-y-2"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">FIRMA</span><input value={form.business} onChange={e=>setForm({...form, business:e.target.value})} placeholder="Lumière" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label></div><label className="space-y-2 block"><span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/30">EMAIL</span><input required type="email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} placeholder="alex@firma.pl" className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 text-white"/></label><BtnPrimary type="submit" className="w-full h-[48px] text-[11px]">ZAMÓW AUDYT — ZA DARMO <ArrowRight className="h-4 w-4 opacity-60" /></BtnPrimary><div className="text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.04em] text-white/20">Lub <button type="button" onClick={()=>navigate("/auth")} className="underline decoration-white/15 text-white/30 hover:text-white/60">zaloguj się</button> by zarządzać budową</div></form>)}</div></Reveal>
         </div>
       </section>
 
-      {/* -------------------------------- plany ------------------------------ */}
-      <section
-        id="pricing"
-        className="mx-auto max-w-[1200px] px-6 py-20 lg:py-28 scroll-mt-24"
-      >
-        <Reveal>
-          <div className="mx-auto max-w-[620px] text-center">
-            <div className="flex justify-center">
-              <Eyebrow>03 — Plany</Eyebrow>
-            </div>
-            <h2 className="mt-6 font-amp font-light text-[36px] sm:text-[48px] leading-[1.1] tracking-[-0.03em] text-ink">
-              <EditableText
-                ek="qraft.pricing.h"
-                def="Jasne ceny."
-                className="font-amp font-light"
-                isEditing={isEditing}
-                as="span"
-              />
-            </h2>
-            <div className="flex justify-center">
-              <Accent className="mt-7" />
-            </div>
-            <EditableText
-              ek="qraft.pricing.sub"
-              def="Miesiąc do miesiąca po 90 dniach. Bez zobowiązań i bez ukrytych opłat."
-              className="mt-7 block font-amp text-[15px] leading-[1.56] text-slate"
-              isEditing={isEditing}
-              as="p"
-            />
-          </div>
-        </Reveal>
-
-        <div className="mt-14 grid lg:grid-cols-3 gap-5 items-start">
-          {plans.map((p, i) => {
-            const cta = (
-              <EditableText
-                ek={`qraft.plan.${i}.cta`}
-                def={p.cta}
-                className="font-amp text-[15px]"
-                isEditing={isEditing}
-                as="span"
-              />
-            );
-            return (
-              <motion.div
-                key={p.name}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
-                className={`rounded-[5px] border p-7 flex flex-col ${
-                  p.featured ? "border-transparent" : "border-hairline bg-white"
-                }`}
-                style={p.featured ? { backgroundColor: "#ffdfcd" } : undefined}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[12px] uppercase tracking-[0.16em] font-medium text-slate">
-                    <EditableText
-                      ek={`qraft.plan.${i}.name`}
-                      def={p.name}
-                      className="uppercase tracking-[0.16em] font-medium"
-                      isEditing={isEditing}
-                      as="span"
-                    />
-                  </span>
-                  {p.featured && (
-                    <span className="rounded-[8px] bg-charcoal px-3 py-1 text-[11px] font-medium text-white">
-                      Najczęściej wybierany
-                    </span>
-                  )}
-                </div>
-                <div className="mt-7 flex items-baseline gap-2">
-                  <span className="font-amp font-light text-[40px] leading-none tracking-[-0.03em] text-ink">
-                    <EditableText
-                      ek={`qraft.plan.${i}.price`}
-                      def={p.price}
-                      className="font-amp font-light"
-                      isEditing={isEditing}
-                      as="span"
-                    />
-                  </span>
-                  <span className="text-[14px] text-ash">
-                    <EditableText
-                      ek={`qraft.plan.${i}.sub`}
-                      def={p.sub}
-                      className="font-amp text-[14px] text-ash"
-                      isEditing={isEditing}
-                      as="span"
-                    />
-                  </span>
-                </div>
-                <EditableText
-                  ek={`qraft.plan.${i}.line`}
-                  def={p.line}
-                  className="mt-4 block font-amp text-[15px] leading-[1.5] text-slate"
-                  isEditing={isEditing}
-                  as="p"
-                />
-                <ul className="mt-7 space-y-3 flex-1 border-t border-hairline pt-7">
-                  {p.pts.map((x, idx) => (
-                    <li
-                      key={x}
-                      className="flex gap-3 font-amp text-[14px] text-carbon"
-                    >
-                      <Check
-                        className="h-4 w-4 mt-[3px] shrink-0"
-                        style={{ color: p.featured ? AMP : "#a2a3a2" }}
-                      />
-                      <EditableText
-                        ek={`qraft.plan.${i}.pt${idx}`}
-                        def={x}
-                        className="font-amp text-[14px]"
-                        isEditing={isEditing}
-                        as="span"
-                      />
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-8">
-                  {p.featured ? (
-                    <BtnPrimary
-                      onClick={() => go("contact")}
-                      className="w-full h-14 text-[15px]"
-                    >
-                      {cta}
-                    </BtnPrimary>
-                  ) : (
-                    <BtnSecondary
-                      onClick={() => go("contact")}
-                      className="w-full h-12 border text-[15px]"
-                    >
-                      {cta}
-                    </BtnSecondary>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-        <div className="mt-8 text-center text-[13px] text-ash">
-          <EditableText
-            ek="qraft.pricing.note"
-            def="Sesja zdjęciowa wchodzi w cenę od planu Skala. Szczegóły ustalamy na audycie."
-            className="font-amp text-[13px] text-ash"
-            isEditing={isEditing}
-            as="span"
-          />
-        </div>
-      </section>
-
-      {/* --------------------------------- faq ------------------------------- */}
-      <section className="mx-auto max-w-[1200px] px-6 pb-20 lg:pb-28">
-        <Reveal>
-          <div className="grid lg:grid-cols-[320px_1fr] gap-10 lg:gap-16">
-            <div>
-              <Eyebrow>04 — FAQ</Eyebrow>
-              <h2 className="mt-6 font-amp font-light text-[30px] leading-[1.15] tracking-[-0.03em] text-ink">
-                <EditableText
-                  ek="qraft.faq.h"
-                  def="Szybkie odpowiedzi."
-                  className="font-amp font-light"
-                  isEditing={isEditing}
-                  as="span"
-                />
-              </h2>
-              <Accent w={80} className="mt-6" />
-              <EditableText
-                ek="qraft.faq.desc"
-                def="Jasno i bez żargonu. Resztę dopowiemy na audycie."
-                className="mt-6 block font-amp text-[14px] leading-[1.5] text-slate"
-                isEditing={isEditing}
-                as="p"
-              />
-            </div>
-            <div className="rounded-[5px] border border-hairline bg-white divide-y divide-hairline overflow-hidden">
-              {[
-                [
-                  "Dla kogo jest QRAFT?",
-                  "Dla firm, gdzie liczy się miejsce i reputacja. Kawiarnie, studia, butiki, kliniki, gabinety i warsztaty.",
-                ],
-                [
-                  "Jak szybko widać efekty?",
-                  "2–4 tygodnie, by dać się znaleźć. 30–60 dni, by urosnąć w środku tygodnia.",
-                ],
-                [
-                  "Czy jest zobowiązanie?",
-                  "Nie. Miesiąc do miesiąca po 90 dniach. Odejście nie kosztuje nic.",
-                ],
-                [
-                  "Czego potrzebujecie na start?",
-                  "90 minut Twojego czasu i dostępu do profili w social mediach. Resztą zajmujemy się my.",
-                ],
-              ].map(([q, a], i) => (
-                <div key={q}>
-                  <button
-                    onClick={() => setFaqOpen(faqOpen === i ? null : i)}
-                    className="w-full flex items-start justify-between gap-6 p-6 text-left"
-                  >
-                    <span
-                      className="font-amp text-[18px] pb-3 border-b-2 border-hairline pr-2"
-                      style={{
-                        color: faqOpen === i ? "#0a0a0a" : "#292b2a",
-                        fontWeight: faqOpen === i ? 500 : 400,
-                      }}
-                    >
-                      <EditableText
-                        ek={`qraft.faq.${i}.q`}
-                        def={q}
-                        className="font-amp text-[18px]"
-                        isEditing={isEditing}
-                        as="span"
-                      />
-                    </span>
-                    <span
-                      className="h-7 w-7 shrink-0 grid place-items-center rounded-[50px] border transition-colors duration-300"
-                      style={{
-                        borderColor: faqOpen === i ? AMP : "#e5e5e5",
-                        color: faqOpen === i ? "#ffffff" : "#a2a3a2",
-                        backgroundColor: faqOpen === i ? AMP : "transparent",
-                      }}
-                    >
-                      {faqOpen === i ? (
-                        <Minus className="h-3.5 w-3.5" />
-                      ) : (
-                        <Plus className="h-3.5 w-3.5" />
-                      )}
-                    </span>
-                  </button>
-                  <AnimatePresence>
-                    {faqOpen === i && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-6 pb-6">
-                          <EditableText
-                            ek={`qraft.faq.${i}.a`}
-                            def={a}
-                            className="block font-amp text-[15px] leading-[1.56] text-slate max-w-[560px]"
-                            isEditing={isEditing}
-                            as="p"
-                          />
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* ------------------------------- kontakt ----------------------------- */}
-      <section
-        id="contact"
-        className="bg-linen border-t border-hairline scroll-mt-24"
-      >
-        <div className="mx-auto max-w-[1200px] px-6 py-20 lg:py-28">
-          <div className="grid lg:grid-cols-2 gap-5">
-            <Reveal>
-              <div className="rounded-[5px] bg-charcoal p-8 lg:p-10 h-full flex flex-col">
-                <Eyebrow className="text-white/50">05 — Budowa</Eyebrow>
-                <h2 className="mt-6 font-amp font-light text-[32px] sm:text-[40px] leading-[1.12] tracking-[-0.03em] text-white">
-                  <EditableText
-                    ek="qraft.contact.h1"
-                    def="Spraw, by każdy"
-                    className="block font-amp font-light"
-                    isEditing={isEditing}
-                    as="span"
-                  />
-                  <EditableText
-                    ek="qraft.contact.h2"
-                    def="klient się liczył."
-                    className="block font-amp font-light text-white/55"
-                    isEditing={isEditing}
-                    as="span"
-                  />
-                </h2>
-                <Accent className="mt-7" />
-                <EditableText
-                  ek="qraft.contact.desc"
-                  def="20 minut. Znajdziemy lukę w Twojej firmie i zostawimy plan — nawet jeśli nas nie wybierzesz. Otwarte dla wszystkich."
-                  className="mt-7 block font-amp text-[15px] leading-[1.56] text-white/60 max-w-[400px]"
-                  isEditing={isEditing}
-                  as="p"
-                />
-                <div className="mt-8 space-y-3 text-[14px] text-white/60">
-                  <div className="flex items-center gap-3">
-                    <Clock className="h-4 w-4 opacity-50" />
-                    <EditableText
-                      ek="qraft.contact.line1"
-                      def="Dwa terminy w tym tygodniu · 20 minut"
-                      className="font-amp text-[14px]"
-                      isEditing={isEditing}
-                      as="span"
-                    />
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-4 w-4 opacity-50" />
-                    <EditableText
-                      ek="qraft.contact.line2"
-                      def="odpowiadamy w ciągu kilku godzin"
-                      className="font-amp text-[14px]"
-                      isEditing={isEditing}
-                      as="span"
-                    />
-                  </div>
-                </div>
-                <div className="mt-10 flex flex-wrap gap-2">
-                  <span className="rounded-[8px] border border-white/15 px-3 py-2 text-[12px] text-white/70">
-                    <EditableText
-                      ek="qraft.contact.badge1"
-                      def="BEZ PREZENTACJI"
-                      className="font-amp text-[12px]"
-                      isEditing={isEditing}
-                      as="span"
-                    />
-                  </span>
-                  <span className="rounded-[8px] border border-white/15 px-3 py-2 text-[12px] text-white/70">
-                    <EditableText
-                      ek="qraft.contact.badge2"
-                      def="BEZ ŻARGONU"
-                      className="font-amp text-[12px]"
-                      isEditing={isEditing}
-                      as="span"
-                    />
-                  </span>
-                </div>
-              </div>
-            </Reveal>
-
-            <Reveal delay={0.06}>
-              <div className="rounded-[5px] border border-hairline bg-white p-7 lg:p-8 h-full">
-                <div className="flex items-center justify-between gap-3">
-                  <h3 className="font-amp text-[24px] font-medium tracking-[-0.02em] text-ink">
-                    <EditableText
-                      ek="qraft.form.h"
-                      def="Rozpocznij budowę"
-                      className="font-amp font-medium"
-                      isEditing={isEditing}
-                      as="span"
-                    />
-                  </h3>
-                  <span className="rounded-[8px] border border-hairline px-3 py-1 text-[12px] text-ash">
-                    2 min
-                  </span>
-                </div>
-
-                {sent ? (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-8 rounded-[5px] p-8 text-center"
-                    style={{ backgroundColor: "#ffdfcd" }}
-                  >
-                    <div
-                      className="h-10 w-10 mx-auto grid place-items-center rounded-[50px] text-white"
-                      style={{ backgroundColor: AMP }}
-                    >
-                      <Check className="h-5 w-5" />
-                    </div>
-                    <div className="mt-5 font-amp text-[18px] font-medium text-ink">
-                      Zgłoszenie otrzymane.
-                    </div>
-                    <div className="mt-2 font-amp text-[14px] text-ink/60">
-                      Wyślemy terminy w ciągu kilku godzin.
-                    </div>
-                    <button
-                      onClick={() => setSent(false)}
-                      className="mt-6 text-[13px] text-ink/60 underline underline-offset-4"
-                    >
-                      Wyślij kolejne
-                    </button>
-                  </motion.div>
-                ) : (
-                  <form onSubmit={submit} className="mt-8 space-y-5">
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <label className="space-y-2 block">
-                        <span className="block text-[12px] uppercase tracking-[0.12em] text-ash font-medium">
-                          Imię i nazwisko
-                        </span>
-                        <input
-                          required
-                          value={form.name}
-                          onChange={(e) => setForm({ ...form, name: e.target.value })}
-                          placeholder="Alex Kowalski"
-                          className="w-full h-14 rounded-[50px] border border-hairline bg-white px-5 font-amp text-[15px] text-ink placeholder:text-ash focus:outline-none focus:border-[#ff6105]"
-                        />
-                      </label>
-                      <label className="space-y-2 block">
-                        <span className="block text-[12px] uppercase tracking-[0.12em] text-ash font-medium">
-                          Firma
-                        </span>
-                        <input
-                          value={form.business}
-                          onChange={(e) =>
-                            setForm({ ...form, business: e.target.value })
-                          }
-                          placeholder="Lumière"
-                          className="w-full h-14 rounded-[50px] border border-hairline bg-white px-5 font-amp text-[15px] text-ink placeholder:text-ash focus:outline-none focus:border-[#ff6105]"
-                        />
-                      </label>
-                    </div>
-                    <label className="space-y-2 block">
-                      <span className="block text-[12px] uppercase tracking-[0.12em] text-ash font-medium">
-                        Email
-                      </span>
-                      <input
-                        required
-                        type="email"
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        placeholder="alex@firma.pl"
-                        className="w-full h-14 rounded-[50px] border border-hairline bg-white px-5 font-amp text-[15px] text-ink placeholder:text-ash focus:outline-none focus:border-[#ff6105]"
-                      />
-                    </label>
-                    <BtnPrimary type="submit" className="w-full h-14 text-[16px]">
-                      Zamów audyt — za darmo <ArrowRight className="h-4 w-4" />
-                    </BtnPrimary>
-                    <div className="text-center text-[13px] text-slate">
-                      Lub{" "}
-                      <button
-                        type="button"
-                        onClick={() => navigate("/auth")}
-                        className="font-medium text-ink underline underline-offset-4"
-                      >
-                        zaloguj się
-                      </button>{" "}
-                      by zarządzać budową
-                    </div>
-                  </form>
-                )}
-              </div>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      {/* -------------------------------- footer ----------------------------- */}
-      <footer className="border-t border-hairline bg-white">
-        <div className="mx-auto max-w-[1200px] px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-5 text-[13px] text-ash">
-          <div className="flex items-center gap-3">
-            <span className="h-7 w-7 rounded-[5px] bg-charcoal grid place-items-center">
-              <span className="font-amp font-medium text-[13px] text-white">Q</span>
-            </span>
-            <span className="font-amp font-medium text-[14px] tracking-[0.16em] text-ink">
-              QRAFT
-            </span>
-            <span>© {new Date().getFullYear()}</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <EditableText
-              ek="qraft.footer.tag"
-              def="Precyzja buduje marki"
-              className="font-amp text-[13px]"
-              isEditing={isEditing}
-              as="span"
-            />
-            <span className="h-3 w-px bg-hairline" />
-            <span>qraft.build</span>
-          </div>
+      <footer className="border-t border-white/[0.04]">
+        <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 font-[JetBrains_Mono] font-light text-[11px] tracking-[0.08em] text-white/20">
+          <div className="flex items-center gap-3"><div className="h-7 w-7 rounded-[9px] border border-white/10 grid place-items-center font-[Instrument_Serif] text-[14px] font-light">Q</div><span className="font-[Space_Grotesk] font-light tracking-[0.2em] text-white/60 text-xs">QRAFT</span><span className="hidden sm:inline">© {new Date().getFullYear()} · PERFEKCJA BUDUJE MARKI</span></div>
+          <div className="flex gap-3"><span>qraft.build</span><span className="opacity-20">·</span><span>Otwarte dla wszystkich</span></div>
         </div>
       </footer>
 
       {!isEditing && (
-        <button
-          onClick={() => setIsEditing(true)}
-          className="fixed bottom-6 right-6 z-50 hidden lg:inline-flex items-center gap-2 h-11 px-5 rounded-[50px] bg-charcoal text-white text-[13px]"
-        >
+        <button onClick={()=>setIsEditing(true)} className="group fixed bottom-6 right-6 z-50 hidden lg:inline-flex items-center gap-2 px-5 h-11 rounded-full border border-white/25 bg-white/[0.03] backdrop-blur-2xl font-[JetBrains_Mono] font-light text-[11px] tracking-[0.08em] text-white/70 transition-all duration-500 hover:border-white/50 hover:bg-white hover:text-black shadow-[0_12px_40px_rgba(0,0,0,0.4)]">
           <Pencil className="h-3.5 w-3.5" /> EDYTUJ TEKSTY
         </button>
       )}
