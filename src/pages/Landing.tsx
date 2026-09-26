@@ -1167,12 +1167,15 @@ const PROMO_RATE = 0.5;
 const zl = (n: number) =>
   `${Math.round(n).toLocaleString("pl-PL").replace(/\u00a0/g, " ")} zł`;
 
+/* Kwoty zaokrąglamy do pełnych złotów: przy stawkach 999 / 1 999 / 2 300
+   wyszły ułamki, a CountUp formatuje liczbę z separatorem dziesiętnym
+   w amerykańskim zapisie — dawało to “4 077.96” zamiast “4 077 zł”. */
 const calc = (amount: number, months: number, discount: number) => {
-  const promoSaving = amount * PROMO_RATE * PROMO_MONTHS;
-  const termSaving = amount * discount * months;
+  const promoSaving = Math.round(amount * PROMO_RATE * PROMO_MONTHS);
+  const termSaving = Math.round(amount * discount * months);
   const total = amount * months;
   const paid = amount * (1 - discount) * months - promoSaving;
-  return { promoSaving, termSaving, total, saved: total - paid, monthly: paid / months };
+  return { promoSaving, termSaving, total, saved: Math.round(total - paid), monthly: paid / months };
 };
 
 const MENU_ITEMS: StaggeredMenuItem[] = [
