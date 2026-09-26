@@ -1,5 +1,5 @@
 import { motion, AnimatePresence, useScroll, useSpring, useTransform, useInView } from "framer-motion";
-import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save } from "lucide-react";
+import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save, RefreshCw } from "lucide-react";
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
@@ -7,6 +7,7 @@ import GlowCursor from "@/components/GlowCursor";
 import GlareHover from "@/components/GlareHover";
 import GradualBlur from "@/components/GradualBlur";
 import PixelTrail from "@/components/PixelTrail";
+import FlipCard from "@/components/FlipCard";
 
 function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, popKey }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean; popKey?: string }) {
   const [val, setVal] = useState(def);
@@ -17,10 +18,21 @@ function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, po
       if (saved !== null) setVal(saved);
     } catch {}
   }, [ek]);
+  /* ten sam klucz może być widoczny w dwóch miejscach (np. przód/tył kafla)
+     — po zmianie rozsyłamy nową wartość do wszystkich instancji */
+  useEffect(() => {
+    const sync = (e: Event) => {
+      const d = (e as CustomEvent<{ ek: string; val: string }>).detail;
+      if (d && d.ek === ek) setVal(d.val);
+    };
+    window.addEventListener("qraft:text", sync);
+    return () => window.removeEventListener("qraft:text", sync);
+  }, [ek]);
   const handleBlur = (e: React.FocusEvent<HTMLElement>) => {
     const t = e.currentTarget.textContent || "";
     setVal(t);
     try { localStorage.setItem(ek, t); } catch {}
+    window.dispatchEvent(new CustomEvent("qraft:text", { detail: { ek, val: t } }));
   };
   if (!isEditing && pop && /\d/.test(val))
     return (
@@ -42,12 +54,12 @@ function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, po
 }
 
 const serviceDefaults = [
-  { n: "01", title: "System Marki", dostajesz: "spójny system wizualny, hasło i szyld.", cel: "rozpoznają Cię zanim ktoś się dowie." },
-  { n: "02", title: "Strona i Wydajność", dostajesz: "szybką stronę z rezerwacją i formularzem.", cel: "każdy klik kończy się zamówieniem." },
-  { n: "03", title: "Pozyskiwanie", dostajesz: "widoczność w Mapach i wyszukiwaniu do 3 km.", cel: "trafiają do Ciebie ludzie z okolicy." },
-  { n: "04", title: "Silnik Treści", dostajesz: "zdjęcia, wideo i teksty o Twoim rzemiośle.", cel: "klient widzi jakość jeszcze przed wizytą." },
-  { n: "05", title: "Kampanie", dostajesz: "kalendarz ofert i mailingi, które wracają.", cel: "puste godziny w tygodniu się zapełniają." },
-  { n: "06", title: "Retencja", dostajesz: "system opinii, lojalności i raport tygodniowy.", cel: "klienci wracają i polecają Cię znajomym." },
+  { n: "01", title: "System Marki", meta: "TYGODNIE 1–2", dostajesz: "spójny system wizualny, hasło i szyld.", cel: "rozpoznają Cię zanim ktoś się dowie.", pts: ["Nazwa, hasło, szyld", "Kolor, typografia, materiały", "Szablon social media"] },
+  { n: "02", title: "Strona i Wydajność", meta: "TYGODNIE 2–4", dostajesz: "szybką stronę z rezerwacją i formularzem.", cel: "każdy klik kończy się zamówieniem.", pts: ["Landing pod konkretną usługę", "Rezerwacja i formularz", "Prędkość i SEO techniczne"] },
+  { n: "03", title: "Pozyskiwanie", meta: "TYGODNIE 3–6", dostajesz: "widoczność w Mapach i wyszukiwaniu do 3 km.", cel: "trafiają do Ciebie ludzie z okolicy.", pts: ["Wizytówka w Mapach", "Pozycjonowanie lokalne", "Zasięg w promieniu 3 km"] },
+  { n: "04", title: "Silnik Treści", meta: "CYKLICZNIE", dostajesz: "zdjęcia, wideo i teksty o Twoim rzemiośle.", cel: "klient widzi jakość jeszcze przed wizytą.", pts: ["Sesja foto 2× w miesiącu", "Krótkie wideo z realizacji", "Posty gotowe do publikacji"] },
+  { n: "05", title: "Kampanie", meta: "CYKLICZNIE", dostajesz: "kalendarz ofert i mailingi, które wracają.", cel: "puste godziny w tygodniu się zapełniają.", pts: ["Kalendarz ofert", "Mailing do bazy klientów", "Raport z konwersji"] },
+  { n: "06", title: "Retencja", meta: "STALE", dostajesz: "system opinii, lojalności i raport tygodniowy.", cel: "klienci wracają i polecają Cię znajomym.", pts: ["System opinii", "Program poleceń", "Raport tygodniowy"] },
 ];
 
 const plans = [
@@ -1165,27 +1177,92 @@ export default function Landing() {
         </Reveal>
         <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
           {serviceDefaults.map((s,i)=>(
-            <motion.div key={s.n} initial={{ opacity:0, y:14 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}} className="group bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.2] border border-white/[0.08] rounded-[24px] p-8 hover:bg-white/[0.06] hover:border-white/20 hover:-translate-y-2 transition-all duration-500 relative overflow-hidden" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 8px 32px rgba(0,0,0,0.35)" } as any}>
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/0 to-transparent group-hover:via-white/10 transition duration-700"/>
-              <div className="pointer-events-none absolute -inset-20 opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ background: "radial-gradient(55% 45% at 50% 0%, rgba(255,255,255,0.10), transparent 70%)" }} />
-              <div className="flex items-center justify-between">
-                <PopNumber text={s.n} className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-white/20" />
-                <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10 text-white/20 group-hover:border-white/30 group-hover:text-white group-hover:rotate-45 group-hover:bg-white/5 transition-all duration-500"><ArrowUpRight className="h-3.5 w-3.5"/></span>
-              </div>
-              <h3 className="mt-7 font-[Cormorant_Garamond] font-light text-[23px] tracking-[-0.01em] leading-none">
-                <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
-              </h3>
-
-              <div className="mt-5 space-y-2">
-                <p className="font-[Inter] font-light text-[14.5px] leading-6 text-white/50">
-                  <span className="font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.14em] text-white/30 mr-2">DOSTAJESZ</span>
-                  <EditableText ek={`qraft.service.${i}.d`} def={s.dostajesz} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
-                </p>
-                <p className="font-[Inter] font-light text-[14.5px] leading-6 text-white/80">
-                  <span className="font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.14em] text-white/45 mr-2">CEL</span>
-                  <EditableText ek={`qraft.service.${i}.c`} def={s.cel} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
-                </p>
-              </div>
+            <motion.div
+              key={s.n}
+              initial={{ opacity:0, y:14 }}
+              whileInView={{ opacity:1, y:0 }}
+              viewport={{ once:true }}
+              transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}}
+              className="h-[330px] sm:h-[348px]"
+            >
+              <FlipCard
+                fill
+                editable={isEditing}
+                axis="y"
+                ariaLabel={`Modu\u0142 ${s.n} \u2014 ${s.title}`}
+                background="#0A0A0D"
+                color="#F2F2F0"
+                radius={24}
+                width={420}
+                height={348}
+                perspective={1200}
+                tiltMax={9}
+                hoverScale={1.02}
+                glareOpacity={0.13}
+                shadowColor="#000000"
+                shadowOpacity={0.55}
+                flipOnClick={!isEditing}
+                draggable={!isEditing}
+                front={(
+                  <div className="relative flex h-full w-full flex-col p-7 sm:p-8">
+                    <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(74% 54% at 50% 0%, rgba(255,255,255,0.08), transparent 72%)" }} />
+                    <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.08]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06)" }} />
+                    <div className="relative flex items-center justify-between">
+                      <PopNumber text={s.n} className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-white/25" />
+                      <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10 text-white/25"><ArrowUpRight className="h-3.5 w-3.5"/></span>
+                    </div>
+                    <h3 className="relative mt-7 font-[Cormorant_Garamond] font-light text-[23px] tracking-[-0.01em] leading-none">
+                      <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
+                    </h3>
+                    <div className="relative mt-auto space-y-2 pt-6">
+                      <p className="font-[Inter] font-light text-[14.5px] leading-6 text-white/55">
+                        <span className="font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.14em] text-white/30 mr-2">DOSTAJESZ</span>
+                        <EditableText ek={`qraft.service.${i}.d`} def={s.dostajesz} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
+                      </p>
+                      {isEditing && (
+                        <p className="font-[Inter] font-light text-[14.5px] leading-6 text-white/80">
+                          <span className="font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.14em] text-white/45 mr-2">CEL</span>
+                          <EditableText ek={`qraft.service.${i}.c`} def={s.cel} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
+                        </p>
+                      )}
+                      <div className="flex items-center gap-2 pt-3 font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.18em] text-white/25">
+                        {isEditing ? "TRYB EDYCJI \u2014 OBR\u00d3T WY\u0141\u0105CZONE" : <><RefreshCw className="h-3 w-3"/> OBR\u00d3\u0106 KAFEL</>}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                back={(
+                  <div className="relative flex h-full w-full flex-col p-7 sm:p-8">
+                    <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(86% 62% at 50% 108%, rgba(255,255,255,0.10), transparent 70%)" }} />
+                    <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.12]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.08)" }} />
+                    <div className="relative font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.18em] text-white/30">{s.meta}</div>
+                    <h3 className="relative mt-3 font-[Cormorant_Garamond] font-light text-[21px] leading-none tracking-[-0.01em]">
+                      <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
+                    </h3>
+                    <p className="relative mt-4 font-[Inter] font-light text-[13.5px] leading-5 text-white/80">
+                      <span className="font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.14em] text-white/45 mr-2">CEL</span>
+                      <EditableText ek={`qraft.service.${i}.c`} def={s.cel} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
+                    </p>
+                    <ul className="relative mt-4 space-y-1.5">
+                      {s.pts.map((p,k)=>(
+                        <li key={k} className="flex items-start gap-2 font-[Inter] font-light text-[13px] leading-5 text-white/55">
+                          <Check className="mt-[3px] h-3 w-3 shrink-0 text-white/30"/>{p}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="relative mt-auto flex items-center justify-between gap-3 pt-6">
+                      <span className="font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.18em] text-white/25">COFNIJ</span>
+                      <button
+                        onPointerDown={(e)=>e.stopPropagation()}
+                        onClick={(e)=>{ e.stopPropagation(); go("contact"); }}
+                        className="inline-flex items-center gap-2 h-9 px-4 rounded-full bg-white text-black font-[JetBrains_Mono] font-light text-[10px] tracking-[0.14em]"
+                      >
+                        DODAJ DO SYSTEMU <ArrowRight className="h-3 w-3 opacity-60"/>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              />
             </motion.div>
           ))}
         </div>
