@@ -372,7 +372,9 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
                 borderRadius="28px"
                 borderColor="transparent"
                 glareColor="#ffffff"
-                glareOpacity={front ? 0.18 : 0.1}
+                /* poświata tylko na wybranym pakiecie — na bocznych kartach
+                   rgba(255,255,255,0) = całkowicie przezroczysty pas */
+                glareOpacity={front ? 0.18 : 0}
                 glareAngle={-30}
                 glareSize={320}
                 transitionDuration={850}
