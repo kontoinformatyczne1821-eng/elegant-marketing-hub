@@ -1122,7 +1122,6 @@ export default function Landing() {
   const { scrollY, scrollYProgress } = useScroll();
   const { scrollYProgress: cinemaProgress } = useScroll({ target: cinemaRef, offset: ["start end", "end start"] });
   const cinemaY = useTransform(cinemaProgress, [0, 1], ["-14%", "14%"]);
-  const cinemaY2 = useTransform(cinemaProgress, [0, 1], ["6%", "-10%"]);
   const cinemaText = useTransform(cinemaProgress, [0, 0.5], ["-40px", "0px"]);
   const progress = useTransform(scrollYProgress, [0,1], [0,1]);
   /* pasek boczny pokazuje się po kliknięciu Q w nagłówku */
@@ -1362,21 +1361,13 @@ export default function Landing() {
       )}
 
       <section ref={cinemaRef} className="relative overflow-hidden">
-        {/* deep layered mountains */}
+        {/* jedna duża fotografia gór — parallax przez całą sekcję */}
         <div className="absolute inset-0">
-          <motion.div style={{ y: cinemaY }} className="absolute inset-0 scale-[1.2]">
+          <motion.div style={{ y: cinemaY }} className="absolute inset-0 scale-[1.35]">
             <img
               src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=2000&q=80&auto=format&fit=crop"
               alt="Góry o świcie"
               className="h-full w-full object-cover grayscale contrast-110 brightness-[0.42]"
-            />
-          </motion.div>
-
-          <motion.div style={{ y: cinemaY2 }} className="absolute inset-x-0 bottom-0 h-[62%] scale-[1.15]">
-            <img
-              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2000&q=80&auto=format&fit=crop"
-              alt="Grzbiet mgłą"
-              className="h-full w-full object-cover grayscale contrast-110 brightness-[0.30]"
             />
           </motion.div>
 
