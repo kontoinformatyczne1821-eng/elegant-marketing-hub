@@ -216,6 +216,83 @@ function BtnGlass({ children, onClick, className = "" }: { children: React.React
   );
 }
 
+/* Efekt kafla SYSTEM na małych kafelkach: 3D przechylenie za kursorem
+   (9°), delikatne powiększenie i refleks podąący za palcem. */
+function finePointerMedia() {
+  return (
+    typeof window !== "undefined" &&
+    !!window.matchMedia &&
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches
+  );
+}
+
+function HoverTile({
+  active,
+  onClick,
+  className = "",
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const px = useMotionValue(0.5);
+  const py = useMotionValue(0);
+  const sheen = useMotionValue(0);
+  const targetRx = useMotionValue(0);
+  const targetRy = useMotionValue(0);
+  const targetScale = useMotionValue(1);
+
+  const rx = useSpring(targetRx, { stiffness: 220, damping: 20 });
+  const ry = useSpring(targetRy, { stiffness: 220, damping: 20 });
+  const scale = useSpring(targetScale, { stiffness: 300, damping: 24 });
+  const glareOpacity = useSpring(sheen, { stiffness: 200, damping: 26 });
+
+  const glare = useTransform(
+    [px, py, glareOpacity],
+    ([x, y, o]: number[]) =>
+      `radial-gradient(130% 100% at ${x * 100}% ${y * 100}%, rgba(255,255,255,${0.17 * o}), transparent 64%)`,
+  );
+
+  return (
+    <motion.button
+      type="button"
+      onClick={onClick}
+      onPointerMove={(e) => {
+        if (e.pointerType === "touch") return;
+        const r = e.currentTarget.getBoundingClientRect();
+        const nx = (e.clientX - r.left) / r.width;
+        const ny = (e.clientY - r.top) / r.height;
+        px.set(nx);
+        py.set(ny);
+        targetRy.set((nx - 0.5) * 2 * 9);
+        targetRx.set(-(ny - 0.5) * 2 * 9);
+        sheen.set(1);
+      }}
+      onPointerEnter={() => {
+        if (finePointerMedia()) targetScale.set(1.02);
+      }}
+      onPointerLeave={() => {
+        targetRx.set(0);
+        targetRy.set(0);
+        targetScale.set(1);
+        sheen.set(0);
+      }}
+      style={{ rotateX: rx, rotateY: ry, scale, transformPerspective: 900 }}
+      data-on={active ? "true" : "false"}
+      className={`relative h-full w-full overflow-hidden rounded-[20px] border p-4 text-left outline-none backdrop-blur-2xl transition-colors duration-500 ${className}`}
+    >
+      <motion.span
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{ backgroundImage: glare }}
+      />
+      <span className="relative flex flex-col items-start gap-2">{children}</span>
+    </motion.button>
+  );
+}
+
 function FloatingField() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -1795,20 +1872,22 @@ export default function Landing() {
             const q = calc(tierData.amount, t.months, t.discount);
             const on = t.value === term;
             return (
-              <motion.button
+              <motion.div
                 key={t.value}
-                type="button"
-                onClick={() => setTerm(t.value)}
                 initial={{ opacity: 0, y: 14 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-10%" }}
                 transition={{ duration: 0.6, delay: k * 0.05, ease: [0.22, 1, 0.36, 1] }}
-                className={`flex flex-col items-start gap-2 rounded-[20px] border p-4 text-left outline-none backdrop-blur-2xl transition-colors duration-500 ${
-                  on
-                    ? "border-[#7DF0AE]/60 bg-[#0A120E]"
-                    : "border-white/[0.08] bg-white/[0.02] hover:border-white/25"
-                }`}
               >
+                <HoverTile
+                  active={on}
+                  onClick={() => setTerm(t.value)}
+                  className={
+                    on
+                      ? "border-[#7DF0AE]/60 bg-[#0A120E]"
+                      : "border-white/[0.08] bg-white/[0.02] hover:border-white/25"
+                  }
+                >
                 <span className="flex w-full items-center justify-between gap-2">
                   <span className={`font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.2em] ${on ? "text-[#7DF0AE]" : "text-white/35"}`}>
                     {t.label.toUpperCase()}
@@ -1823,7 +1902,8 @@ export default function Landing() {
                 <span className="font-[Cormorant_Garamond] font-light text-[20px] sm:text-[26px] leading-none text-[#7DF0AE]">
                   {zl(q.saved)}
                 </span>
-              </motion.button>
+                </HoverTile>
+              </motion.div>
             );
           })}
         </div>
