@@ -62,6 +62,8 @@ export interface LineSidebarProps {
   active?: number | null;
   /** Called when an item is clicked; the clicked item also becomes active. */
   onItemClick?: (index: number, label: string) => void;
+  /** When false, pozycje nie reagują na kursor — tylko stan aktywny. */
+  followPointer?: boolean;
   className?: string;
 }
 
@@ -85,6 +87,7 @@ const LineSidebar = ({
   defaultActive = null,
   active,
   onItemClick,
+  followPointer = true,
   className = "",
 }: LineSidebarProps) => {
   const listRef = useRef<HTMLUListElement | null>(null);
@@ -202,8 +205,8 @@ const LineSidebar = ({
       <ul
         ref={listRef}
         className="line-sidebar__list"
-        onPointerMove={handlePointerMove}
-        onPointerLeave={handlePointerLeave}
+        onPointerMove={followPointer ? handlePointerMove : undefined}
+        onPointerLeave={followPointer ? handlePointerLeave : undefined}
       >
         {items.map((label, index) => (
           <li
