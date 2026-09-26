@@ -532,59 +532,27 @@ function PlanShowcase({
                 off === 0 ? "cursor-default" : "cursor-pointer"
               } ${front ? "shadow-[0_10px_26px_rgba(0,0,0,0.28)]" : "shadow-[0_8px_22px_rgba(0,0,0,0.28)]"}`}
             >
-              {/* animacja nie zostaje w granicach kafla: poświata i obracające się
-                  światło żyją poza nim i towarzyszą karcie w spirali */}
+              {/* poświat poza kaflem — statyczna, bez pulsowania */}
               <motion.div
                 aria-hidden
                 className="pointer-events-none absolute -inset-x-10 -top-10 -bottom-14"
                 initial={false}
-                animate={{ opacity: front ? [0.65, 1, 0.65] : 0.26 }}
-                transition={
-                  front
-                    ? { duration: 7.5, repeat: Infinity, ease: "easeInOut" }
-                    : { duration: 0.5 }
-                }
+                animate={{ opacity: front ? 1 : 0.26 }}
+                transition={{ duration: 0.5 }}
                 style={{
                   background:
                     "radial-gradient(58% 52% at 50% 58%, rgba(255,255,255,0.18), rgba(255,255,255,0.05) 56%, transparent 76%)",
                   filter: "blur(30px)",
                 }}
               />
-              {front && (
-                <motion.div
-                  aria-hidden
-                  className="pointer-events-none absolute left-1/2 top-1/2"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 26, repeat: Infinity, ease: "linear" }}
-                >
-                  {[
-                    { x: -300, y: -60, s: 210, o: 0.5 },
-                    { x: 260, y: 130, s: 150, o: 0.34 },
-                  ].map((d, k) => (
-                    <span
-                      key={k}
-                      className="absolute rounded-full"
-                      style={{
-                        left: d.x,
-                        top: d.y,
-                        width: d.s,
-                        height: d.s,
-                        opacity: d.o,
-                        background: "radial-gradient(circle, rgba(255,255,255,0.5), transparent 70%)",
-                        filter: "blur(26px)",
-                      }}
-                    />
-                  ))}
-                </motion.div>
-              )}
               <GlareHover
                 width="100%"
                 height="100%"
                 background="transparent"
                 borderRadius="28px"
                 borderColor="transparent"
-                glareColor="#ffffff"
-                glareOpacity={front ? 0.18 : 0}
+                glareColor={front ? "#0a0a0a" : "#ffffff"}
+                glareOpacity={front ? 0.14 : 0}
                 glareAngle={-30}
                 glareSize={320}
                 transitionDuration={850}
