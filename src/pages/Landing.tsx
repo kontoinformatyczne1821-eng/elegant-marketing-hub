@@ -1731,7 +1731,11 @@ export default function Landing() {
               </p>
             </div>
             <JellyRadio
-              items={["Standard", "Pro", "Max"]}
+              items={[
+                { value: "standard", label: "Standard" },
+                { value: "pro", label: "Pro" },
+                { value: "max", label: "Max" },
+              ]}
               value={tier}
               onChange={(v) => setTier(v)}
               chipColor="rgba(255,255,255,0.045)"
