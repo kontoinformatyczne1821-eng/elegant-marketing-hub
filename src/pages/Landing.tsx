@@ -30,12 +30,12 @@ function EditableText({ ek, def, className, as: Tag = "span", isEditing }: { ek:
 }
 
 const serviceDefaults = [
-  { n: "01", title: "System Marki", desc: "Przejrzysty. Wyrazisty. Wybierany jako pierwszy.", line: "Pozycjonowanie · Tożsamość · Szyld" },
-  { n: "02", title: "Strona & Wydajność", desc: "Szybkie strony, które zamieniają intencję w rezerwację.", line: "<100ms · Mapy · Rezerwacje" },
-  { n: "03", title: "Pozyskiwanie", desc: "Lokalny zasięg. Cichy wzrost.", line: "Wyszukiwanie · Mapy · Płatne" },
-  { n: "04", title: "Silnik Treści", desc: "Reżyseria i rzemiosło, które widać.", line: "Art direction · Film" },
-  { n: "05", title: "Kampanie", desc: "Oferty, które wypełniają tydzień.", line: "Kalendarz · Email · Pętla" },
-  { n: "06", title: "Retencja", desc: "Opinie i przychód — udowodnione.", line: "CRM · Raport" },
+  { n: "01", title: "System Marki", dostajesz: "spójny system wizualny, hasło i szyld.", cel: "rozpoznają Cię zanim ktoś się dowie." },
+  { n: "02", title: "Strona i Wydajność", dostajesz: "szybką stronę z rezerwacją i formularzem.", cel: "każdy klik kończy się zamówieniem." },
+  { n: "03", title: "Pozyskiwanie", dostajesz: "widoczność w Mapach i wyszukiwaniu do 3 km.", cel: "trafiają do Ciebie ludzie z okolicy." },
+  { n: "04", title: "Silnik Treści", dostajesz: "zdjęcia, wideo i teksty o Twoim rzemiośle.", cel: "klient widzi jakość jeszcze przed wizytą." },
+  { n: "05", title: "Kampanie", dostajesz: "kalendarz ofert i mailingi, które wracają.", cel: "puste godziny w tygodniu się zapełniają." },
+  { n: "06", title: "Retencja", dostajesz: "system opinii, lojalności i raport tygodniowy.", cel: "klienci wracają i polecają Cię znajomym." },
 ];
 
 const plans = [
@@ -554,33 +554,47 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="services" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-28 lg:py-36">
+      <section id="services" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-28">
         <Reveal>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 border-b border-white/[0.06] pb-12 lg:pb-16">
             <div>
               <div className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.2em] text-white/35">01 — SYSTEM</div>
-              <h2 className="mt-5 leading-[0.88] tracking-[-0.02em]">
-                <EditableText ek="qraft.system.h1" def="Jeden system." className="block font-[Cormorant_Garamond] font-light text-[42px] sm:text-[54px]" isEditing={isEditing} as="span" />
-                <EditableText ek="qraft.system.h2" def="Bez nadmiaru." className="block font-[Cormorant_Garamond] font-light italic text-[42px] sm:text-[54px] text-white/35" isEditing={isEditing} as="span" />
+              <h2 className="mt-5 leading-[0.9] tracking-[-0.02em]">
+                <EditableText ek="qraft.system.h1" def="Jeden system. Sześć modułów." className="block font-[Cormorant_Garamond] font-light text-[40px] sm:text-[52px]" isEditing={isEditing} as="span" />
               </h2>
             </div>
-            <EditableText ek="qraft.system.subtitle" def="Sześć modułów. Uruchom jeden lub wszystkie. Start w 20 minut — lekko, precyzyjnie, z oddechem." className="max-w-[420px] font-[Inter] font-light text-[16px] leading-8 text-white/35" isEditing={isEditing} as="p" />
+            <EditableText
+              ek="qraft.system.subtitle"
+              def="System prowadzi klienta od pierwszego wyszukania aż do powtórnych zakupów. Włączasz moduły po kolei albo wszystkie naraz — każdy działa sam, a razem działają lepiej."
+              className="max-w-[460px] font-[Inter] font-light text-[16px] leading-8 text-white/45"
+              isEditing={isEditing}
+              as="p"
+            />
           </div>
         </Reveal>
-        <div className="mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
           {serviceDefaults.map((s,i)=>(
-            <motion.div key={s.n} initial={{ opacity:0, y:14 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}} className="group bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.2] border border-white/[0.08] rounded-[28px] p-10 lg:p-10 hover:bg-white/[0.06] hover:border-white/20 hover:-translate-y-2 transition-all duration-500 relative overflow-hidden" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 8px 32px rgba(0,0,0,0.35)" } as any}>
+            <motion.div key={s.n} initial={{ opacity:0, y:14 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}} className="group bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.2] border border-white/[0.08] rounded-[24px] p-8 hover:bg-white/[0.06] hover:border-white/20 hover:-translate-y-2 transition-all duration-500 relative overflow-hidden" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 8px 32px rgba(0,0,0,0.35)" } as any}>
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/0 to-transparent group-hover:via-white/10 transition duration-700"/>
               <div className="pointer-events-none absolute -inset-20 opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ background: "radial-gradient(55% 45% at 50% 0%, rgba(255,255,255,0.10), transparent 70%)" }} />
               <div className="flex items-center justify-between">
                 <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-white/20">{s.n}</span>
                 <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10 text-white/20 group-hover:border-white/30 group-hover:text-white group-hover:rotate-45 group-hover:bg-white/5 transition-all duration-500"><ArrowUpRight className="h-3.5 w-3.5"/></span>
               </div>
-              <h3 className="mt-8 font-[Cormorant_Garamond] font-light text-[24px] tracking-[-0.01em] leading-none">
+              <h3 className="mt-7 font-[Cormorant_Garamond] font-light text-[23px] tracking-[-0.01em] leading-none">
                 <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
               </h3>
-              <EditableText ek={`qraft.service.${i}.desc`} def={s.desc} className="mt-4 block font-[Inter] font-light text-[16px] leading-7 text-white/35" isEditing={isEditing} as="p" />
-              <EditableText ek={`qraft.service.${i}.line`} def={s.line} className="mt-8 block font-[JetBrains_Mono] font-light text-[11px] tracking-[0.12em] text-white/20 border-t border-white/[0.05] pt-5" isEditing={isEditing} as="div" />
+
+              <div className="mt-5 space-y-2">
+                <p className="font-[Inter] font-light text-[14.5px] leading-6 text-white/50">
+                  <span className="font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.14em] text-white/30 mr-2">DOSTAJESZ</span>
+                  <EditableText ek={`qraft.service.${i}.d`} def={s.dostajesz} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
+                </p>
+                <p className="font-[Inter] font-light text-[14.5px] leading-6 text-white/80">
+                  <span className="font-[JetBrains_Mono] font-light text-[9.5px] tracking-[0.14em] text-white/45 mr-2">CEL</span>
+                  <EditableText ek={`qraft.service.${i}.c`} def={s.cel} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
+                </p>
+              </div>
             </motion.div>
           ))}
         </div>
