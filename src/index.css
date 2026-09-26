@@ -119,6 +119,12 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* QRAFT: strona jest ciemna u źródła, żeby tło parallaxowe
+     nie przebijało spod przezroczystych sekcji */
+  body {
+    background-color: #050507;
+    color: #f2f2f0;
+  }
   button:not([disabled]),
   [role="button"]:not([disabled]) {
     cursor: pointer;

@@ -1,4 +1,4 @@
-import { motion, AnimatePresence, useScroll, useTransform, useInView } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring, useTransform, useInView } from "framer-motion";
 import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Menu, X, Check, Minus, Plus, Clock, Terminal, Pencil, Save } from "lucide-react";
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router";
@@ -784,6 +784,121 @@ function ProcessStack({ isEditing }: { isEditing: boolean }) {
   );
 }
 
+/* --------------------- tło: czarne łuki ze światłem ---------------- */
+/* Wektor odwzorowujący motyw zdjęcia: ciemne wstęgi płynące przez
+   kadr z białymi konturami i poświatą. Parallax sprężynowy — tło nie
+   skacze przy scrollu, tylko się przeciąga za nim.
+   Podmiana na oryginalne zdjęcie: wpisz ścieżkę w FLOW_BG_SRC. */
+
+const FLOW_BG_SRC = "";
+
+function FlowArt() {
+  return (
+    <svg
+      viewBox="0 0 1920 1080"
+      preserveAspectRatio="xMidYMid slice"
+      className="h-full w-full"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="qSheen" x1="0" y1="0" x2="1" y2="0.35">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+          <stop offset="26%" stopColor="#cfcfcf" stopOpacity="0.26" />
+          <stop offset="48%" stopColor="#ffffff" stopOpacity="0.7" />
+          <stop offset="62%" stopColor="#8e8e8e" stopOpacity="0.32" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id="qSheenSoft" x1="0" y1="0" x2="1" y2="0.6">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+          <stop offset="34%" stopColor="#6f6f74" stopOpacity="0.5" />
+          <stop offset="58%" stopColor="#b9b9be" stopOpacity="0.75" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+        </linearGradient>
+        <radialGradient id="qLamp" cx="62%" cy="34%" r="52%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.2" />
+          <stop offset="55%" stopColor="#ffffff" stopOpacity="0.05" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+        </radialGradient>
+        <filter id="qSoft" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="26" />
+        </filter>
+        <filter id="qGlow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="7" result="b" />
+          <feMerge>
+            <feMergeNode in="b" />
+            <feMergeNode in="b" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <rect width="1920" height="1080" fill="#050507" />
+      <rect width="1920" height="1080" fill="url(#qLamp)" />
+
+      <g fill="none" strokeLinecap="round" filter="url(#qSoft)">
+        <path d="M -260 830 C 240 1250, 1120 1230, 2180 630" stroke="url(#qSheenSoft)" strokeWidth="300" opacity="0.5" />
+        <path d="M -260 630 C 220 1090, 1080 1050, 2180 440" stroke="url(#qSheenSoft)" strokeWidth="180" opacity="0.55" />
+        <path d="M -260 440 C 200 910, 1040 860, 2180 260" stroke="url(#qSheen)" strokeWidth="86" opacity="0.6" />
+        <path d="M -260 255 C 240 710, 1000 630, 2180 70" stroke="url(#qSheen)" strokeWidth="34" opacity="0.7" />
+      </g>
+
+      <g fill="none" strokeLinecap="round" filter="url(#qGlow)">
+        <path d="M -260 120 C 260 520, 940 470, 2180 -40" stroke="url(#qSheen)" strokeWidth="3.5" />
+        <path d="M -260 255 C 240 710, 1000 630, 2180 70" stroke="url(#qSheen)" strokeWidth="2.4" opacity="0.9" />
+        <path d="M -260 440 C 200 910, 1040 860, 2180 260" stroke="url(#qSheen)" strokeWidth="2" opacity="0.7" />
+        <path d="M -260 630 C 220 1090, 1080 1050, 2180 440" stroke="url(#qSheen)" strokeWidth="1.6" opacity="0.5" />
+      </g>
+
+      <g fill="none" stroke="#ffffff" strokeWidth="1" opacity="0.12">
+        <path d="M -260 60 C 280 430, 980 380, 2180 -110" />
+        <path d="M -260 700 C 240 1160, 1100 1120, 2180 510" />
+        <path d="M -260 900 C 260 1300, 1140 1290, 2180 700" />
+      </g>
+    </svg>
+  );
+}
+
+function FlowBackdrop() {
+  const { scrollYProgress } = useScroll();
+  /* niska sprężystość = tło ciągnie się za scrollem zamiast skakać */
+  const p = useSpring(scrollYProgress, { stiffness: 40, damping: 16, mass: 0.8 });
+  const y = useTransform(p, [0, 1], ["0%", "-30%"]);
+  const x = useTransform(p, [0, 1], ["0%", "-11%"]);
+  const scale = useTransform(p, [0, 1], [1.08, 1.36]);
+  const rotate = useTransform(p, [0, 1], ["0deg", "-2.6deg"]);
+
+  return (
+    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#050507]">
+      <motion.div
+        className="absolute inset-[-14%] will-change-transform"
+        style={{ y, x, scale, rotate }}
+      >
+        {FLOW_BG_SRC ? (
+          <img src={FLOW_BG_SRC} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <FlowArt />
+        )}
+      </motion.div>
+
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+          backgroundSize: "88px 88px",
+        }}
+      />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(125% 95% at 50% 0%, transparent 35%, rgba(5,5,7,0.72) 100%)",
+        }}
+      />
+    </div>
+  );
+}
+
 export default function Landing() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -822,18 +937,11 @@ export default function Landing() {
   const svc = auditServices.find((s) => s.id === form.service) || auditServices[0];
 
   return (
-    <div className="min-h-screen bg-[#050507] text-[#F2F2F0] antialiased selection:bg-white selection:text-black">
+    <div className="min-h-screen text-[#F2F2F0] antialiased selection:bg-white selection:text-black">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&family=Space+Grotesk:wght@300;400&display=swap'); html{scroll-behavior:smooth} @keyframes qmarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}} @keyframes qmsheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}} @keyframes qmbreathe{0%,100%{opacity:.35}50%{opacity:.9}}`}</style>
       <CursorAura />
       <motion.div className="fixed top-0 inset-x-0 h-[1px] bg-white/80 z-50 origin-left" style={{ scaleX: progress }} />
-      <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[#050507]" />
-        {/* odcienie czerni — subtelne winiety */}
-        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "88px 88px" }} />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[720px] w-[1200px] -translate-y-1/2 rounded-full opacity-[0.09] blur-[140px]" style={{ background: "radial-gradient(ellipse at center, white 0%, #2A2A2E 32%, transparent 70%)" }} />
-        <div className="absolute top-[38%] right-[-6%] h-[560px] w-[560px] rounded-full opacity-[0.045] blur-[90px]" style={{ background: "radial-gradient(ellipse at center, #1A1A1E 0%, transparent 68%)" }} />
-        <div className="absolute bottom-0 left-[-8%] h-[520px] w-[700px] rounded-full opacity-[0.035] blur-[100px]" style={{ background: "radial-gradient(ellipse at center, #0F0F12 0%, transparent 70%)" }} />
-      </div>
+      <FlowBackdrop />
       <FloatingField />
 
       <header className="sticky top-0 z-40 bg-[#050507]/28 backdrop-blur-[28px] backdrop-saturate-[1.5] border-b border-white/[0.08] supports-[backdrop-filter]:bg-[#050507]/20" style={{ WebkitBackdropFilter: "blur(28px) saturate(1.5)" } as any}>
