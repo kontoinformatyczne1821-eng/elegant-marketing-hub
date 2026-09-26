@@ -11,6 +11,7 @@ import GlowCursor from "@/components/GlowCursor";
 import PixelTrail from "@/components/PixelTrail";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import JellyRadio from "@/components/JellyRadio";
+import SavingsCount from "@/components/CountUp";
 import type { StaggeredMenuItem } from "@/components/StaggeredMenu";
 
 const REDUCE_MOTION =
@@ -1855,15 +1856,10 @@ export default function Landing() {
               className="mt-6 overflow-hidden rounded-[28px] border border-white/[0.10] bg-white/[0.03] p-7 sm:p-10 backdrop-blur-2xl backdrop-saturate-[1.4]"
               style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 30px 80px rgba(0,0,0,0.35)" }}
             >
-              <div className="grid gap-10 lg:grid-cols-[1fr_320px]">
+              <div className="grid gap-10 lg:grid-cols-[1fr_400px]">
                 <div>
-                  <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
-                    <span className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.24em] text-white/35">
-                      OSZCZĘDNOŚĆ · {tierData.name} · {termData.label.toUpperCase()}
-                    </span>
-                    <span className="font-[Cormorant_Garamond] font-light text-[34px] sm:text-[58px] leading-none tracking-[-0.02em] text-[#7DF0AE]">
-                      <PopNumber text={zl(quote.saved)} className="font-[Cormorant_Garamond] font-light" />
-                    </span>
+                  <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.24em] text-white/35">
+                    {tierData.name} · {termData.label.toUpperCase()}
                   </div>
                   <p className="mt-6 font-[Inter] font-light text-[14px] sm:text-[16px] leading-7 text-white/60">{tierData.desc}</p>
                   <ul className="mt-8 space-y-3">
@@ -1882,12 +1878,21 @@ export default function Landing() {
                   </ul>
                 </div>
 
-                <div className="flex flex-col justify-between gap-8 rounded-[22px] border border-white/[0.08] bg-white/[0.02] p-7">
+                <div className="flex flex-col justify-between gap-10 rounded-[28px] border border-white/[0.10] bg-white/[0.03] p-8 sm:p-10 backdrop-blur-2xl">
                   <div>
                     <div className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-white/30">
-                      CO W TYM JEST
+                      CO OSZCZĘDZASZ
                     </div>
-                    <div className="mt-6 font-[Inter] font-light text-[13px] sm:text-[14px] leading-6 text-white/50">
+                    <div className="mt-4 font-[Cormorant_Garamond] font-light leading-[0.92] tracking-[-0.03em] text-[#7DF0AE] text-[clamp(40px,5.4vw,68px)] tabular-nums">
+                      <SavingsCount
+                        key={`${tier}-${term}`}
+                        to={quote.saved}
+                        duration={1.6}
+                        separator=" "
+                      />
+                      <span className="text-white/35"> zł</span>
+                    </div>
+                    <div className="mt-8 font-[Inter] font-light text-[13px] sm:text-[14px] leading-6 text-white/50">
                       <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] py-3">
                         <span>−50% przez pierwsze 90 dni</span>
                         <span className="text-[#7DF0AE]">{zl(quote.promoSaving)}</span>
@@ -1898,7 +1903,7 @@ export default function Landing() {
                       </div>
                     </div>
                   </div>
-                  <BtnGlass onClick={() => go("contact")} className="w-full h-12 text-[10px] sm:text-[11px]">ZACZNIJ WSPÓŁPRACĘ</BtnGlass>
+                  <BtnGlass onClick={() => go("contact")} className="w-full h-14 text-[10px] sm:text-[11px]">ZACZNIJ WSPÓŁPRACĘ</BtnGlass>
                 </div>
               </div>
             </motion.div>
