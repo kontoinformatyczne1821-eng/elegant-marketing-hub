@@ -1199,8 +1199,9 @@ export default function Landing() {
   const darkCursor = inProcess || overWhiteCard;
   /* wybrany plan ładze do sekcji PROMOCJE + wybrany poziom i okres */
   const [chosenPlan, setChosenPlan] = useState<number | null>(null);
-  const [tier, setTier] = useState(TIERS[1].value);
   const [term, setTerm] = useState(TERMS[1].value);
+  /* poziom wynika z wybranego planu: ESSENCE → Standard, SIGNATURE → Pro, PRESTIGE → Max */
+  const tier = TIERS[chosenPlan === null ? 1 : Math.min(2, chosenPlan)].value;
   const tierData = TIERS.find((x) => x.value === tier) ?? TIERS[1];
   const termData = TERMS.find((x) => x.value === term) ?? TERMS[1];
   const quote = calc(tierData.amount, termData.months, termData.discount);
@@ -1745,8 +1746,7 @@ export default function Landing() {
 
       <section id="promo" className="relative mx-auto max-w-[1280px] px-6 lg:px-8 pb-24 lg:pb-32">
         <Reveal>
-          <div className="flex flex-col gap-10 border-t border-white/[0.06] pt-16 lg:flex-row lg:items-end lg:justify-between lg:pt-20">
-            <div className="max-w-[560px]">
+          <div className="max-w-[620px] border-t border-white/[0.06] pt-16 lg:pt-20">
               <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/20">04 — PROMOCJE</div>
               <h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[27px] sm:text-[50px] leading-[0.98] tracking-[-0.02em] text-white">
                 Pierwsze 90 dni <span className="font-[Instrument_Serif] italic text-white/55">połowa ceny</span>.
@@ -1756,32 +1756,9 @@ export default function Landing() {
               </p>
               {chosenPlan !== null && (
                 <p className="mt-4 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.18em] text-white/40">
-                  PLAN <span className="text-[#7DF0AE]">{plans[chosenPlan]?.name}</span> — dobraj poziom i okres
+                  PLAN <span className="text-[#7DF0AE]">{plans[chosenPlan]?.name}</span> — {tierData.name} na {termData.label.toLowerCase()}
                 </p>
               )}
-            </div>
-            <div className="flex flex-col items-start gap-4">
-              <JellyRadio
-                items={[
-                  { value: "standard", label: "Standard" },
-                  { value: "pro", label: "Pro" },
-                  { value: "max", label: "Max" },
-                ]}
-                value={tier}
-                onChange={(v) => setTier(v)}
-                chipColor="rgba(255,255,255,0.045)"
-                activeColor="#F7F7F5"
-                textColor="rgba(242,242,240,0.55)"
-                activeTextColor="#0A0A0A"
-                size="md"
-                gap={10}
-                radius={18}
-                swell={0.22}
-                barge={7}
-                stiffness={560}
-                ariaLabel="Poziom współpracy"
-              />
-            </div>
           </div>
         </Reveal>
 
