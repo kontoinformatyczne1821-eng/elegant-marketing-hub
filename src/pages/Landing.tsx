@@ -390,9 +390,9 @@ function spiralAt(off: number) {
     x: Math.sin(a) * SPIRAL_R,
     y: (1 - Math.cos(a)) * 150,
     rotate: Math.sin(a) * 11,
-    scale: 1 - Math.abs(off) * 0.07,
-    opacity: off === 0 ? 1 : 0.4,
-    filter: off === 0 ? "blur(0px)" : "blur(1.5px)",
+    scale: off === 0 ? 1.02 : 1 - Math.abs(off) * 0.07,
+    opacity: off === 0 ? 1 : 0.55,
+    filter: off === 0 ? "blur(0px)" : "blur(1px)",
     zIndex: 20 - Math.abs(off) * 10,
   };
 }
@@ -410,6 +410,21 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
   return (
     <>
       <div className="relative mt-14 flex flex-col lg:block lg:h-[660px]">
+        {/* strzałki obok wybranego planu, nie pod nim */}
+        <button
+          onClick={() => turn(-1)}
+          aria-label="Poprzedni plan"
+          className="hidden lg:grid absolute top-1/2 -translate-y-1/2 left-[24px] z-30 h-12 w-12 place-items-center rounded-full border border-white/15 bg-white/[0.04] backdrop-blur-xl text-white/60 transition-colors duration-300 hover:text-white hover:border-white/45 hover:bg-white/[0.09]"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => turn(1)}
+          aria-label="Następny plan"
+          className="hidden lg:grid absolute top-1/2 -translate-y-1/2 right-[24px] z-30 h-12 w-12 place-items-center rounded-full border border-white/15 bg-white/[0.04] backdrop-blur-xl text-white/60 transition-colors duration-300 hover:text-white hover:border-white/45 hover:bg-white/[0.09]"
+        >
+          <ArrowRight className="h-4 w-4" />
+        </button>
         {/* guide rings + floor light (desktop only) */}
         <div
           className="pointer-events-none absolute left-1/2 top-1/2 hidden lg:block"
@@ -430,6 +445,7 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
 
         {plans.map((p, i) => {
           const off = signed(i - active);
+          const front = off === 0;
           const pos = isDesktop
             ? spiralAt(off)
             : { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, filter: "blur(0px)", zIndex: 1 };
@@ -455,16 +471,20 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
               }`}
             >
               <div
-                className={`rounded-[28px] border p-8 flex flex-col h-full ${
-                  p.featured
-                    ? "bg-[#F7F7F5] text-black border-[#F7F7F5] shadow-[0_24px_64px_rgba(0,0,0,0.35)]"
-                    : "bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.3] border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_12px_40px_rgba(0,0,0,0.3)]"
+                className={`relative overflow-hidden rounded-[28px] border p-8 flex flex-col h-full transition-colors duration-500 ${
+                  front
+                    ? "bg-[#F7F7F5] text-black border-[#F7F7F5] shadow-[0_30px_80px_rgba(0,0,0,0.5)]"
+                    : "bg-white/[0.07] text-white border-white/[0.14] backdrop-blur-2xl backdrop-saturate-[1.4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.16),0_12px_40px_rgba(0,0,0,0.35)]"
                 }`}
               >
+                {/* szklany polysk na kartach bocznych */}
+                {!front && (
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
+                )}
                 <div className="flex items-center justify-between">
                   <span
                     className={`font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] ${
-                      p.featured ? "text-black/35" : "text-white/25"
+                      front ? "text-black/40" : "text-white/35"
                     }`}
                   >
                     <EditableText
@@ -476,7 +496,13 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
                     />
                   </span>
                   {p.featured && (
-                    <span className="font-[JetBrains_Mono] font-light text-[10px] bg-black text-white rounded-full px-3 py-1">
+                    <span
+                      className={`font-[JetBrains_Mono] font-light text-[10px] rounded-full px-3 py-1 ${
+                        front
+                          ? "bg-black text-white"
+                          : "bg-white/10 text-white/80 border border-white/15"
+                      }`}
+                    >
                       WYRÓŻNIONY
                     </span>
                   )}
@@ -495,7 +521,7 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
                   </span>
                   <span
                     className={`font-[JetBrains_Mono] font-light text-[11px] ${
-                      p.featured ? "text-black/35" : "text-white/25"
+                      front ? "text-black/40" : "text-white/35"
                     }`}
                   >
                     <EditableText
@@ -511,7 +537,7 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
                   ek={`qraft.plan.${i}.line`}
                   def={p.line}
                   className={`mt-2 block font-[Inter] font-light text-[14px] ${
-                    p.featured ? "text-black/45" : "text-white/30"
+                    front ? "text-black/50" : "text-white/40"
                   }`}
                   isEditing={isEditing}
                   as="div"
@@ -521,12 +547,12 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
                     <li
                       key={x}
                       className={`flex gap-3 font-[Inter] font-light text-[14px] ${
-                        p.featured ? "text-black/65" : "text-white/55"
+                        front ? "text-black/70" : "text-white/65"
                       }`}
                     >
                       <Check
                         className={`h-4 w-4 mt-0.5 shrink-0 ${
-                          p.featured ? "text-black/20" : "text-white/40"
+                          front ? "text-black/25" : "text-white/45"
                         }`}
                       />
                       <EditableText
@@ -561,40 +587,24 @@ function PlanShowcase({ isEditing, onPick }: { isEditing: boolean; onPick: () =>
         <div className="text-center font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] text-white/25">
           KLIKNIJ PLAN — SPIRALA PRZESUNIE SIĘ DALEJ
         </div>
-        <div className="mt-6 flex items-center justify-center gap-4">
-          <button
-            onClick={() => turn(-1)}
-            aria-label="Poprzedni plan"
-            className="h-11 w-11 grid place-items-center rounded-full border border-white/15 text-white/50 transition-colors duration-300 hover:text-white hover:border-white/40"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          <div className="flex items-center gap-2">
-            {plans.map((p, i) => (
-              <button
-                key={p.name}
-                onClick={() => setActive(i)}
-                className="h-11 px-5 rounded-full border transition-colors duration-300"
-                style={
-                  i === active
-                    ? { backgroundColor: "#ffffff", borderColor: "#ffffff", color: "#0a0a0a" }
-                    : { borderColor: "rgba(255,255,255,0.14)", color: "rgba(255,255,255,0.5)" }
-                }
-              >
-                <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] flex items-center gap-2">
-                  <PopNumber text={`0${i + 1}`} />
-                  <span className="opacity-70">{p.name}</span>
-                </span>
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => turn(1)}
-            aria-label="Następny plan"
-            className="h-11 w-11 grid place-items-center rounded-full border border-white/15 text-white/50 transition-colors duration-300 hover:text-white hover:border-white/40"
-          >
-            <ArrowRight className="h-4 w-4" />
-          </button>
+        <div className="mt-6 flex items-center justify-center gap-2">
+          {plans.map((p, i) => (
+            <button
+              key={p.name}
+              onClick={() => setActive(i)}
+              className="h-11 px-5 rounded-full border transition-colors duration-300"
+              style={
+                i === active
+                  ? { backgroundColor: "#ffffff", borderColor: "#ffffff", color: "#0a0a0a" }
+                  : { borderColor: "rgba(255,255,255,0.14)", color: "rgba(255,255,255,0.5)" }
+              }
+            >
+              <span className="font-[JetBrains_Mono] font-light text-[11px] tracking-[0.16em] flex items-center gap-2">
+                <PopNumber text={`0${i + 1}`} />
+                <span className="opacity-70">{p.name}</span>
+              </span>
+            </button>
+          ))}
         </div>
       </div>
     </>
