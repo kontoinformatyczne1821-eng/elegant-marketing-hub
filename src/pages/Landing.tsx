@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
 import GlowCursor from "@/components/GlowCursor";
 import GlareHover from "@/components/GlareHover";
+import GradualBlur from "@/components/GradualBlur";
 
 function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, popKey }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean; popKey?: string }) {
   const [val, setVal] = useState(def);
@@ -844,6 +845,21 @@ export default function Landing() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&family=Space+Grotesk:wght@300;400&display=swap'); html{scroll-behavior:smooth} @keyframes qmarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}} @keyframes qmsheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}} @keyframes qmbreathe{0%,100%{opacity:.35}50%{opacity:.9}}`}</style>
       <motion.div className="fixed top-0 inset-x-0 h-[1px] bg-white/80 z-50 origin-left" style={{ scaleX: progress }} />
       <FlowBackdrop />
+      <GradualBlur
+        target="page"
+        position="top"
+        height="9rem"
+        strength={3}
+        divCount={10}
+        curve="bezier"
+        exponential={false}
+        opacity={1}
+        animated="scroll"
+        duration="0.4s"
+        easing="ease-out"
+        style={{ zIndex: 30 }}
+      />
+
       <GlowCursor
         globalPointer
         enabled={!REDUCE_MOTION}
@@ -982,6 +998,18 @@ export default function Landing() {
         </div>
 
         {/* content */}
+        <GradualBlur
+          target="parent"
+          position="bottom"
+          height="16rem"
+          strength={2.6}
+          divCount={8}
+          curve="bezier"
+          exponential={true}
+          opacity={1}
+          zIndex={0}
+        />
+
         <div className="relative mx-auto max-w-[1280px] px-6 lg:px-8">
           <div className="flex min-h-[calc(100vh-72px)] flex-col justify-center py-24 lg:py-32">
             <motion.div
