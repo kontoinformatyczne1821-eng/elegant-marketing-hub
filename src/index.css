@@ -517,3 +517,60 @@ input:-webkit-autofill + .t-clear-mirror,
 .t-clear input:-webkit-autofill {
   color: #f2f2f0;
 }
+
+/* ================================================================
+   Custom scrollbar — w klimacie QRAFT: ciemny, cienki, precyzyjny.
+   Chrome/Safari/Edge rządzą się pseudoelementami webkit (szkło +
+   pomarańcz przy trzymaniu). Firefox dostaje cienki standardowy
+   pasek przez scrollbar-width/scrollbar-color — @supports pilnuje,
+   by Chromium nie nadpisało efektu webkit regułami standardowymi.
+   ================================================================ */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* tor — tylko ciemna podkładka, pasek „unosi się” nad treścią */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* uchwyt — szklany pigułkowaty pasek, jaśnieje pod kursorem */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.14)
+  );
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0.35)
+  );
+  background-clip: padding-box;
+}
+/* trzymanie — akcent marki (#FF3E0A) */
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, #ff3e0a, #c9300a);
+  background-clip: padding-box;
+}
+
+/* bez strzałek i z czystym narożnikiem poziomych pasków */
+::-webkit-scrollbar-button {
+  display: none;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
