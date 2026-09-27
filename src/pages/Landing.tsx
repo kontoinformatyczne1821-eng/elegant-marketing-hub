@@ -1391,7 +1391,7 @@ export default function Landing() {
   };
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.email || !form.name || !form.date) return;
+    if (!form.phone) return;
     setSent(true);
     setTimeout(()=>setSent(false), 6000);
   };
@@ -2128,17 +2128,17 @@ export default function Landing() {
 
               <form onSubmit={submit} className="mt-7 space-y-5">
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <ClearField label="Imię i nazwisko" name="name" value={form.name} onChange={(v)=>setForm({...form, name:v})} placeholder="Alex Kowalski" autoComplete="name" required />
+                  <ClearField label="Imię i nazwisko" name="name" value={form.name} onChange={(v)=>setForm({...form, name:v})} placeholder="Alex Kowalski" autoComplete="name" />
                   <ClearField label="Firma" name="business" value={form.business} onChange={(v)=>setForm({...form, business:v})} placeholder="Lumière" autoComplete="organization" />
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <ClearField label="Telefon" name="phone" type="tel" value={form.phone} onChange={(v)=>setForm({...form, phone:v})} placeholder="600 100 200" autoComplete="tel" />
-                  <ClearField label="Email" name="email" type="email" value={form.email} onChange={(v)=>setForm({...form, email:v})} placeholder="alex@firma.pl" autoComplete="email" required />
+                  <ClearField label="Telefon" name="phone" type="tel" value={form.phone} onChange={(v)=>setForm({...form, phone:v})} placeholder="600 100 200" autoComplete="tel" required />
+                  <ClearField label="Email" name="email" type="email" value={form.email} onChange={(v)=>setForm({...form, email:v})} placeholder="alex@firma.pl" autoComplete="email" />
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <label className="block space-y-2">
                     <span className="block font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.12em] text-white/45">DZIEN</span>
-                    <input required type="date" name="date" min={new Date().toISOString().slice(0,10)} value={form.date} onChange={(e)=>setForm({...form, date:e.target.value})} className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm text-white [color-scheme:dark] focus:outline-none focus:border-white/25"/>
+                    <input type="date" name="date" min={new Date().toISOString().slice(0,10)} value={form.date} onChange={(e)=>setForm({...form, date:e.target.value})} className="w-full h-11 rounded-full border border-white/10 bg-white/[0.02] px-5 font-[Inter] font-light text-sm text-white [color-scheme:dark] focus:outline-none focus:border-white/25"/>
                   </label>
                   <label className="block space-y-2">
                     <span className="block font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.12em] text-white/45">GODZINA</span>
@@ -2168,7 +2168,7 @@ export default function Landing() {
                 </BtnPrimary>
                 <div className="text-center font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.04em] text-white/20">
                   {sent ? (
-                    <TextSwap text="Dziękujemy — potwierdzimy termin na e-mail." />
+                    <TextSwap text="Dziękujemy — odezwiemy się z potwierdzeniem." />
                   ) : (
                     <>Lub <button type="button" onClick={()=>navigate("/auth")} className="underline decoration-white/15 text-white/30 hover:text-white/60">zaloguj się</button> by zarządzać terminami</>
                   )}
@@ -2190,7 +2190,7 @@ export default function Landing() {
                     <div>
                       <div className="font-[Inter] font-light text-[13px] sm:text-[14px] text-white">Termin zarezerwowany</div>
                       <div className="mt-1 font-[Inter] font-light text-[12px] sm:text-[13px] leading-6 text-white/55">
-                        {form.date ? new Date(form.date + "T12:00:00").toLocaleDateString("pl-PL", { weekday: "long", day: "numeric", month: "long" }) : ""} · {form.time} · {svc.label} — potwierdzenie wyślemy na {form.email}.
+                        {form.date ? new Date(form.date + "T12:00:00").toLocaleDateString("pl-PL", { weekday: "long", day: "numeric", month: "long" }) : ""} · {form.time} · {svc.label} — potwierdzenie wyślemy na {form.email || form.phone}.
                       </div>
                     </div>
                   </motion.div>
