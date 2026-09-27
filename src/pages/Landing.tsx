@@ -1333,9 +1333,16 @@ export default function Landing() {
   const spy = useSectionSpy(SIDEBAR_IDS);
   /* zaznaczone moduły w SYSTEM napędzają rekomendowany pakiet */
   const [picked, setPicked] = useState<number[]>([]);
-  const toggleModule = (i: number) =>
-    setPicked((p) => (p.includes(i) ? p.filter((x) => x !== i) : [...p, i]));
-  const recommended = picked.length > 3 ? 2 : 1;
+  const toggleModule = (i: number) => {
+    const next = picked.includes(i)
+      ? picked.filter((x) => x !== i)
+      : [...picked, i];
+    setPicked(next);
+    /* wiecej niz 4 moduly -> automatycznie pakiet PRESTIGE; zejscie wraca do SIGNATURE */
+    if (next.length > 4) setChosenPlan(2);
+    else if (chosenPlan === 2) setChosenPlan(1);
+  };
+  const recommended = picked.length > 4 ? 2 : 1;
   const cinemaRef = useRef<HTMLElement>(null);
   const { scrollY, scrollYProgress } = useScroll();
   const { scrollYProgress: cinemaProgress } = useScroll({ target: cinemaRef, offset: ["start end", "end start"] });
@@ -1735,7 +1742,7 @@ export default function Landing() {
             </div>
             <EditableText
               ek="qraft.system.subtitle"
-              def="System prowadzi klienta od pierwszego wyszukania aż do powtórnych zakupów. Włączasz moduły po kolei albo wszystkie naraz — każdy działa sam, a razem działają lepiej."
+              def={"System prowadzi klienta od pierwszego wyszukania aż do powtórnych zakupów. Włączasz moduły po kolei albo wszystkie naraz — każdy działa sam, a razem działają lepiej." + (picked.length ? ` (Twoje zaznaczenie: ${picked.length}/6)` : "")}
               className="max-w-[460px] font-[Inter] font-light text-[14.5px] sm:text-[16px] leading-8 text-white/45"
               isEditing={isEditing}
               as="p"
@@ -1863,6 +1870,17 @@ export default function Landing() {
             </motion.div>
           ))}
         </div>
+        {/* przy wiecej niz 4 modulach pakiet PRESTIGE dobiera sie automatycznie */}
+        {picked.length > 4 && (
+          <div className="mt-6 flex items-center justify-between gap-4 rounded-[20px] border border-[#7DF0AE]/40 bg-[#7DF0AE]/10 p-4 sm:p-5">
+            <p className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.16em] text-[#9BF3C0]">
+              5+ MODUŁÓW — DOBRALIŚMY CI PAKIET PRESTIGE
+            </p>
+            <BtnGhost onClick={()=>go("pricing")} className="h-9 shrink-0 border-[#7DF0AE]/50 px-4 text-[9px] text-[#9BF3C0]">
+              ZOBACZ PLANY
+            </BtnGhost>
+          </div>
+        )}
         <div className="mt-10 flex flex-col sm:flex-row justify-between gap-4 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px]">
           <EditableText ek="qraft.system.footerL" def="OTWARTE DLA KAŻDEGO KLIENTA." className="text-white/20 tracking-[0.08em]" isEditing={isEditing} as="span" />
           <BtnGhost onClick={()=>go("contact")} className="h-11 px-6 text-[10px] sm:text-[11px]">
