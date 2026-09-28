@@ -1002,6 +1002,10 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
 const FLOW_BG_SRC = "";
 
 function FlowArt() {
+  /* na dotyku pomijamy filtry SVG (feGaussianBlur) — to najdroższa część tła */
+  const light = typeof window !== "undefined" &&
+    !!window.matchMedia &&
+    !window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   return (
     <svg
       viewBox="0 0 1920 1080"
@@ -1044,7 +1048,7 @@ function FlowArt() {
       <rect width="1920" height="1080" fill="#050507" />
       <rect width="1920" height="1080" fill="url(#qLamp)" />
 
-      <g fill="none" strokeLinecap="round" filter="url(#qSoft)">
+      <g fill="none" strokeLinecap="round" filter={light ? undefined : "url(#qSoft)"}>
         <path d="M -260 830 C 240 1250, 1120 1230, 2180 630" stroke="url(#qSheenSoft)" strokeWidth="300" opacity="0.5" />
         <path d="M -260 630 C 220 1090, 1080 1050, 2180 440" stroke="url(#qSheenSoft)" strokeWidth="180" opacity="0.55" />
         <path d="M -260 440 C 200 910, 1040 860, 2180 260" stroke="url(#qSheen)" strokeWidth="86" opacity="0.6" />
@@ -1244,10 +1248,14 @@ function FlowBackdrop() {
   const { scrollYProgress } = useScroll();
   /* niska sprężystość = tło ciągnie się za scrollem zamiast skakać */
   const p = useSpring(scrollYProgress, { stiffness: 40, damping: 16, mass: 0.8 });
-  const y = useTransform(p, [0, 1], ["0%", "-30%"]);
-  const x = useTransform(p, [0, 1], ["0%", "-11%"]);
-  const scale = useTransform(p, [0, 1], [1.08, 1.36]);
-  const rotate = useTransform(p, [0, 1], ["0deg", "-2.6deg"]);
+  /* na dotyku mniejszy zakres ruchu = mniej podpikselowych repointów tła */
+  const fineBg = typeof window !== "undefined" &&
+    !!window.matchMedia &&
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const y = useTransform(p, [0, 1], ["0%", fineBg ? "-30%" : "-18%"]);
+  const x = useTransform(p, [0, 1], ["0%", fineBg ? "-11%" : "-6%"]);
+  const scale = useTransform(p, [0, 1], [fineBg ? 1.08 : 1.05, fineBg ? 1.36 : 1.2]);
+  const rotate = useTransform(p, [0, 1], ["0deg", fineBg ? "-2.6deg" : "-1.6deg"]);
 
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#050507]">
@@ -1262,8 +1270,9 @@ function FlowBackdrop() {
         )}
       </motion.div>
 
+      {/* siatka 88px to druga warstwa repaintu przy scrollu — tylko desktop */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.03] hidden lg:block"
         style={{
           backgroundImage:
             "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
@@ -1407,15 +1416,15 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen text-[#F2F2F0] antialiased selection:bg-white selection:text-black">
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&family=Space+Grotesk:wght@300;400&display=swap'); html{scroll-behavior:smooth} @keyframes qmarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}} @keyframes qmsheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}} @keyframes qmbreathe{0%,100%{opacity:.35}50%{opacity:.9}}`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap'); html{scroll-behavior:smooth} @keyframes qmarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}} @keyframes qmsheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}} @keyframes qmbreathe{0%,100%{opacity:.35}50%{opacity:.9}}`}</style>
       <motion.div className="fixed top-0 inset-x-0 h-[1px] bg-white/80 z-50 origin-left" style={{ scaleX: progress }} />
       <FlowBackdrop />
       <GradualBlur
         target="page"
         position="bottom"
-        height="8rem"
-        strength={3}
-        divCount={10}
+        height={finePointer ? "8rem" : "5rem"}
+        strength={finePointer ? 3 : 1.5}
+        divCount={finePointer ? 10 : 3}
         curve="bezier"
         exponential={false}
         /* na samym dole strony gasniemy, żeby stopka nie zniknęła w rozmazie */
@@ -1429,7 +1438,7 @@ export default function Landing() {
       {/* globalny, świecący kursor — zmienia barwę przy sekcji procesu */}
       <GlowCursor
         globalPointer
-        enabled={!REDUCE_MOTION}
+        enabled={finePointer && !REDUCE_MOTION}
         color={darkCursor ? "#0a0a0a" : "#ffffff"}
         secondaryColor={darkCursor ? "#3c3e3d" : "#c9c9cf"}
         trailLength={38}
@@ -1551,7 +1560,7 @@ export default function Landing() {
               <span className="font-[Instrument_Serif] text-[14.5px] sm:text-[16px]">Q</span>
             </button>
             <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} className="flex items-center gap-4 cursor-pointer">
-              <span className="font-[Space_Grotesk] font-light tracking-[0.28em] text-[11px] sm:text-[12px]">QRAFT</span>
+              <span className="font-[Instrument_Serif] font-light tracking-[0.28em] text-[11px] sm:text-[12px]">QRAFT</span>
               <span className="hidden lg:inline font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.18em] text-white/25 border-l border-white/10 pl-4 ml-1">PERFEKCJA BUDUJE MARKI</span>
             </button>
           </motion.div>
@@ -1677,7 +1686,7 @@ export default function Landing() {
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              <h1 className="font-[Space_Grotesk] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[clamp(24px,7.4vw,100px)]">
+              <h1 className="font-[Instrument_Serif] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[clamp(24px,7.4vw,100px)]">
                 <span className="block text-white">Precision</span>
                 <span className="block text-white">Builds</span>
                 <span className="block text-transparent" style={{ WebkitTextStroke: "1.2px rgba(255,255,255,0.6)" }}>
@@ -2092,7 +2101,7 @@ export default function Landing() {
                         <span className="block font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.18em] text-[#7DF0AE]">
                           PAKIET WYBRANY
                         </span>
-                        <span className="mt-1 block font-[Space_Grotesk] font-light text-[14px] sm:text-[16px] text-white">
+                        <span className="mt-1 block font-[Instrument_Serif] font-light text-[14px] sm:text-[16px] text-white">
                           {svc.label}
                           <span className="text-white/45"> · {svc.note}</span>
                         </span>
@@ -2221,7 +2230,7 @@ export default function Landing() {
 
       <footer className="border-t border-white/[0.04]">
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.08em] text-white/20">
-          <div className="flex items-center gap-3"><div className="h-7 w-7 rounded-[9px] border border-white/10 grid place-items-center font-[Instrument_Serif] text-[13px] sm:text-[14px] font-light">Q</div><span className="font-[Space_Grotesk] font-light tracking-[0.2em] text-white/60 text-xs">QRAFT</span><span className="hidden sm:inline">© {new Date().getFullYear()} · PERFEKCJA BUDUJE MARKI</span></div>
+          <div className="flex items-center gap-3"><div className="h-7 w-7 rounded-[9px] border border-white/10 grid place-items-center font-[Instrument_Serif] text-[13px] sm:text-[14px] font-light">Q</div><span className="font-[Instrument_Serif] font-light tracking-[0.2em] text-white/60 text-xs">QRAFT</span><span className="hidden sm:inline">© {new Date().getFullYear()} · PERFEKCJA BUDUJE MARKI</span></div>
           <div className="flex gap-3"><span>qraft.build</span><span className="opacity-20">·</span><span>Otwarte dla wszystkich</span></div>
         </div>
       </footer>
