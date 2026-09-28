@@ -39,6 +39,29 @@ function useFinePointer() {
   );
 }
 
+/* liczba kolumn w siatce SYSTEM — od tego zależy, które kafle leżą naprawdę obok siebie */
+function useGridColumns() {
+  return useSyncExternalStore(
+    (onChange) => {
+      if (typeof window === "undefined" || !window.matchMedia) return () => {};
+      const md = window.matchMedia("(min-width: 768px)");
+      const lg = window.matchMedia("(min-width: 1024px)");
+      md.addEventListener("change", onChange);
+      lg.addEventListener("change", onChange);
+      return () => {
+        md.removeEventListener("change", onChange);
+        lg.removeEventListener("change", onChange);
+      };
+    },
+    () => {
+      if (typeof window === "undefined" || !window.matchMedia) return 3;
+      if (window.matchMedia("(min-width: 1024px)").matches) return 3;
+      return window.matchMedia("(min-width: 768px)").matches ? 2 : 1;
+    },
+    () => 3,
+  );
+}
+
 function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, popKey }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean; popKey?: string }) {
   const [val, setVal] = useState(def);
   const popRef = usePopIn<HTMLSpanElement>([val, popKey], popKey !== "off");
@@ -1395,6 +1418,8 @@ export default function Landing() {
   const manifestNear = useInView(manifestRef, { once: true, margin: "35%" });
   /* bez WebGPU chowamy płótno i zostawiamy samo tło gradientowe */
   const [shardsFailed, setShardsFailed] = useState(false);
+  /* 1 / 2 / 3 kolumny — potrzebne do sklejania sąsiadujących kafli */
+  const gridCols = useGridColumns();
   /* zaznaczone moduły w SYSTEM napędzają rekomendowany pakiet */
   const [picked, setPicked] = useState<number[]>([]);
   const toggleModule = (i: number) => {
@@ -1813,39 +1838,54 @@ export default function Landing() {
             />
           </div>
         </Reveal>
-        <div className="mt-6 sm:mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
-          {serviceDefaults.map((s,i)=>(
+        {/* tło siatki prześwituje przez przyciemniane panele — bez tego szkło nie ma czego przepuszczać */}
+        <div
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5 mt-6 sm:mt-10"
+          style={{
+            backgroundImage:
+              "radial-gradient(54% 48% at 16% 10%, rgba(255,62,10,0.14), rgba(255,62,10,0) 72%), radial-gradient(58% 52% at 86% 92%, rgba(125,240,174,0.08), rgba(125,240,174,0) 74%), radial-gradient(64% 58% at 50% 46%, rgba(255,255,255,0.05), rgba(255,255,255,0) 76%)",
+          }}
+        >
+          {serviceDefaults.map((s,i)=>{
+            /* dwa zaznaczone kafle obok siebie zlewają się w jedną szklaną taflę */
+            const mergeL = i % gridCols !== 0 && picked.includes(i - 1);
+            const mergeR = (i + 1) % gridCols !== 0 && i + 1 < serviceDefaults.length && picked.includes(i + 1);
+            const pane = mergeL || mergeR;
+            const paneClass = `q-pane${mergeL ? " q-m-l" : ""}${mergeR ? " q-m-r" : ""}`;
+            return (
             <motion.div
               key={s.n}
               initial={{ opacity:0, y:14 }}
               whileInView={{ opacity:1, y:0 }}
               viewport={{ once:true }}
               transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}}
-              className="h-[296px] sm:h-[348px]"
+              className={`h-[296px] sm:h-[348px]${mergeL ? " -ml-1.5 sm:-ml-2 lg:-ml-2.5" : ""}${mergeR ? " -mr-1.5 sm:-mr-2 lg:-mr-2.5" : ""}`}
             >
               <FlipCard
                 fill
                 editable={isEditing}
-                selected={picked.includes(i)}
+                selected={picked.includes(i) && !pane}
+                className={paneClass}
+                tilt={!pane}
                 onActivate={() => { sfxTap(); toggleModule(i); }}
                 axis="y"
                 ariaLabel={`Modu\u0142 ${s.n} \u2014 ${s.title}`}
-                background={picked.includes(i) ? "#0A120E" : "#0A0A0D"}
+                background={picked.includes(i) ? "rgba(10,20,15,0.55)" : "rgba(12,12,16,0.5)"}
                 color="#F2F2F0"
                 radius={24}
                 width={420}
                 height={348}
                 perspective={1200}
                 tiltMax={9}
-                hoverScale={1.02}
+                hoverScale={pane ? 1 : 1.02}
                 glareOpacity={0.17}
                 shadow={false}
                 flipOnClick={!isEditing}
                 draggable={!isEditing}
                 front={(
                   <div className="relative flex h-full w-full flex-col p-5 sm:p-7 lg:p-8">
-                    <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(74% 54% at 50% 0%, rgba(255,255,255,0.08), transparent 72%)" }} />
-                    <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.08]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06)" }} />
+                    <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(74% 54% at 50% 0%, rgba(255,255,255,0.11), transparent 72%)" }} />
+                    <div className={`pointer-events-none absolute inset-0 border border-white/[0.10] ${paneClass}`} style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.07)" }} />
                     <div className="relative flex items-center justify-between">
                       <PopNumber text={s.n} className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.16em] text-white/25" />
                       <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10 text-white/25"><ArrowUpRight className="h-3.5 w-3.5"/></span>
@@ -1891,7 +1931,7 @@ export default function Landing() {
                 back={(
                   <div className="relative flex h-full w-full flex-col p-5 sm:p-7 lg:p-8">
                     <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(86% 62% at 50% 108%, rgba(255,255,255,0.10), transparent 70%)" }} />
-                    <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.12]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.08)" }} />
+                    <div className={`pointer-events-none absolute inset-0 border border-white/[0.14] ${paneClass}`} style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.09)" }} />
                     <div className="relative font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.18em] text-white/30">{s.meta}</div>
                     <h3 className="relative mt-3 font-[Cormorant_Garamond] font-light text-[18px] sm:text-[21px] leading-none tracking-[-0.01em]">
                       <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
@@ -1932,7 +1972,8 @@ export default function Landing() {
                 )}
               />
             </motion.div>
-          ))}
+            );
+          })}
         </div>
         {/* przy wiecej niz 4 modulach pakiet PRESTIGE dobiera sie automatycznie */}
         {picked.length > 4 && (
