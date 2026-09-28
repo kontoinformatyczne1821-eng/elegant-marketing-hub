@@ -1,6 +1,6 @@
 import { motion, AnimatePresence, useScroll, useSpring, useTransform, useInView, useMotionValue, useMotionValueEvent } from "framer-motion";
 import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Check, Minus, Plus, Clock, Terminal, Pencil, Save, RefreshCw } from "lucide-react";
-import { useState, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from "react";
+import { Fragment, useState, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from "react";
 import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
 import GradualBlur from "@/components/GradualBlur";
@@ -834,6 +834,22 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
     setActive(next);
   };
 
+  /* dwa sąsiednie punkty kliknięte jeden po drugim zlewają się w jedną szklaną taflę */
+  const [lastDot, setLastDot] = useState<number | null>(null);
+  const pair: [number, number] | null =
+    lastDot !== null && Math.abs(lastDot - active) === 1
+      ? [Math.min(lastDot, active), Math.max(lastDot, active)]
+      : null;
+  const pickStep = (i: number) => {
+    setLastDot(i === active ? null : active);
+    step(i, mod(i - active) <= n / 2 ? 1 : -1);
+  };
+  /* strzałki rozłączają taflę — zlać mogą się tylko dwa kliknięte punkty */
+  const stepBy = (dir: 1 | -1) => {
+    setLastDot(null);
+    step(active + dir, dir);
+  };
+
   /* wypłukaj stan spoczynkowy, potem puść go w tym samym ticku —
      rAF zostałby pominięty przy throttlowaniu zegara i baner wjechałby bez ruchu */
   useLayoutEffect(() => {
@@ -864,7 +880,7 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
             dir={-1}
             axis="y"
             tone="light"
-            onClick={() => step(active - 1, -1)}
+            onClick={() => stepBy(-1)}
             label="Poprzedni etap"
             className="hidden sm:grid"
           />
@@ -872,7 +888,7 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
             dir={1}
             axis="y"
             tone="light"
-            onClick={() => step(active + 1, 1)}
+            onClick={() => stepBy(1)}
             label="Następny etap"
             className="hidden sm:grid"
           />
@@ -896,25 +912,58 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
             style={{ boxShadow: "0 0 16px 3px rgba(0,0,0,0.30)" }}
           />
           <div className="relative flex h-full flex-col items-center justify-between py-[7px]">
-            {processSteps.map((s, i) => (
-              <button
-                key={s.n}
-                onClick={() => step(i, mod(i - active) <= n / 2 ? 1 : -1)}
-                aria-label={`Etap ${s.n}`}
-                className="grid place-items-center outline-none"
-              >
-                <span
-                  className="block rounded-full transition-all duration-500"
-                  style={{
-                    width: i === active ? 13 : 8,
-                    height: i === active ? 13 : 8,
-                    backgroundColor: i <= active ? "#0a0a0a" : "#E4E4E0",
-                    border: `1px solid ${i <= active ? "#0a0a0a" : "rgba(0,0,0,0.28)"}`,
-                    boxShadow: i === active ? "0 0 18px 4px rgba(0,0,0,0.30)" : "none",
-                  }}
-                />
-              </button>
-            ))}
+            {processSteps.map((s, i) => {
+              const reached = i <= active;
+              const inSurface = pair !== null && (i === pair[0] || i === pair[1]);
+              return (
+                <Fragment key={s.n}>
+                  {/* słupek między punktami: ta sama szerokość co kółka, więc po
+                      podświetleniu kółko + słupek + kółko zlewa się w jedną kapsułę */}
+                  {i > 0 && (
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none relative z-[5] w-[13px] flex-1 rounded-full transition-all duration-500"
+                      style={
+                        pair !== null && i === pair[1]
+                          ? {
+                              background: "rgba(10,10,10,0.62)",
+                              backdropFilter: "blur(6px)",
+                              WebkitBackdropFilter: "blur(6px)",
+                            }
+                          : undefined
+                      }
+                    />
+                  )}
+                  <button
+                    onClick={() => pickStep(i)}
+                    aria-label={`Etap ${s.n}`}
+                    aria-pressed={inSurface}
+                    className="relative z-10 grid shrink-0 place-items-center outline-none"
+                  >
+                    <span
+                      className="block rounded-full"
+                      style={{
+                        width: 13,
+                        height: 13,
+                        transform: i === active && !inSurface ? "scale(1.22)" : "scale(1)",
+                        background: reached || inSurface ? "rgba(10,10,10,0.62)" : "rgba(10,10,10,0.07)",
+                        border: `1px solid ${inSurface ? "transparent" : reached ? "rgba(10,10,10,0.70)" : "rgba(10,10,10,0.28)"}`,
+                        backdropFilter: "blur(6px)",
+                        WebkitBackdropFilter: "blur(6px)",
+                        boxShadow: inSurface
+                          ? "inset 0 1px 0 rgba(255,255,255,0.30)"
+                          : i === active
+                            ? "0 0 18px 4px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.35)"
+                            : reached
+                              ? "0 2px 7px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.32)"
+                              : "inset 0 1px 0 rgba(255,255,255,0.5)",
+                        transition: "all 500ms cubic-bezier(0.22,1,0.36,1)",
+                      }}
+                    />
+                  </button>
+                </Fragment>
+              );
+            })}
           </div>
         </div>
 
@@ -932,7 +981,7 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                   onClick={() => {
                     if (front && !isEditing && window.matchMedia("(hover: none)").matches) {
                       sfxPop();
-                      step(active + 1, 1);
+                      stepBy(1);
                     }
                   }}
                   className={`t-stack-banner h-[236px] sm:h-[292px] w-full rounded-[20px] sm:rounded-[24px] border p-5 sm:p-7 lg:p-8 flex flex-col ${
