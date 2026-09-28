@@ -574,24 +574,3 @@ input:-webkit-autofill + .t-clear-mirror,
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
-
-/* SYSTEM — panele z przyciemnianego szkła. Dwa zaznaczone kafle obok siebie
-   zlewają się w jedną taflę, więc stykające się krawędzie tracą zaokrąglenie
-   i obramowanie. Klasy dostaje kafel, a twarze karty dziedziczą promienie. */
-.q-pane {
-  border-radius: 24px;
-}
-.q-pane.q-m-l {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-left-color: transparent;
-}
-.q-pane.q-m-r {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  border-right-color: transparent;
-}
-.flip-card.q-pane .flip-card__rotor,
-.flip-card.q-pane .flip-card__face {
-  border-radius: inherit;
-}
