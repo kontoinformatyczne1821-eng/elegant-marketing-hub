@@ -1264,7 +1264,7 @@ export default function AeroShards({
   holdToGather = true,
   paused = false,
   className = '',
-  onError = undefined
+  onError
 }) {
   const rootRef = useRef(null);
   const canvasRef = useRef(null);

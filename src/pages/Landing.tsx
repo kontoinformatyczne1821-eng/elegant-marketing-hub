@@ -1343,7 +1343,7 @@ export default function Landing() {
   const spy = useSectionSpy(SIDEBAR_IDS);
   /* MANIFEST: pole odłamków (WebGPU) montujemy dopiero, gdy sekcja zbliża się do ekranu */
   const manifestRef = useRef<HTMLElement>(null);
-  const manifestNear = useInView(manifestRef, { once: true, margin: "25%" });
+  const manifestNear = useInView(manifestRef, { once: true, margin: "35%" });
   /* bez WebGPU chowamy płótno i zostawiamy samo tło gradientowe */
   const [shardsFailed, setShardsFailed] = useState(false);
   /* zaznaczone moduły w SYSTEM napędzają rekomendowany pakiet */
@@ -1746,7 +1746,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="services" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-28">
+      <section id="services" className="mx-auto max-w-[1280px] px-6 lg:px-8 pt-20 lg:pt-28 pb-24 lg:pb-32">
         <Reveal>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 border-b border-white/[0.06] pb-12 lg:pb-16">
             <div>
@@ -1908,7 +1908,7 @@ export default function Landing() {
       <section
         ref={manifestRef}
         id="manifest"
-        className="relative isolate flex min-h-[540px] items-center overflow-hidden border-t border-white/[0.06] sm:min-h-[660px] lg:min-h-[760px]"
+        className="relative isolate flex min-h-[540px] items-center overflow-hidden sm:min-h-[660px] lg:min-h-[760px]"
       >
         {/* zapasowe tło: zostaje widoczne, gdy przeglądarka nie ma WebGPU */}
         <div
@@ -1916,7 +1916,7 @@ export default function Landing() {
           className="absolute inset-0"
           style={{
             backgroundImage:
-              "radial-gradient(72% 62% at 50% 108%, rgba(255,62,10,0.16), rgba(255,62,10,0) 70%), linear-gradient(180deg, #050507 0%, rgba(5,5,7,0) 22%, rgba(5,5,7,0) 78%, #050507 100%)",
+              "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0) 22%, rgba(5,5,7,0) 78%, #050507 100%)",
           }}
         />
         {manifestNear && !shardsFailed && (
@@ -1950,6 +1950,33 @@ export default function Landing() {
             />
           </div>
         )}
+
+        {/* płynne wejście i wyjście: pole odłamków wnika w tło strony zamiast zaczynać się cięciem */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-28 sm:h-40"
+          style={{
+            backgroundImage:
+              "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.86) 26%, rgba(5,5,7,0.5) 58%, rgba(5,5,7,0) 100%)",
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-28 sm:h-40"
+          style={{
+            backgroundImage:
+              "linear-gradient(0deg, #050507 0%, rgba(5,5,7,0.86) 26%, rgba(5,5,7,0.5) 58%, rgba(5,5,7,0) 100%)",
+          }}
+        />
+        {/* ciepła łuna marki — ta sama w obu stanach (z WebGPU i bez) */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[6]"
+          style={{
+            backgroundImage:
+              "radial-gradient(70% 55% at 50% 112%, rgba(255,62,10,0.13), rgba(255,62,10,0) 72%)",
+          }}
+        />
 
         <div className="relative z-10 mx-auto w-full max-w-[1280px] px-6 py-24 text-center sm:py-32 lg:px-8 lg:py-40">
           <Reveal>
