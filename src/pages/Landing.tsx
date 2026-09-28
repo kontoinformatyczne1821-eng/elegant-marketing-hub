@@ -12,6 +12,7 @@ import PixelTrail from "@/components/PixelTrail";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import JellyRadio from "@/components/JellyRadio";
 import SavingsCount from "@/components/CountUp";
+import AeroShards from "@/components/AeroShards";
 import { Volume2, VolumeX } from "lucide-react";
 import { setMuted, sfxConfirm, sfxPop, sfxTap, sfxWhoosh, unlockAudio } from "@/lib/sound";
 import type { StaggeredMenuItem } from "@/components/StaggeredMenu";
@@ -1340,6 +1341,11 @@ export default function Landing() {
   /* ślad pikselowy w hero ma sens tylko dla myszy/trackpada */
   const finePointer = useFinePointer();
   const spy = useSectionSpy(SIDEBAR_IDS);
+  /* MANIFEST: pole odłamków (WebGPU) montujemy dopiero, gdy sekcja zbliża się do ekranu */
+  const manifestRef = useRef<HTMLElement>(null);
+  const manifestNear = useInView(manifestRef, { once: true, margin: "25%" });
+  /* bez WebGPU chowamy płótno i zostawiamy samo tło gradientowe */
+  const [shardsFailed, setShardsFailed] = useState(false);
   /* zaznaczone moduły w SYSTEM napędzają rekomendowany pakiet */
   const [picked, setPicked] = useState<number[]>([]);
   const toggleModule = (i: number) => {
@@ -1895,6 +1901,87 @@ export default function Landing() {
           <BtnGhost onClick={()=>go("contact")} className="h-11 px-6 text-[10px] sm:text-[11px]">
             <EditableText ek="qraft.system.footerR" def="DIAGNOSTYKA →" className="font-[JetBrains_Mono] font-light tracking-[0.14em]" isEditing={isEditing} as="span" />
           </BtnGhost>
+        </div>
+      </section>
+
+      {/* MANIFEST — cała sekcja poświęcona jednej myśli; tło: pole odłamków (AeroShards, WebGPU) */}
+      <section
+        ref={manifestRef}
+        id="manifest"
+        className="relative isolate flex min-h-[540px] items-center overflow-hidden border-t border-white/[0.06] sm:min-h-[660px] lg:min-h-[760px]"
+      >
+        {/* zapasowe tło: zostaje widoczne, gdy przeglądarka nie ma WebGPU */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(72% 62% at 50% 108%, rgba(255,62,10,0.16), rgba(255,62,10,0) 70%), linear-gradient(180deg, #050507 0%, rgba(5,5,7,0) 22%, rgba(5,5,7,0) 78%, #050507 100%)",
+          }}
+        />
+        {manifestNear && !shardsFailed && (
+          <div className="absolute inset-0 pointer-events-none">
+            <AeroShards
+              backgroundColor="#050507"
+              shardColor="#8E8A96"
+              accentColor="#FF3E0A"
+              placement="full"
+              flow="stream"
+              material="pearl"
+              detail="balanced"
+              effect="none"
+              scale={1}
+              spread={0.95}
+              depth={1}
+              speed={0.75}
+              spin={0.8}
+              interaction="repel"
+              density={finePointer ? 1.15 : 0.8}
+              shardSize={1.05}
+              stretch={1}
+              turbulence={1}
+              glow={1}
+              bloom={finePointer ? 0.5 : 0.35}
+              grain={0.045}
+              interactionRadius={1.4}
+              interactionStrength={0.45}
+              rippleIntensity={0.9}
+              onError={() => setShardsFailed(true)}
+            />
+          </div>
+        )}
+
+        <div className="relative z-10 mx-auto w-full max-w-[1280px] px-6 py-24 text-center sm:py-32 lg:px-8 lg:py-40">
+          <Reveal>
+            <div className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.24em] text-white/35 sm:text-[11px]">MANIFEST</div>
+            <h2 className="mt-6 font-[Cormorant_Garamond] font-light leading-[0.9] tracking-[-0.03em] text-[clamp(30px,7.4vw,96px)]">
+              <EditableText ek="qraft.manifest.l1" def="Perfekcji" className="block text-white/95" isEditing={isEditing} as="span" />
+              <EditableText ek="qraft.manifest.l2" def="nie można" className="block text-white/95" isEditing={isEditing} as="span" />
+              <span
+                className="block font-[Instrument_Serif] italic text-transparent"
+                style={{ WebkitTextStroke: "1.1px rgba(255,255,255,0.75)" }}
+              >
+                przyspieszyć.
+              </span>
+            </h2>
+            <EditableText
+              ek="qraft.manifest.sub"
+              def="Trzy tygodnie pracy wyglądają jak trzy tygodnie pracy. Każdy detal doprowadzamy do końca, zamiast dowozić go szybciej."
+              className="mx-auto mt-7 block max-w-[540px] font-[Inter] font-light text-[14px] leading-7 text-white/45 sm:text-[15px]"
+              isEditing={isEditing}
+              as="p"
+            />
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+              <BtnGhost onClick={() => go("process")} className="h-11 px-6 text-[10px] sm:text-[11px]">
+                ZOBACZ PROCES <ArrowRight className="h-3 w-3 opacity-60" />
+              </BtnGhost>
+              <BtnGhost onClick={() => go("contact")} className="h-11 px-6 text-[10px] sm:text-[11px]">
+                ZAMÓW AUDYT
+              </BtnGhost>
+            </div>
+          </Reveal>
         </div>
       </section>
 
