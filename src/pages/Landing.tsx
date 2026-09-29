@@ -1536,9 +1536,9 @@ export default function Landing() {
         <div className="absolute inset-0">
           <motion.div style={{ y: cinemaY }} className="absolute inset-0 scale-[1.35]">
             <img
-              src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=2000&q=80&auto=format&fit=crop"
-              alt="Góry o świcie"
-              className="h-full w-full object-cover grayscale contrast-110 brightness-[0.42]"
+              src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=2000&q=80&auto=format&fit=crop"
+              alt="Góra pod gwiazdami nocą"
+              className="h-full w-full object-cover grayscale contrast-110 brightness-[0.38]"
             />
           </motion.div>
 
@@ -1599,7 +1599,7 @@ export default function Landing() {
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              <h1 className="font-[Instrument_Serif] font-light uppercase leading-[0.84] tracking-[-0.045em] text-[clamp(24px,7.4vw,100px)]">
+              <h1 className="font-[Cormorant_Garamond] font-light uppercase leading-[0.86] tracking-[0.01em] text-[clamp(26px,7.8vw,106px)]">
                 <span className="block text-white">Precision</span>
                 <span className="block text-white">Builds</span>
                 <span className="block text-transparent" style={{ WebkitTextStroke: "1.2px rgba(255,255,255,0.6)" }}>
