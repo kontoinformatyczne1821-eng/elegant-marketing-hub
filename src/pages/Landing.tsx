@@ -1709,7 +1709,7 @@ export default function Landing() {
               whileInView={{ opacity:1, y:0 }}
               viewport={{ once:true }}
               transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}}
-              className="h-[196px] sm:h-[212px] lg:h-[224px]"
+              className="h-[260px] sm:h-[300px]"
             >
               <FlipCard
                 fill
@@ -1731,18 +1731,18 @@ export default function Landing() {
                 flipOnClick={!isEditing}
                 draggable={!isEditing}
                 front={(
-                  <div className="relative flex h-full w-full flex-col p-3 sm:p-4">
+                  <div className="relative flex h-full w-full flex-col p-4 sm:p-6 lg:p-7">
                     <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(74% 54% at 50% 0%, rgba(255,255,255,0.08), transparent 72%)" }} />
                     <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.08]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06)" }} />
                     <div className="relative flex items-center justify-between">
                       <PopNumber text={s.n} className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.16em] text-white/25" />
                       <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10 text-white/25"><ArrowUpRight className="h-3.5 w-3.5"/></span>
                     </div>
-                    <h3 className="relative mt-2 sm:mt-2.5 font-[Cormorant_Garamond] font-light text-[16.5px] sm:text-[18px] tracking-[-0.01em] leading-none">
+                    <h3 className="relative mt-3 sm:mt-5 font-[Cormorant_Garamond] font-light text-[19px] sm:text-[21px] tracking-[-0.01em] leading-none">
                       <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
                     </h3>
-                    <div className="relative mt-auto space-y-1.5 pt-2.5">
-                      <p className="font-[Inter] font-light text-[12.5px] sm:text-[13px] leading-5 text-white/55">
+                    <div className="relative mt-auto space-y-2 pt-4">
+                      <p className="font-[Inter] font-light text-[13.5px] sm:text-[14.5px] leading-6 text-white/55">
                         <span className="font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.14em] text-white/30 mr-2">DOSTAJESZ</span>
                         <EditableText ek={`qraft.service.${i}.d`} def={s.dostajesz} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
                       </p>
@@ -1777,26 +1777,27 @@ export default function Landing() {
                   </div>
                 )}
                 back={(
-                  <div className="relative flex h-full w-full flex-col p-3 sm:p-4">
+                  <div className="relative flex h-full w-full flex-col p-4 sm:p-6 lg:p-7">
                     <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(86% 62% at 50% 108%, rgba(255,255,255,0.10), transparent 70%)" }} />
                     <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.12]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.08)" }} />
-                    <h3 className="relative mt-2 font-[Cormorant_Garamond] font-light text-[16.5px] sm:text-[18px] leading-none tracking-[-0.01em]">
+                    <div className="relative font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.18em] text-white/30">{s.meta}</div>
+                    <h3 className="relative mt-3 font-[Cormorant_Garamond] font-light text-[17px] sm:text-[19px] leading-none tracking-[-0.01em]">
                       <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
                     </h3>
-                    <p className="relative mt-2 line-clamp-2 font-[Inter] font-light text-[12.5px] leading-[1.15rem] text-white/80">
+                    <p className="relative mt-4 font-[Inter] font-light text-[13.5px] leading-5 text-white/80">
                       <span className="font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.14em] text-white/45 mr-2">CEL</span>
                       <EditableText ek={`qraft.service.${i}.c`} def={s.cel} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
                     </p>
-                    <ul className="relative mt-2.5 space-y-1">
+                    <ul className="relative mt-3 space-y-1">
                       {s.pts.map((p,k)=>(
-                        <li key={k} className="flex items-start gap-2 font-[Inter] font-light text-[11.5px] sm:text-[12px] leading-[1.15rem] text-white/55">
+                        <li key={k} className="flex items-start gap-2 font-[Inter] font-light text-[12px] sm:text-[13px] leading-5 text-white/55">
                           <Check className="mt-[3px] h-3 w-3 shrink-0 text-white/30"/>{p}
                         </li>
                       ))}
                     </ul>
-                    <div className="relative mt-auto pt-2.5">
+                    <div className="relative mt-auto space-y-3 pt-6">
                       <span
-                        className={`flex h-9 w-full items-center justify-center gap-2 rounded-full border font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.16em] transition-colors duration-500 ${
+                        className={`flex h-10 w-full items-center justify-center gap-2 rounded-full border font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.16em] transition-colors duration-500 ${
                           picked.includes(i)
                             ? "border-[#7DF0AE] bg-[#7DF0AE] text-black"
                             : "border-white/20 text-white/75"
@@ -1804,6 +1805,16 @@ export default function Landing() {
                       >
                         {picked.includes(i) ? <><Check className="h-3.5 w-3.5"/> W TWOIM SYSTEMIE</> : <>DODAJ DO SYSTEMU <ArrowRight className="h-3 w-3 opacity-60"/></>}
                       </span>
+                      <div className="flex items-center justify-between font-[JetBrains_Mono] font-light text-[8px] sm:text-[9px] tracking-[0.18em]">
+                        <span className="text-white/25">COFNIJ</span>
+                        <button
+                          onPointerDown={(e)=>e.stopPropagation()}
+                          onClick={(e)=>{ e.stopPropagation(); go("contact"); }}
+                          className="text-white/50 transition-colors duration-300 hover:text-white"
+                        >
+                          SPRAWDZIMY NA AUDYCIE →
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
