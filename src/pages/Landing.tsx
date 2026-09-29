@@ -11,8 +11,6 @@ import QraftMark from "@/components/QraftMark";
 import GlowCursor from "@/components/GlowCursor";
 import PixelTrail from "@/components/PixelTrail";
 import StaggeredMenu from "@/components/StaggeredMenu";
-import JellyRadio from "@/components/JellyRadio";
-import SavingsCount from "@/components/CountUp";
 import AeroShards from "@/components/AeroShards";
 import { Volume2, VolumeX } from "lucide-react";
 import { setMuted, sfxConfirm, sfxPop, sfxTap, sfxWhoosh, unlockAudio } from "@/lib/sound";
@@ -209,120 +207,6 @@ function BtnDark({ children, onClick, className = "" }: { children: React.ReactN
       />
       <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
     </button>
-  );
-}
-
-function BtnGlass({ children, onClick, className = "" }: { children: React.ReactNode; onClick?: () => void; className?: string }) {
-  const [hover, setHover] = useState(false);
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
-      className={`relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-full border font-[JetBrains_Mono] font-light tracking-[0.14em] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-white/50 backdrop-blur-xl ${className}`}
-      style={{ background: "rgba(247,247,245,0.92)", borderColor: hover ? "#0A0A0A" : "rgba(10,10,10,0.16)" }}
-    >
-      <motion.span
-        aria-hidden
-        className="absolute inset-0 bg-[#0A0A0A] origin-left"
-        initial={false}
-        animate={{ scaleX: hover ? 1 : 0 }}
-        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        style={{ originX: 0 }}
-      />
-      <span
-        className="relative z-10 inline-flex items-center gap-2"
-        style={{ color: hover ? "#F2F2F0" : "#0A0A0A" }}
-      >
-        {children}
-      </span>
-    </button>
-  );
-}
-
-/* Efekt kafla SYSTEM na małych kafelkach: 3D przechylenie za kursorem
-   (9°), delikatne powiększenie i refleks podąący za palcem. */
-function finePointerMedia() {
-  return (
-    typeof window !== "undefined" &&
-    !!window.matchMedia &&
-    window.matchMedia("(hover: hover) and (pointer: fine)").matches
-  );
-}
-
-function HoverTile({
-  active,
-  onClick,
-  tapAdvance,
-  className = "",
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  /** na dotyku: cały kafelek reaguje tapnięciem (bez efektów hover) */
-  tapAdvance?: () => void;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  const px = useMotionValue(0.5);
-  const py = useMotionValue(0);
-  const sheen = useMotionValue(0);
-  const targetRx = useMotionValue(0);
-  const targetRy = useMotionValue(0);
-  const targetScale = useMotionValue(1);
-
-  const rx = useSpring(targetRx, { stiffness: 220, damping: 20 });
-  const ry = useSpring(targetRy, { stiffness: 220, damping: 20 });
-  const scale = useSpring(targetScale, { stiffness: 300, damping: 24 });
-  const glareOpacity = useSpring(sheen, { stiffness: 200, damping: 26 });
-
-  const glare = useTransform(
-    [px, py, glareOpacity],
-    ([x, y, o]: number[]) =>
-      `radial-gradient(130% 100% at ${x * 100}% ${y * 100}%, rgba(255,255,255,${0.17 * o}), transparent 64%)`,
-  );
-
-  return (
-    <motion.button
-      type="button"
-      onPointerMove={(e) => {
-        if (e.pointerType === "touch") return;
-        const r = e.currentTarget.getBoundingClientRect();
-        const nx = (e.clientX - r.left) / r.width;
-        const ny = (e.clientY - r.top) / r.height;
-        px.set(nx);
-        py.set(ny);
-        targetRy.set((nx - 0.5) * 2 * 9);
-        targetRx.set(-(ny - 0.5) * 2 * 9);
-        sheen.set(1);
-      }}
-      onPointerEnter={() => {
-        if (finePointerMedia()) targetScale.set(1.02);
-      }}
-      onPointerLeave={() => {
-        targetRx.set(0);
-        targetRy.set(0);
-        targetScale.set(1);
-        sheen.set(0);
-      }}
-      onClick={() => {
-        onClick();
-        tapAdvance?.();
-      }}
-      style={{ rotateX: rx, rotateY: ry, scale, transformPerspective: 900 }}
-      data-on={active ? "true" : "false"}
-      className={`relative h-full w-full overflow-hidden rounded-[16px] sm:rounded-[20px] border p-3 sm:p-4 text-left outline-none backdrop-blur-2xl transition-colors duration-500 ${className}`}
-    >
-      <motion.span
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{ backgroundImage: glare }}
-      />
-      <span className="relative flex flex-col items-start gap-2">{children}</span>
-    </motion.button>
   );
 }
 
@@ -1127,7 +1011,6 @@ function useAtPageEnd(threshold = 24) {
 const SIDEBAR = [
   { label: "SYSTEM", id: "services" },
   { label: "PLANY", id: "pricing" },
-  { label: "PROMOCJE", id: "promo" },
   { label: "PROCES", id: "process" },
   { label: "FAQ", id: "faq" },
   { label: "KONTAKT", id: "contact" },
@@ -1135,106 +1018,9 @@ const SIDEBAR = [
 const SIDEBAR_IDS = SIDEBAR.map((s) => s.id);
 
 /* menu z boku: kolejność zgodna z ławkiem bocznym */
-/* poziomy współpracy — wybierane po wskazaniu planu */
-const TIERS = [
-  {
-    value: "standard",
-    name: "STANDARD",
-    amount: 1200,
-    price: "1 200 zł",
-    cycle: "/ mies.",
-    lead: "PUNKT WYJŚCIA",
-    desc: "Jedna sesja w miesiącu, pełna opieka nad profilem i raport, który mówi wprost, co działa.",
-    includes: [
-      "Jedna sesja zdjęciowa w miesiącu",
-      "Posting, opisy i plan treści",
-      "Raport miesięczny",
-      "Odpowiedź w 24 godziny",
-    ],
-    meta: [
-      { k: "Pierwsze efekty", v: "2–4 tygodnie" },
-      { k: "Sesje w miesiącu", v: "1" },
-      { k: "Format", v: "Zdjęcia 4:5" },
-      { k: "Minimalny okres", v: "3 miesiące" },
-    ],
-  },
-  {
-    value: "pro",
-    name: "PRO",
-    amount: 1999,
-    price: "1 999 zł",
-    cycle: "/ mies.",
-    lead: "NAJCZĘSTSZY WYBÓR",
-    desc: "Dwa strzały w miesiącu, wideo i płatne zasięgi. Tempo, przy którym marka wchodzi w rynek — i zostaje.",
-    includes: [
-      "Dwie sesje zdjęciowe w miesiącu",
-      "Reelsy i wideo krótkie",
-      "Kampanie płatne w promieniu",
-      "Warsztat raz na kwartał",
-      "Odpowiedź w 6 godzin",
-    ],
-    meta: [
-      { k: "Pierwsze efekty", v: "10–14 dni" },
-      { k: "Sesje w miesiącu", v: "2" },
-      { k: "Format", v: "Zdjęcia + wideo" },
-      { k: "Minimalny okres", v: "3 miesiące" },
-    ],
-  },
-  {
-    value: "max",
-    name: "MAX",
-    amount: 2300,
-    price: "2 300 zł",
-    cycle: "/ mies.",
-    lead: "DEDYKOWANY ZESPÓŁ",
-    desc: "Nieograniczone sesje, produkcja wideo i podcast oraz kierownik projektu, który zna markę na pamięć.",
-    includes: [
-      "Nieograniczone sesje w miesiącu",
-      "Produkcja wideo i podcastu",
-      "Kierownik projektu na stałe",
-      "Priorytet w kolejce",
-      "Raporty tygodniowe",
-    ],
-    meta: [
-      { k: "Pierwsze efekty", v: "7 dni" },
-      { k: "Sesje w miesiącu", v: "Bez limitu" },
-      { k: "Format", v: "Pełna produkcja" },
-      { k: "Minimalny okres", v: "6 miesięcy" },
-    ],
-  },
-];
-
-/* okresy współpracy — im dłużej, tym niższa cena miesięczna */
-const TERMS = [
-  { value: "h6", label: "6 mies.", months: 6, discount: 0 },
-  { value: "y1", label: "Rok", months: 12, discount: 0.17 },
-  { value: "y2", label: "2 lata", months: 24, discount: 0.24 },
-  { value: "y5", label: "5 lat", months: 60, discount: 0.28 },
-  { value: "y10", label: "10 lat", months: 120, discount: 0.3 },
-];
-
-/* nowy klient: 50% przez pierwsze 90 dni */
-const PROMO_MONTHS = 3;
-const PROMO_RATE = 0.5;
-
-const zl = (n: number) =>
-  `${Math.round(n).toLocaleString("pl-PL").replace(/\u00a0/g, " ")} zł`;
-
-/* Kwoty zaokrąglamy do pełnych złotów: przy stawkach 999 / 1 999 / 2 300
-   wyszły ułamki, a CountUp formatuje liczbę z separatorem dziesiętnym
-   w amerykańskim zapisie — dawało to “4 077.96” zamiast “4 077 zł”. */
-const calc = (amount: number, months: number, discount: number) => {
-  const promoSaving = Math.round(amount * PROMO_RATE * PROMO_MONTHS);
-  const termSaving = Math.round(amount * discount * months);
-  const total = amount * months;
-  const paid = amount * (1 - discount) * months - promoSaving;
-  return { promoSaving, termSaving, total, saved: Math.round(total - paid), monthly: paid / months };
-};
-
 const MENU_ITEMS: StaggeredMenuItem[] = [
   { label: "System", ariaLabel: "Przejdź do sekcji SYSTEM", link: "#services" },
   { label: "Plany", ariaLabel: "Przejdź do sekcji PLANY", link: "#pricing" },
-  { label: "Promocje", ariaLabel: "Przejdź do sekcji PROMOCJE", link: "#promo" },
   { label: "Proces", ariaLabel: "Przejdź do sekcji PROCES", link: "#process" },
   { label: "FAQ", ariaLabel: "Przejdź do sekcji FAQ", link: "#faq" },
   { label: "Kontakt", ariaLabel: "Przejdź do sekcji KONTAKT", link: "#contact" },
@@ -1337,16 +1123,8 @@ export default function Landing() {
   /* biała karta frontowa PLANY — ślad kursora robi się czarny */
   const [overWhiteCard, setOverWhiteCard] = useState(false);
   const darkCursor = inProcess || overWhiteCard;
-  /* wybrany plan ładze do sekcji PROMOCJE + wybrany poziom i okres */
+  /* wybrany pakiet PLANY: podświetla kafel i trafia do zapytania w KONTAKCIE */
   const [chosenPlan, setChosenPlan] = useState<number | null>(null);
-  const [term, setTerm] = useState(TERMS[1].value);
-  /* poziom wynika z wybranego planu: ESSENCE → Standard, SIGNATURE → Pro, PRESTIGE → Max */
-  const tier = TIERS[chosenPlan === null ? 1 : Math.min(2, chosenPlan)].value;
-  const tierData = TIERS.find((x) => x.value === tier) ?? TIERS[1];
-  /* MAX (PRESTIGE) sprzedajemy tylko na 2 lata — poza tym poziom nie ma dłuższych okresów */
-  const availableTerms = tier === "max" ? TERMS.slice(0, 3) : TERMS;
-  const termData = availableTerms.find((x) => x.value === term) ?? availableTerms[0];
-  const quote = calc(tierData.amount, termData.months, termData.discount);
   const atPageEnd = useAtPageEnd();
   /* ikona głośnika musi się odświeża, więc stan trzymamy w Reaccie */
   const [soundOn, setSoundOn] = useState(true);
@@ -1437,7 +1215,7 @@ export default function Landing() {
     sfxConfirm();
     setChosenPlan(i);
     setForm((f) => ({ ...f, service: plans[i].name.toLowerCase() }));
-    go("promo");
+    go("pricing");
   };
   /* anulowanie wyboru odblokowuje znowu pasek pakietów */
   const clearPlan = () => {
@@ -2079,165 +1857,13 @@ export default function Landing() {
         <div className="mt-8 text-center font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.06em] text-white/20"><EditableText ek="qraft.pricing.note2" def="Start bez sesji zdjęciowej — dostępna od Signature. Szczegóły na audycie." className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div>
       </section>
 
-      <section id="promo" className="relative mx-auto max-w-[1280px] px-5 sm:px-6 lg:px-8 pb-16 sm:pb-24 lg:pb-32">
-        <Reveal>
-          <div className="max-w-[620px] border-t border-white/[0.06] pt-10 sm:pt-16 lg:pt-20">
-              <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/20">04 — PROMOCJE</div>
-              <h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[27px] sm:text-[50px] leading-[0.98] tracking-[-0.02em] text-white">
-                Pierwsze 90 dni <span className="font-[Instrument_Serif] italic text-white/55">połowa ceny</span>.
-              </h2>
-              <p className="mt-5 font-[Inter] font-light text-[14px] sm:text-[15px] leading-7 text-white/45">
-                Nowi klienci QRAFT płacą połowę przez pierwsze 90 dni. Potem cena zależy od okresu — im dłużej, tym niższa.
-              </p>
-              {chosenPlan !== null && (
-                <p className="mt-4 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.18em] text-white/40">
-                  PLAN <span className="text-[#7DF0AE]">{plans[chosenPlan]?.name}</span> — {tierData.name} na {termData.label.toLowerCase()}
-                </p>
-              )}
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.06}>
-          <div className="mt-10 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-white/30">OKRES</div>
-            <JellyRadio
-              items={availableTerms.map((t) => ({ value: t.value, label: t.label }))}
-              value={term}
-              onChange={(v) => { sfxPop(); setTerm(v); }}
-              chipColor="rgba(255,255,255,0.045)"
-              activeColor="#7DF0AE"
-              textColor="rgba(242,242,240,0.55)"
-              activeTextColor="#0A120E"
-              size="sm"
-              gap={4}
-              radius={14}
-              swell={0.16}
-              barge={4}
-              stiffness={620}
-              ariaLabel="Okres współpracy"
-            />
-          </div>
-        </Reveal>
-
-        <div
-          className={`mt-4 sm:mt-6 grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-3 ${
-            availableTerms.length === 5 ? "lg:grid-cols-5" : "lg:grid-cols-3"
-          }`}
-        >
-          {availableTerms.map((t, k) => {
-            const q = calc(tierData.amount, t.months, t.discount);
-            const on = t.value === term;
-            return (
-              <motion.div
-                key={t.value}
-                initial={{ opacity: 0, y: 14 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-10%" }}
-                transition={{ duration: 0.6, delay: k * 0.05, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <HoverTile
-                  active={on}
-                  onClick={() => setTerm(t.value)}
-                  className={
-                    on
-                      ? "border-[#7DF0AE]/60 bg-[#0A120E]"
-                      : "border-white/[0.08] bg-white/[0.02] hover:border-white/25"
-                  }
-                >
-                <span className="flex w-full items-center justify-between gap-2">
-                  <span className={`font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.2em] ${on ? "text-[#7DF0AE]" : "text-white/35"}`}>
-                    {t.label.toUpperCase()}
-                  </span>
-                  {t.discount > 0 && (
-                    <span className="font-[JetBrains_Mono] font-light text-[9px] tracking-[0.12em] text-white/35">−{Math.round(t.discount * 100)}%</span>
-                  )}
-                </span>
-                <span className="font-[Inter] font-light text-[12px] leading-5 text-white/45">
-                  oszczędzasz
-                </span>
-                <span className="font-[Cormorant_Garamond] font-light text-[20px] sm:text-[26px] leading-none text-[#7DF0AE]">
-                  {zl(q.saved)}
-                </span>
-                </HoverTile>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        <Reveal delay={0.08}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${tier}-${term}`}
-              initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -14, filter: "blur(8px)" }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-4 sm:mt-6 overflow-hidden rounded-[20px] sm:rounded-[28px] border border-white/[0.10] bg-white/[0.03] p-5 sm:p-7 lg:p-10 backdrop-blur-2xl backdrop-saturate-[1.4]"
-              style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 30px 80px rgba(0,0,0,0.35)" }}
-            >
-              <div className="grid gap-10 lg:grid-cols-[1fr_400px]">
-                <div>
-                  <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.24em] text-white/35">
-                    {tierData.name} · {termData.label.toUpperCase()}
-                  </div>
-                  <p className="mt-6 font-[Inter] font-light text-[14px] sm:text-[16px] leading-7 text-white/60">{tierData.desc}</p>
-                  <ul className="mt-8 space-y-3">
-                    {tierData.includes.map((x, k) => (
-                      <motion.li
-                        key={x}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.45, delay: 0.06 + k * 0.06, ease: [0.22, 1, 0.36, 1] }}
-                        className="flex items-start gap-3 font-[Inter] font-light text-[13px] sm:text-[15px] leading-6 text-white/70"
-                      >
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#7DF0AE]" />
-                        <span>{x}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="flex flex-col justify-between gap-6 sm:gap-10 rounded-[20px] sm:rounded-[28px] border border-white/[0.10] bg-white/[0.03] p-5 sm:p-8 lg:p-10 backdrop-blur-2xl">
-                  <div>
-                    <div className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-white/30">
-                      CO OSZCZĘDZASZ
-                    </div>
-                    <div className="mt-4 font-[Cormorant_Garamond] font-light leading-[0.92] tracking-[-0.03em] text-[#7DF0AE] text-[clamp(34px,5.4vw,68px)] tabular-nums">
-                      <SavingsCount
-                        key={`${tier}-${term}`}
-                        to={quote.saved}
-                        duration={1.6}
-                        separator=" "
-                      />
-                      <span className="text-white/35"> zł</span>
-                    </div>
-                    <div className="mt-8 font-[Inter] font-light text-[13px] sm:text-[14px] leading-6 text-white/50">
-                      <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] py-3">
-                        <span>−50% przez pierwsze 90 dni</span>
-                        <span className="text-[#7DF0AE]">{zl(quote.promoSaving)}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4 py-3">
-                        <span>Rabat za {termData.label.toLowerCase()}</span>
-                        <span className="text-[#7DF0AE]">{zl(quote.termSaving)}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <BtnGlass onClick={() => go("contact")} className="w-full h-14 text-[10px] sm:text-[11px]">ZACZNIJ WSPÓŁPRACĘ</BtnGlass>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </Reveal>
-      </section>
-
-
       <section id="faq" className="mx-auto max-w-[1280px] px-6 lg:px-8 pb-12">
-        <Reveal><div className="grid lg:grid-cols-[320px_1fr] gap-10 border-t border-white/[0.06] pt-12"><div><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/20">05 — FAQ</div><h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[26px] sm:text-[30px] leading-none"><EditableText ek="qraft.faq.h" def="Szybkie odpowiedzi." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><EditableText ek="qraft.faq.desc" def="Jasno i bez żargonu. Resztę dopowiemy na audycie." className="mt-3 block font-[Inter] font-light text-[13px] sm:text-[14px] leading-6 text-white/30" isEditing={isEditing} as="p" /></div><div className="divide-y divide-white/5 border border-white/10 rounded-[20px] overflow-hidden bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.3]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.25)" } as any}>{[["Dla kogo jest QRAFT?","Dla firm, gdzie liczy się miejsce i reputacja. Kawiarnie, studia, butiki, kliniki."],["Jak szybko widać efekty?","2–4 tygodnie by dać się znaleźć. 30–60 dni by urosnąć w środku tygodnia."],["Czy jest zobowiązanie?","Nie. Miesiąc do miesiąca po 90 dniach."],["Czego potrzebujecie na start?","90 minut + dostęp do profilu. Resztą zajmujemy się my."]].map(([q,a],i)=>(<div key={q}><button onClick={()=>setFaqOpen(faqOpen===i?null:i)} className="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition"><span className="font-[Cormorant_Garamond] font-light text-[15px] sm:text-[17px] pr-6"><EditableText ek={`qraft.faq.${i}.q`} def={q} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span><span className={`h-7 w-7 grid place-items-center rounded-full border shrink-0 transition ${faqOpen===i?"bg-white text-black border-white":"border-white/10 text-white/20"}`}>{faqOpen===i?<Minus className="h-3.5 w-3.5"/>:<Plus className="h-3.5 w-3.5"/>}</span></button><AnimatePresence>{faqOpen===i && (<motion.div initial={{ height:0, opacity:0 }} animate={{ height:"auto", opacity:1 }} exit={{ height:0, opacity:0 }} className="overflow-hidden"><div className="px-6 pb-6 font-[Inter] font-light text-[13px] sm:text-[14px] leading-7 text-white/60 max-w-[560px]"><EditableText ek={`qraft.faq.${i}.a`} def={a} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></div></motion.div>)}</AnimatePresence></div>))}</div></div></Reveal>
+        <Reveal><div className="grid lg:grid-cols-[320px_1fr] gap-10 border-t border-white/[0.06] pt-12"><div><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/20">04 — FAQ</div><h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[26px] sm:text-[30px] leading-none"><EditableText ek="qraft.faq.h" def="Szybkie odpowiedzi." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><EditableText ek="qraft.faq.desc" def="Jasno i bez żargonu. Resztę dopowiemy na audycie." className="mt-3 block font-[Inter] font-light text-[13px] sm:text-[14px] leading-6 text-white/30" isEditing={isEditing} as="p" /></div><div className="divide-y divide-white/5 border border-white/10 rounded-[20px] overflow-hidden bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.3]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.25)" } as any}>{[["Dla kogo jest QRAFT?","Dla firm, gdzie liczy się miejsce i reputacja. Kawiarnie, studia, butiki, kliniki."],["Jak szybko widać efekty?","2–4 tygodnie by dać się znaleźć. 30–60 dni by urosnąć w środku tygodnia."],["Czy jest zobowiązanie?","Nie. Miesiąc do miesiąca po 90 dniach."],["Czego potrzebujecie na start?","90 minut + dostęp do profilu. Resztą zajmujemy się my."]].map(([q,a],i)=>(<div key={q}><button onClick={()=>setFaqOpen(faqOpen===i?null:i)} className="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition"><span className="font-[Cormorant_Garamond] font-light text-[15px] sm:text-[17px] pr-6"><EditableText ek={`qraft.faq.${i}.q`} def={q} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span><span className={`h-7 w-7 grid place-items-center rounded-full border shrink-0 transition ${faqOpen===i?"bg-white text-black border-white":"border-white/10 text-white/20"}`}>{faqOpen===i?<Minus className="h-3.5 w-3.5"/>:<Plus className="h-3.5 w-3.5"/>}</span></button><AnimatePresence>{faqOpen===i && (<motion.div initial={{ height:0, opacity:0 }} animate={{ height:"auto", opacity:1 }} exit={{ height:0, opacity:0 }} className="overflow-hidden"><div className="px-6 pb-6 font-[Inter] font-light text-[13px] sm:text-[14px] leading-7 text-white/60 max-w-[560px]"><EditableText ek={`qraft.faq.${i}.a`} def={a} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></div></motion.div>)}</AnimatePresence></div>))}</div></div></Reveal>
       </section>
 
       <section id="contact" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-12 lg:py-20">
         <div className="grid lg:grid-cols-[1fr_1fr] gap-6">
-          <Reveal><div className="bg-[#0F0F11] border border-white/10 text-white rounded-[32px] p-8 lg:p-10 relative overflow-hidden min-h-[440px] flex flex-col"><div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/[0.04] blur-2xl"/><div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"/><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/30">06 — AUDYT</div><h2 className="mt-6 font-[Cormorant_Garamond] font-light text-[32px] sm:text-[40px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.contact.h1b" def="Zamów bezpłatny" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.contact.h2b" def="audyt." className="block font-[Cormorant_Garamond] font-light italic text-white/50" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.contact.desc2" def="20 minut online. Wybierz usługę, dzień i godzinę — potwierdzimy w ciągu kilku godzin. Nawet jeśli nas nie wybierzesz, zostajesz z planem." className="mt-4 block font-[Inter] font-light text-[13px] sm:text-[14px] leading-7 text-white/60 max-w-[380px]" isEditing={isEditing} as="p" /><div className="mt-8 space-y-3 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.06em] text-white/35"><div className="flex items-center gap-2.5"><Clock className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line1" def="Dwa terminy w tym tygodniu · 20 min" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div><div className="flex items-center gap-2.5"><Terminal className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line2" def="Otwarte dla każdego klienta" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div></div><div className="mt-auto pt-10 flex gap-2 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.1em]"><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge1" def="BEZ OPŁAT" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge2" def="BEZ ZOBOWIĄZAŃ" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div></div></Reveal>
+          <Reveal><div className="bg-[#0F0F11] border border-white/10 text-white rounded-[32px] p-8 lg:p-10 relative overflow-hidden min-h-[440px] flex flex-col"><div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/[0.04] blur-2xl"/><div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"/><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/30">05 — AUDYT</div><h2 className="mt-6 font-[Cormorant_Garamond] font-light text-[32px] sm:text-[40px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.contact.h1b" def="Zamów bezpłatny" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.contact.h2b" def="audyt." className="block font-[Cormorant_Garamond] font-light italic text-white/50" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.contact.desc2" def="20 minut online. Wybierz usługę, dzień i godzinę — potwierdzimy w ciągu kilku godzin. Nawet jeśli nas nie wybierzesz, zostajesz z planem." className="mt-4 block font-[Inter] font-light text-[13px] sm:text-[14px] leading-7 text-white/60 max-w-[380px]" isEditing={isEditing} as="p" /><div className="mt-8 space-y-3 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.06em] text-white/35"><div className="flex items-center gap-2.5"><Clock className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line1" def="Dwa terminy w tym tygodniu · 20 min" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div><div className="flex items-center gap-2.5"><Terminal className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line2" def="Otwarte dla każdego klienta" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div></div><div className="mt-auto pt-10 flex gap-2 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.1em]"><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge1" def="BEZ OPŁAT" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge2" def="BEZ ZOBOWIĄZAŃ" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div></div></Reveal>
           <Reveal delay={0.06}>
             <div className="bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.4] border border-white/10 rounded-[22px] sm:rounded-[32px] p-5 sm:p-7 lg:p-8 h-full flex flex-col" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.32)" } as any}>
               <div className="flex items-center justify-between gap-3">
