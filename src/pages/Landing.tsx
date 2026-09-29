@@ -12,6 +12,7 @@ import GlowCursor from "@/components/GlowCursor";
 import PixelTrail from "@/components/PixelTrail";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import AeroShards from "@/components/AeroShards";
+import StarField from "@/components/StarField";
 import { Volume2, VolumeX } from "lucide-react";
 import { setMuted, sfxConfirm, sfxPop, sfxTap, sfxWhoosh, unlockAudio } from "@/lib/sound";
 import type { StaggeredMenuItem } from "@/components/StaggeredMenu";
@@ -1664,36 +1665,8 @@ export default function Landing() {
               "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0) 26%, rgba(5,5,7,0) 74%, #050507 100%)",
           }}
         />
-        {servicesNear && !shardsFailed && (
-          <div className="absolute inset-0 z-0 pointer-events-none">
-            <AeroShards
-              backgroundColor="#050507"
-              shardColor="#8E8A96"
-              accentColor="#FF3E0A"
-              placement="full"
-              flow="stream"
-              material="pearl"
-              detail="balanced"
-              effect="none"
-              scale={1}
-              spread={1}
-              depth={0.85}
-              speed={0.55}
-              spin={0.6}
-              interaction="repel"
-              density={finePointer ? 0.9 : 0.6}
-              shardSize={0.9}
-              stretch={1}
-              turbulence={0.9}
-              glow={0.8}
-              bloom={finePointer ? 0.35 : 0.25}
-              grain={0.04}
-              interactionRadius={1.2}
-              interactionStrength={0.35}
-              rippleIntensity={0.7}
-              onError={() => setShardsFailed(true)}
-            />
-          </div>
+        {servicesNear && (
+          <StarField className="absolute inset-0 z-0 h-full w-full" />
         )}
         {/* wejście w pole: czerń rozpuszcza się w głąb, jak w MANIFEŚCIE */}
         <div
