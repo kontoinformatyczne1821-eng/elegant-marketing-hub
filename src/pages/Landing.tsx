@@ -1,6 +1,6 @@
 import { motion, AnimatePresence, useScroll, useSpring, useTransform, useInView, useMotionValue, useMotionValueEvent } from "framer-motion";
 import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Check, Minus, Plus, Clock, Terminal, Pencil, Save, RefreshCw } from "lucide-react";
-import { useState, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import Lenis from "lenis";
 import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
@@ -492,12 +492,16 @@ function PlanShowcase({
   const stageRef = useRef<HTMLDivElement>(null);
   /* wjeżdżając w sekcję planów podpowiadamy pakiet dobrany do liczby modułów */
   const inView = useInView(stageRef, { amount: 0.25, margin: "0px 0px -12% 0px" });
+  const onActiveRef = useRef(onActiveChange);
+  useEffect(() => {
+    onActiveRef.current = onActiveChange;
+  });
   useEffect(() => {
     if (inView) {
       setActive(recommended);
-      onActiveChange?.(recommended);
+      onActiveRef.current?.(recommended);
     }
-  }, [inView, recommended, onActiveChange]);
+  }, [inView, recommended]);
   const signed = (n: number) => {
     const m = ((n % L) + L) % L;
     return m > L / 2 ? m - L : m;
@@ -1089,9 +1093,21 @@ function FlowBackdrop({ essence }: { essence: boolean }) {
 
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#050507]">
-      {/* motyw ESSENCE: bursztyn i fiolet na czerni — ten sam typ tła, inne światło */}
       <motion.div
-        className="absolute inset-0"
+        className="absolute inset-[-14%] will-change-transform"
+        style={{ y, x, scale, rotate }}
+      >
+        {FLOW_BG_SRC ? (
+          <img src={FLOW_BG_SRC} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <FlowArt />
+        )}
+      </motion.div>
+      {/* motyw ESSENCE: bursztyn i fiolet na czerni — przykrywa białe łuki na czas
+          trwania planu ESSENCE i odkrywa je z powrotem przy zmianie planu */}
+      <motion.div
+        className="absolute inset-[-14%] will-change-transform"
+        style={{ y, x, scale, rotate }}
         initial={false}
         animate={{ opacity: essence ? 1 : 0 }}
         transition={{ duration: 1.1, ease: "easeInOut" }}
@@ -1103,22 +1119,13 @@ function FlowBackdrop({ essence }: { essence: boolean }) {
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(90% 70% at 22% 18%, rgba(214,164,86,0.30), transparent 55%)," +
-                "radial-gradient(80% 62% at 78% 28%, rgba(146,86,214,0.26), transparent 58%)," +
-                "radial-gradient(70% 58% at 42% 86%, rgba(122,66,178,0.22), transparent 60%)," +
-                "radial-gradient(56% 44% at 86% 84%, rgba(230,182,110,0.14), transparent 62%)",
+                "radial-gradient(90% 70% at 22% 18%, rgba(214,164,86,0.38), transparent 55%)," +
+                "radial-gradient(80% 62% at 78% 28%, rgba(146,86,214,0.34), transparent 58%)," +
+                "radial-gradient(70% 58% at 42% 86%, rgba(122,66,178,0.30), transparent 60%)," +
+                "radial-gradient(56% 44% at 86% 84%, rgba(230,182,110,0.20), transparent 62%)," +
+                "linear-gradient(180deg, #0A0608 0%, #060406 100%)",
             }}
           />
-        )}
-      </motion.div>
-      <motion.div
-        className="absolute inset-[-14%] will-change-transform"
-        style={{ y, x, scale, rotate }}
-      >
-        {FLOW_BG_SRC ? (
-          <img src={FLOW_BG_SRC} alt="" className="h-full w-full object-cover" />
-        ) : (
-          <FlowArt />
         )}
       </motion.div>
 
@@ -1164,6 +1171,7 @@ export default function Landing() {
   const darkCursor = inProcess || overWhiteCard;
   /* ESSENCE (pierwszy plan) z przodu: tło strony przechodzi w bursztyn/fiolet */
   const [essenceFront, setEssenceFront] = useState(true);
+  const handleActiveChange = useCallback((i: number) => setEssenceFront(i === 0), []);
   /* wybrany pakiet PLANY: podświetla kafel i trafia do zapytania w KONTAKCIE */
   const [chosenPlan, setChosenPlan] = useState<number | null>(null);
   const atPageEnd = useAtPageEnd();
@@ -1894,7 +1902,7 @@ export default function Landing() {
           recommended={recommended}
           pickedCount={picked.length}
           onWhiteHover={setOverWhiteCard}
-          onActiveChange={(i) => setEssenceFront(i === 0)}
+          onActiveChange={handleActiveChange}
         /></Reveal>
         <div className="mt-8 text-center font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.06em] text-white/20"><EditableText ek="qraft.pricing.note2" def="Start bez sesji zdjęciowej — dostępna od Signature. Szczegóły na audycie." className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div>
       </section>
