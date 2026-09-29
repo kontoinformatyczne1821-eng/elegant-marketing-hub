@@ -723,10 +723,6 @@ function PlanShowcase({
           </span>
           <span className="h-px w-14 bg-gradient-to-l from-transparent to-white/20" />
         </div>
-        <p className="mt-5 font-[Cormorant_Garamond] font-light text-[32px] sm:text-[40px] leading-[1.04] tracking-[-0.01em] text-[#F2F2F0]">
-          Perfection{" "}
-          <span className="font-[Instrument_Serif] italic text-white/55">can’t be rushed</span>
-        </p>
         <p className="mt-4 font-[Cormorant_Garamond] font-light text-[17px] sm:text-[20px] leading-none text-white/50">
           Cały proces zajmuje{" "}
           <span className={`font-[Instrument_Serif] italic ${essence ? "text-[#E9C68C]" : "text-[#7DF0AE]"}`}>od 90 dni</span>.
