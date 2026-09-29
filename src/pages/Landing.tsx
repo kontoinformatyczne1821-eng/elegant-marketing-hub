@@ -1,6 +1,7 @@
 import { motion, AnimatePresence, useScroll, useSpring, useTransform, useInView, useMotionValue, useMotionValueEvent } from "framer-motion";
 import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Check, Minus, Plus, Clock, Terminal, Pencil, Save, RefreshCw } from "lucide-react";
 import { useState, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from "react";
+import Lenis from "lenis";
 import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
 import GradualBlur from "@/components/GradualBlur";
@@ -37,6 +38,29 @@ function useFinePointer() {
       window.matchMedia("(hover: hover) and (pointer: fine)").matches,
     () => false,
   );
+}
+
+/* Płynny scroll strony: Lenis prowadzi okno z lekkim wybieganiem (lerp) zamiast skoków kółka.
+   Dotyk zostaje natywny, a przy prefers-reduced-motion w ogóle go nie włączamy. */
+const lenisRef: { current: InstanceType<typeof Lenis> | null } = { current: null };
+
+function useLenis() {
+  useEffect(() => {
+    if (REDUCE_MOTION || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    const lenis = new Lenis({ lerp: 0.09 });
+    lenisRef.current = lenis;
+    let raf = 0;
+    const loop = (time: number) => {
+      lenis.raf(time);
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => {
+      cancelAnimationFrame(raf);
+      lenis.destroy();
+      lenisRef.current = null;
+    };
+  }, []);
 }
 
 function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, popKey }: { ek: string; def: string; className?: string; as?: any; isEditing: boolean; pop?: boolean; popKey?: string }) {
@@ -1343,6 +1367,8 @@ export default function Landing() {
   /* ślad pikselowy w hero ma sens tylko dla myszy/trackpada */
   const finePointer = useFinePointer();
   const spy = useSectionSpy(SIDEBAR_IDS);
+  /* płynny, sprzężony scroll strony (Lenis) — kotwice i CTA korzystają z jego API */
+  useLenis();
   /* MANIFEST: pole odłamków (WebGPU) montujemy dopiero, gdy sekcja zbliża się do ekranu */
   const manifestRef = useRef<HTMLElement>(null);
   const manifestNear = useInView(manifestRef, { once: true, margin: "35%" });
@@ -1399,7 +1425,12 @@ export default function Landing() {
   };
   const go = (id: string) => {
     sfxWhoosh(true);
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const target = document.getElementById(id);
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(target ?? 0, { duration: 1.5 });
+      return;
+    }
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
   /* wybrany pakiet trafia od razu do zapytania o audyt */
   const pickPlan = (i: number) => {
@@ -1567,7 +1598,7 @@ export default function Landing() {
             >
               <span className="font-[Instrument_Serif] text-[14.5px] sm:text-[16px]">Q</span>
             </button>
-            <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} className="flex items-center gap-4 cursor-pointer">
+            <button onClick={()=>lenisRef.current ? lenisRef.current.scrollTo(0,{duration:1.5}) : window.scrollTo({top:0,behavior:"smooth"})} className="flex items-center gap-4 cursor-pointer">
               <span className="font-[Instrument_Serif] font-light tracking-[0.28em] text-[11px] sm:text-[12px]">QRAFT</span>
               <span className="hidden lg:inline font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.18em] text-white/25 border-l border-white/10 pl-4 ml-1">PERFEKCJA BUDUJE MARKI</span>
             </button>

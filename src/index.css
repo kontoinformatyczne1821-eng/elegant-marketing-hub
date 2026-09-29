@@ -574,3 +574,21 @@ input:-webkit-autofill + .t-clear-mirror,
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/* Lenis: skrypt musi znać wysokość strony (html.lenis), a html.stop wstrzymuje przewijanie */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
