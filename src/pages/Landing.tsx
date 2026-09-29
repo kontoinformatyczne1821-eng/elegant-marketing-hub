@@ -477,12 +477,14 @@ function PlanShowcase({
   recommended = 1,
   pickedCount = 0,
   onWhiteHover,
+  onActiveChange,
 }: {
   isEditing: boolean;
   onPick: (index: number) => void;
   onWhiteHover: (on: boolean) => void;
   recommended?: number;
   pickedCount?: number;
+  onActiveChange?: (index: number) => void;
 }) {
   const L = plans.length;
   const [active, setActive] = useState(recommended);
@@ -491,13 +493,23 @@ function PlanShowcase({
   /* wjeżdżając w sekcję planów podpowiadamy pakiet dobrany do liczby modułów */
   const inView = useInView(stageRef, { amount: 0.25, margin: "0px 0px -12% 0px" });
   useEffect(() => {
-    if (inView) setActive(recommended);
-  }, [inView, recommended]);
+    if (inView) {
+      setActive(recommended);
+      onActiveChange?.(recommended);
+    }
+  }, [inView, recommended, onActiveChange]);
   const signed = (n: number) => {
     const m = ((n % L) + L) % L;
     return m > L / 2 ? m - L : m;
   };
-  const turn = (d: number) => setActive((a) => ((a + d) % L + L) % L);
+  /* ESSENCE z przodu: szkło, poświata i akcenty przechodzą w bursztyn/fiolet */
+  const essence = active === 0;
+  const warm = essence;
+  const turn = (d: number) => {
+    const next = ((active + d) % L + L) % L;
+    setActive(next);
+    onActiveChange?.(next);
+  };
 
   return (
     <>
@@ -528,8 +540,9 @@ function PlanShowcase({
           style={{
             width: 640,
             height: 90,
-            background:
-              "radial-gradient(ellipse at center, rgba(255,255,255,0.12), transparent 70%)",
+            background: essence
+              ? "radial-gradient(ellipse at center, rgba(236,192,120,0.20), rgba(170,110,215,0.10) 55%, transparent 72%)"
+              : "radial-gradient(ellipse at center, rgba(255,255,255,0.12), transparent 70%)",
           }}
         />
 
@@ -570,8 +583,9 @@ function PlanShowcase({
                 animate={{ opacity: front ? 1 : 0.26 }}
                 transition={{ duration: 0.5 }}
                 style={{
-                  background:
-                    "radial-gradient(58% 52% at 50% 58%, rgba(255,255,255,0.18), rgba(255,255,255,0.05) 56%, transparent 76%)",
+                  background: warm
+                    ? "radial-gradient(58% 52% at 50% 58%, rgba(233,190,118,0.30), rgba(190,130,220,0.12) 56%, transparent 76%)"
+                    : "radial-gradient(58% 52% at 50% 58%, rgba(255,255,255,0.18), rgba(255,255,255,0.05) 56%, transparent 76%)",
                   filter: "blur(30px)",
                 }}
               />
@@ -579,7 +593,7 @@ function PlanShowcase({
                 className={`relative overflow-hidden rounded-[22px] sm:rounded-[28px] border p-5 sm:p-8 flex flex-col h-full transition-colors duration-500 ${
                   front
                     ? "bg-[#F7F7F5] text-black border-[#F7F7F5]"
-                    : "bg-white/[0.07] text-white border-white/[0.14] backdrop-blur-2xl backdrop-saturate-[1.4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.16)]"
+                    : `bg-white/[0.07] text-white border-white/[0.14] backdrop-blur-2xl backdrop-saturate-[1.4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.16)] ${warm ? "border-[#E3B66A]/45 shadow-[inset_0_1px_1px_rgba(255,226,176,0.28)]" : ""}`
                 }`}
               >
                 {/* szklany polysk na kartach bocznych */}
@@ -711,7 +725,7 @@ function PlanShowcase({
         </p>
         <p className="mt-4 font-[Cormorant_Garamond] font-light text-[17px] sm:text-[20px] leading-none text-white/50">
           Cały proces zajmuje{" "}
-          <span className="font-[Instrument_Serif] italic text-[#7DF0AE]">od 90 dni</span>.
+          <span className={`font-[Instrument_Serif] italic ${essence ? "text-[#E9C68C]" : "text-[#7DF0AE]"}`}>od 90 dni</span>.
         </p>
         {pickedCount > 0 && (
           <p className="mt-4 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-white/25">
@@ -912,6 +926,9 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
 
 const FLOW_BG_SRC = "";
 
+/* zdjęcie tła dla motywu ESSENCE (bursztyn/fiolet); puste = warstwa gradientowa */
+const ESSENCE_BG_SRC = "";
+
 function FlowArt() {
   /* na dotyku pomijamy filtry SVG (feGaussianBlur) — to najdroższa część tła */
   const light = typeof window !== "undefined" &&
@@ -1057,7 +1074,7 @@ function useSectionSpy(ids: string[]) {
   return active;
 }
 
-function FlowBackdrop() {
+function FlowBackdrop({ essence }: { essence: boolean }) {
   const { scrollYProgress } = useScroll();
   /* niska sprężystość = tło ciągnie się za scrollem zamiast skakać */
   const p = useSpring(scrollYProgress, { stiffness: 40, damping: 16, mass: 0.8 });
@@ -1072,6 +1089,28 @@ function FlowBackdrop() {
 
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#050507]">
+      {/* motyw ESSENCE: bursztyn i fiolet na czerni — ten sam typ tła, inne światło */}
+      <motion.div
+        className="absolute inset-0"
+        initial={false}
+        animate={{ opacity: essence ? 1 : 0 }}
+        transition={{ duration: 1.1, ease: "easeInOut" }}
+      >
+        {ESSENCE_BG_SRC ? (
+          <img src={ESSENCE_BG_SRC} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(90% 70% at 22% 18%, rgba(214,164,86,0.30), transparent 55%)," +
+                "radial-gradient(80% 62% at 78% 28%, rgba(146,86,214,0.26), transparent 58%)," +
+                "radial-gradient(70% 58% at 42% 86%, rgba(122,66,178,0.22), transparent 60%)," +
+                "radial-gradient(56% 44% at 86% 84%, rgba(230,182,110,0.14), transparent 62%)",
+            }}
+          />
+        )}
+      </motion.div>
       <motion.div
         className="absolute inset-[-14%] will-change-transform"
         style={{ y, x, scale, rotate }}
@@ -1123,6 +1162,8 @@ export default function Landing() {
   /* biała karta frontowa PLANY — ślad kursora robi się czarny */
   const [overWhiteCard, setOverWhiteCard] = useState(false);
   const darkCursor = inProcess || overWhiteCard;
+  /* ESSENCE (pierwszy plan) z przodu: tło strony przechodzi w bursztyn/fiolet */
+  const [essenceFront, setEssenceFront] = useState(true);
   /* wybrany pakiet PLANY: podświetla kafel i trafia do zapytania w KONTAKCIE */
   const [chosenPlan, setChosenPlan] = useState<number | null>(null);
   const atPageEnd = useAtPageEnd();
@@ -1235,7 +1276,7 @@ export default function Landing() {
     <div className="min-h-screen text-[#F2F2F0] antialiased selection:bg-white selection:text-black">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap'); html{scroll-behavior:smooth} @keyframes qmarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}} @keyframes qmsheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}} @keyframes qmbreathe{0%,100%{opacity:.35}50%{opacity:.9}}`}</style>
       <motion.div className="fixed top-0 inset-x-0 h-[1px] bg-white/80 z-50 origin-left" style={{ scaleX: progress }} />
-      <FlowBackdrop />
+      <FlowBackdrop essence={essenceFront} />
       <GradualBlur
         target="page"
         position="bottom"
@@ -1853,6 +1894,7 @@ export default function Landing() {
           recommended={recommended}
           pickedCount={picked.length}
           onWhiteHover={setOverWhiteCard}
+          onActiveChange={(i) => setEssenceFront(i === 0)}
         /></Reveal>
         <div className="mt-8 text-center font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.06em] text-white/20"><EditableText ek="qraft.pricing.note2" def="Start bez sesji zdjęciowej — dostępna od Signature. Szczegóły na audycie." className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div>
       </section>
