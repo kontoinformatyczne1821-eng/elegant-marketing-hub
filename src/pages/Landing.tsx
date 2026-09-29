@@ -1878,7 +1878,7 @@ export default function Landing() {
           className="pointer-events-none absolute inset-0 z-[6]"
           style={{
             backgroundImage:
-              "radial-gradient(70% 55% at 50% 112%, rgba(255,62,10,0.13), rgba(255,62,10,0) 72%)",
+              "radial-gradient(70% 55% at 50% 112%, rgba(255,62,10,0.17), rgba(255,62,10,0) 72%)",
           }}
         />
 
@@ -1929,7 +1929,8 @@ export default function Landing() {
         className="bg-[#ECE8E2] border-t border-white/5 text-[#0A0A0A]"
         style={{
           backgroundImage:
-            "linear-gradient(180deg, #F6DFC6 0%, #F1E5D7 20%, #EEE8E1 52%, #ECE8E2 100%)",
+            "radial-gradient(120% 62% at 50% -10%, rgba(255,62,10,0.18), rgba(255,62,10,0) 62%)," +
+            "linear-gradient(180deg, #F6CFA0 0%, #F4D6B2 16%, #F1E0CC 38%, #EFE4D6 64%, #ECE8E2 100%)",
         }}
       >
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-24">
