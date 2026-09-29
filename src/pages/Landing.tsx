@@ -506,9 +506,9 @@ function PlanShowcase({
     const m = ((n % L) + L) % L;
     return m > L / 2 ? m - L : m;
   };
-  /* ESSENCE z przodu: szkło, poświata i akcenty przechodzą w bursztyn/fiolet */
+  /* ESSENCE = bursztyn/fiolet, SIGNATURE = cyjan/czerwień, PRESTIGE = neutralne szkło */
   const essence = active === 0;
-  const warm = essence;
+  const signature = active === 1;
   const turn = (d: number) => {
     const next = ((active + d) % L + L) % L;
     setActive(next);
@@ -546,7 +546,9 @@ function PlanShowcase({
             height: 90,
             background: essence
               ? "radial-gradient(ellipse at center, rgba(236,192,120,0.20), rgba(170,110,215,0.10) 55%, transparent 72%)"
-              : "radial-gradient(ellipse at center, rgba(255,255,255,0.12), transparent 70%)",
+              : signature
+                ? "radial-gradient(ellipse at center, rgba(86,200,242,0.16), rgba(226,59,59,0.08) 55%, transparent 72%)"
+                : "radial-gradient(ellipse at center, rgba(255,255,255,0.12), transparent 70%)",
           }}
         />
 
@@ -587,9 +589,11 @@ function PlanShowcase({
                 animate={{ opacity: front ? 1 : 0.26 }}
                 transition={{ duration: 0.5 }}
                 style={{
-                  background: warm
+                  background: essence
                     ? "radial-gradient(58% 52% at 50% 58%, rgba(233,190,118,0.30), rgba(190,130,220,0.12) 56%, transparent 76%)"
-                    : "radial-gradient(58% 52% at 50% 58%, rgba(255,255,255,0.18), rgba(255,255,255,0.05) 56%, transparent 76%)",
+                    : signature
+                      ? "radial-gradient(58% 52% at 50% 58%, rgba(125,211,252,0.28), rgba(226,59,59,0.10) 56%, transparent 76%)"
+                      : "radial-gradient(58% 52% at 50% 58%, rgba(255,255,255,0.18), rgba(255,255,255,0.05) 56%, transparent 76%)",
                   filter: "blur(30px)",
                 }}
               />
@@ -597,7 +601,7 @@ function PlanShowcase({
                 className={`relative overflow-hidden rounded-[22px] sm:rounded-[28px] border p-5 sm:p-8 flex flex-col h-full transition-colors duration-500 ${
                   front
                     ? "bg-[#F7F7F5] text-black border-[#F7F7F5]"
-                    : `bg-white/[0.07] text-white border-white/[0.14] backdrop-blur-2xl backdrop-saturate-[1.4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.16)] ${warm ? "border-[#E3B66A]/45 shadow-[inset_0_1px_1px_rgba(255,226,176,0.28)]" : ""}`
+                    : `bg-white/[0.07] text-white border-white/[0.14] backdrop-blur-2xl backdrop-saturate-[1.4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.16)] ${essence ? "border-[#E3B66A]/45 shadow-[inset_0_1px_1px_rgba(255,226,176,0.28)]" : signature ? "border-[#56C8F2]/45 shadow-[inset_0_1px_1px_rgba(190,232,255,0.28)]" : ""}`
                 }`}
               >
                 {/* szklany polysk na kartach bocznych */}
@@ -725,7 +729,7 @@ function PlanShowcase({
         </div>
         <p className="mt-4 font-[Cormorant_Garamond] font-light text-[17px] sm:text-[20px] leading-none text-white/50">
           Cały proces zajmuje{" "}
-          <span className={`font-[Instrument_Serif] italic ${essence ? "text-[#E9C68C]" : "text-[#7DF0AE]"}`}>od 90 dni</span>.
+          <span className={`font-[Instrument_Serif] italic ${essence ? "text-[#E9C68C]" : signature ? "text-[#7DD3FC]" : "text-[#7DF0AE]"}`}>od 90 dni</span>.
         </p>
         {pickedCount > 0 && (
           <p className="mt-4 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-white/25">
@@ -929,6 +933,9 @@ const FLOW_BG_SRC = "";
 /* zdjęcie tła dla motywu ESSENCE (bursztyn/fiolet); puste = warstwa gradientowa */
 const ESSENCE_BG_SRC = "";
 
+/* SIGNATURE: cyjan i czerwien na czerni (referencja) — pusty string = warstwa gradientowa */
+const SIGNATURE_BG_SRC = "";
+
 function FlowArt() {
   /* na dotyku pomijamy filtry SVG (feGaussianBlur) — to najdroższa część tła */
   const light = typeof window !== "undefined" &&
@@ -1074,7 +1081,7 @@ function useSectionSpy(ids: string[]) {
   return active;
 }
 
-function FlowBackdrop({ essence }: { essence: boolean }) {
+function FlowBackdrop() {
   const { scrollYProgress } = useScroll();
   /* niska sprężystość = tło ciągnie się za scrollem zamiast skakać */
   const p = useSpring(scrollYProgress, { stiffness: 40, damping: 16, mass: 0.8 });
@@ -1099,32 +1106,6 @@ function FlowBackdrop({ essence }: { essence: boolean }) {
           <FlowArt />
         )}
       </motion.div>
-      {/* motyw ESSENCE: bursztyn i fiolet na czerni — przykrywa białe łuki na czas
-          trwania planu ESSENCE i odkrywa je z powrotem przy zmianie planu */}
-      <motion.div
-        className="absolute inset-[-14%] will-change-transform"
-        style={{ y, x, scale, rotate }}
-        initial={false}
-        animate={{ opacity: essence ? 1 : 0 }}
-        transition={{ duration: 1.1, ease: "easeInOut" }}
-      >
-        {ESSENCE_BG_SRC ? (
-          <img src={ESSENCE_BG_SRC} alt="" className="h-full w-full object-cover" />
-        ) : (
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(90% 70% at 22% 18%, rgba(214,164,86,0.38), transparent 55%)," +
-                "radial-gradient(80% 62% at 78% 28%, rgba(146,86,214,0.34), transparent 58%)," +
-                "radial-gradient(70% 58% at 42% 86%, rgba(122,66,178,0.30), transparent 60%)," +
-                "radial-gradient(56% 44% at 86% 84%, rgba(230,182,110,0.20), transparent 62%)," +
-                "linear-gradient(180deg, #0A0608 0%, #060406 100%)",
-            }}
-          />
-        )}
-      </motion.div>
-
       {/* siatka 88px to druga warstwa repaintu przy scrollu — tylko desktop */}
       <div
         className="absolute inset-0 opacity-[0.03] hidden lg:block"
@@ -1165,9 +1146,9 @@ export default function Landing() {
   /* biała karta frontowa PLANY — ślad kursora robi się czarny */
   const [overWhiteCard, setOverWhiteCard] = useState(false);
   const darkCursor = inProcess || overWhiteCard;
-  /* ESSENCE (pierwszy plan) z przodu: tło strony przechodzi w bursztyn/fiolet */
-  const [essenceFront, setEssenceFront] = useState(true);
-  const handleActiveChange = useCallback((i: number) => setEssenceFront(i === 0), []);
+  /* który plan stoi z przodu karuzeli — steruje motywem tła sekcji PLANY */
+  const [planFront, setPlanFront] = useState(1);
+  const handleActiveChange = useCallback((i: number) => setPlanFront(i), []);
   /* wybrany pakiet PLANY: podświetla kafel i trafia do zapytania w KONTAKCIE */
   const [chosenPlan, setChosenPlan] = useState<number | null>(null);
   const atPageEnd = useAtPageEnd();
@@ -1280,7 +1261,7 @@ export default function Landing() {
     <div className="min-h-screen text-[#F2F2F0] antialiased selection:bg-white selection:text-black">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap'); html{scroll-behavior:smooth} @keyframes qmarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}} @keyframes qmsheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}} @keyframes qmbreathe{0%,100%{opacity:.35}50%{opacity:.9}}`}</style>
       <motion.div className="fixed top-0 inset-x-0 h-[1px] bg-white/80 z-50 origin-left" style={{ scaleX: progress }} />
-      <FlowBackdrop essence={essenceFront} />
+      <FlowBackdrop />
       <GradualBlur
         target="page"
         position="bottom"
@@ -1628,7 +1609,7 @@ export default function Landing() {
               whileInView={{ opacity:1, y:0 }}
               viewport={{ once:true }}
               transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}}
-              className="h-[296px] sm:h-[348px]"
+              className="h-[260px] sm:h-[300px]"
             >
               <FlipCard
                 fill
@@ -1641,7 +1622,7 @@ export default function Landing() {
                 color="#F2F2F0"
                 radius={24}
                 width={420}
-                height={348}
+                height={300}
                 perspective={1200}
                 tiltMax={9}
                 hoverScale={1.02}
@@ -1650,17 +1631,17 @@ export default function Landing() {
                 flipOnClick={!isEditing}
                 draggable={!isEditing}
                 front={(
-                  <div className="relative flex h-full w-full flex-col p-5 sm:p-7 lg:p-8">
+                  <div className="relative flex h-full w-full flex-col p-4 sm:p-6 lg:p-7">
                     <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(74% 54% at 50% 0%, rgba(255,255,255,0.08), transparent 72%)" }} />
                     <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.08]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06)" }} />
                     <div className="relative flex items-center justify-between">
                       <PopNumber text={s.n} className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.16em] text-white/25" />
                       <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10 text-white/25"><ArrowUpRight className="h-3.5 w-3.5"/></span>
                     </div>
-                    <h3 className="relative mt-4 sm:mt-7 font-[Cormorant_Garamond] font-light text-[20px] sm:text-[23px] tracking-[-0.01em] leading-none">
+                    <h3 className="relative mt-3 sm:mt-5 font-[Cormorant_Garamond] font-light text-[19px] sm:text-[21px] tracking-[-0.01em] leading-none">
                       <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
                     </h3>
-                    <div className="relative mt-auto space-y-2 pt-6">
+                    <div className="relative mt-auto space-y-2 pt-4">
                       <p className="font-[Inter] font-light text-[13.5px] sm:text-[14.5px] leading-6 text-white/55">
                         <span className="font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.14em] text-white/30 mr-2">DOSTAJESZ</span>
                         <EditableText ek={`qraft.service.${i}.d`} def={s.dostajesz} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
@@ -1696,18 +1677,18 @@ export default function Landing() {
                   </div>
                 )}
                 back={(
-                  <div className="relative flex h-full w-full flex-col p-5 sm:p-7 lg:p-8">
+                  <div className="relative flex h-full w-full flex-col p-4 sm:p-6 lg:p-7">
                     <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(86% 62% at 50% 108%, rgba(255,255,255,0.10), transparent 70%)" }} />
                     <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.12]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.08)" }} />
                     <div className="relative font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.18em] text-white/30">{s.meta}</div>
-                    <h3 className="relative mt-3 font-[Cormorant_Garamond] font-light text-[18px] sm:text-[21px] leading-none tracking-[-0.01em]">
+                    <h3 className="relative mt-3 font-[Cormorant_Garamond] font-light text-[17px] sm:text-[19px] leading-none tracking-[-0.01em]">
                       <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
                     </h3>
                     <p className="relative mt-4 font-[Inter] font-light text-[13.5px] leading-5 text-white/80">
                       <span className="font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.14em] text-white/45 mr-2">CEL</span>
                       <EditableText ek={`qraft.service.${i}.c`} def={s.cel} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
                     </p>
-                    <ul className="relative mt-4 space-y-1.5">
+                    <ul className="relative mt-3 space-y-1">
                       {s.pts.map((p,k)=>(
                         <li key={k} className="flex items-start gap-2 font-[Inter] font-light text-[12px] sm:text-[13px] leading-5 text-white/55">
                           <Check className="mt-[3px] h-3 w-3 shrink-0 text-white/30"/>{p}
@@ -1890,7 +1871,58 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="pricing" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-24 lg:py-32">
+      <section id="pricing" className="relative mx-auto max-w-[1280px] px-6 lg:px-8 py-24 lg:py-32">
+        {/* motyw wybranego planu zyje tylko tutaj: ESSENCE = bursztyn/fiolet,
+            SIGNATURE = cyjan/czerwien, PRESTIGE zostawia bazowe biale luki */}
+        <div aria-hidden="true" className="pointer-events-none absolute -inset-x-6 -inset-y-10 overflow-hidden">
+          <motion.div
+            className="absolute inset-0"
+            initial={false}
+            animate={{ opacity: planFront === 0 ? 1 : 0 }}
+            transition={{ duration: 1.1, ease: "easeInOut" }}
+          >
+            {ESSENCE_BG_SRC ? (
+              <img src={ESSENCE_BG_SRC} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "radial-gradient(90% 70% at 22% 18%, rgba(214,164,86,0.40), transparent 55%)," +
+                    "radial-gradient(80% 62% at 78% 28%, rgba(146,86,214,0.36), transparent 58%)," +
+                    "radial-gradient(70% 58% at 42% 86%, rgba(122,66,178,0.32), transparent 60%)," +
+                    "radial-gradient(56% 44% at 86% 84%, rgba(230,182,110,0.22), transparent 62%)," +
+                    "linear-gradient(180deg, #0A0608 0%, #060406 100%)",
+                }}
+              />
+            )}
+          </motion.div>
+          <motion.div
+            className="absolute inset-0"
+            initial={false}
+            animate={{ opacity: planFront === 1 ? 1 : 0 }}
+            transition={{ duration: 1.1, ease: "easeInOut" }}
+          >
+            {SIGNATURE_BG_SRC ? (
+              <img src={SIGNATURE_BG_SRC} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "radial-gradient(85% 66% at 20% 26%, rgba(56,189,248,0.30), transparent 56%)," +
+                    "radial-gradient(78% 60% at 80% 20%, rgba(226,59,59,0.28), transparent 58%)," +
+                    "radial-gradient(70% 56% at 30% 88%, rgba(59,130,246,0.24), transparent 58%)," +
+                    "radial-gradient(60% 46% at 88% 78%, rgba(240,82,82,0.20), transparent 60%)," +
+                    "linear-gradient(180deg, #050A10 0%, #04060A 100%)",
+                }}
+              />
+            )}
+          </motion.div>
+          {/* mieskie wygaszenie krawedzi: motyw rozmywa sie w tlo strony, nie konczy sie cialem */}
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.55) 12%, rgba(5,5,7,0) 30%, rgba(5,5,7,0) 70%, rgba(5,5,7,0.55) 88%, #050507 100%)" }} />
+          <div className="absolute inset-0 hidden lg:block" style={{ background: "linear-gradient(90deg, #050507 0%, rgba(5,5,7,0) 14%, rgba(5,5,7,0) 86%, #050507 100%)" }} />
+        </div>
         <Reveal><div className="text-center max-w-xl mx-auto"><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.2em] text-white/30">03 — PLANY</div><h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[27px] sm:text-[50px] tracking-[-0.02em] leading-none"><EditableText ek="qraft.pricing.h" def="Jasne ceny." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.pricing.sub" def="Miesiąc do miesiąca po 90 dniach. Bez zobowiązań. W odcieniach czerni — wyrafinowane." className="mt-4 block font-[Inter] font-light text-[14px] sm:text-[15px] leading-7 text-white/50 max-w-[480px] mx-auto" isEditing={isEditing} as="p" /></div></Reveal>
         <Reveal><PlanShowcase
           isEditing={isEditing}
