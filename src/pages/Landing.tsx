@@ -1239,6 +1239,9 @@ export default function Landing() {
   const spy = useSectionSpy(SIDEBAR_IDS);
   /* płynny, sprzężony scroll strony (Lenis) — kotwice i CTA korzystają z jego API */
   useLenis();
+  /* SYSTEM: to samo pole odłamków co w MANIFEŚCIE, wygaszone pod kafle */
+  const servicesRef = useRef<HTMLDivElement>(null);
+  const servicesNear = useInView(servicesRef, { once: true, margin: "35%" });
   /* MANIFEST: pole odłamków (WebGPU) montujemy dopiero, gdy sekcja zbliża się do ekranu */
   const manifestRef = useRef<HTMLElement>(null);
   const manifestNear = useInView(manifestRef, { once: true, margin: "35%" });
@@ -1649,7 +1652,59 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="services" className="relative mx-auto max-w-[1280px] px-6 lg:px-8 pt-20 lg:pt-28 pb-16 lg:pb-32">
+      {/* SYSTEM na polu odłamków — to samo „kosmiczne" tło co w MANIFEŚCIE,
+          tylko ciszej: wolniejsze, rzadsze i z miękkimi maskami, by kafle czytały się jak na dłoni */}
+      <div ref={servicesRef} className="relative isolate">
+        {/* zapasowe tło: widoczne, gdy przeglądarka nie ma WebGPU */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0) 26%, rgba(5,5,7,0) 74%, #050507 100%)",
+          }}
+        />
+        {servicesNear && !shardsFailed && (
+          <div className="absolute inset-0 z-0 pointer-events-none">
+            <AeroShards
+              backgroundColor="#050507"
+              shardColor="#8E8A96"
+              accentColor="#FF3E0A"
+              placement="full"
+              flow="stream"
+              material="pearl"
+              detail="balanced"
+              effect="none"
+              scale={1}
+              spread={1}
+              depth={0.85}
+              speed={0.55}
+              spin={0.6}
+              interaction="repel"
+              density={finePointer ? 0.9 : 0.6}
+              shardSize={0.9}
+              stretch={1}
+              turbulence={0.9}
+              glow={0.8}
+              bloom={finePointer ? 0.35 : 0.25}
+              grain={0.04}
+              interactionRadius={1.2}
+              interactionStrength={0.35}
+              rippleIntensity={0.7}
+              onError={() => setShardsFailed(true)}
+            />
+          </div>
+        )}
+        {/* wejście w pole: czerń rozpuszcza się w głąb, jak w MANIFEŚCIE */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-32 sm:h-44"
+          style={{
+            backgroundImage:
+              "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.72) 30%, rgba(5,5,7,0.4) 55%, rgba(5,5,7,0) 100%)",
+          }}
+        />
+        <section id="services" className="relative z-10 mx-auto max-w-[1280px] px-6 lg:px-8 pt-20 lg:pt-28 pb-16 lg:pb-32">
         <Reveal>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 border-b border-white/[0.06] pb-12 lg:pb-16">
             <div>
@@ -1807,6 +1862,7 @@ export default function Landing() {
           </BtnGhost>
         </div>
       </section>
+      </div>
 
       {/* MANIFEST — cała sekcja poświęcona jednej myśli; tło: pole odłamków (AeroShards, WebGPU) */}
       <section
