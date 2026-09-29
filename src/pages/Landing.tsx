@@ -1748,7 +1748,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="services" className="mx-auto max-w-[1280px] px-6 lg:px-8 pt-20 lg:pt-28 pb-24 lg:pb-32">
+      <section id="services" className="relative mx-auto max-w-[1280px] px-6 lg:px-8 pt-20 lg:pt-28 pb-16 lg:pb-32">
         <Reveal>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 border-b border-white/[0.06] pb-12 lg:pb-16">
             <div>
@@ -1898,6 +1898,7 @@ export default function Landing() {
             </BtnGhost>
           </div>
         )}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-40 sm:h-56" style={{ backgroundImage: "linear-gradient(180deg, rgba(5,5,7,0) 0%, rgba(5,5,7,0.55) 45%, #050507 100%)" }} />
         <div className="mt-10 flex flex-col sm:flex-row justify-between gap-4 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px]">
           <EditableText ek="qraft.system.footerL" def="OTWARTE DLA KAŻDEGO KLIENTA." className="text-white/20 tracking-[0.08em]" isEditing={isEditing} as="span" />
           <BtnGhost onClick={()=>go("contact")} className="h-11 px-6 text-[10px] sm:text-[11px]">
@@ -1956,10 +1957,10 @@ export default function Landing() {
         {/* płynne wejście i wyjście: pole odłamków wnika w tło strony zamiast zaczynać się cięciem */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-28 sm:h-40"
+          className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-44 sm:h-64"
           style={{
             backgroundImage:
-              "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.86) 26%, rgba(5,5,7,0.5) 58%, rgba(5,5,7,0) 100%)",
+              "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.72) 30%, rgba(5,5,7,0.4) 55%, rgba(5,5,7,0.12) 78%, rgba(5,5,7,0) 100%)",
           }}
         />
         <div
@@ -1999,6 +2000,13 @@ export default function Landing() {
               className="mx-auto mt-7 block max-w-[540px] font-[Inter] font-light text-[14px] leading-7 text-white/45 sm:text-[15px]"
               isEditing={isEditing}
               as="p"
+            />
+            <EditableText
+              ek="qraft.manifest.start"
+              def="START ZAJMUJE 90 DNI — BEZ POŚPIECHU"
+              className="mt-8 inline-block rounded-full border border-white/10 px-5 py-2 font-[JetBrains_Mono] font-light text-[9px] tracking-[0.2em] text-white/45 sm:text-[10px]"
+              isEditing={isEditing}
+              as="span"
             />
           </Reveal>
           <Reveal delay={0.1}>
