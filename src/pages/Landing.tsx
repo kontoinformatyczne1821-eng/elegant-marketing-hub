@@ -1656,15 +1656,8 @@ export default function Landing() {
       {/* SYSTEM na polu odłamków — to samo „kosmiczne" tło co w MANIFEŚCIE,
           tylko ciszej: wolniejsze, rzadsze i z miękkimi maskami, by kafle czytały się jak na dłoni */}
       <div ref={servicesRef} className="relative isolate">
-        {/* zapasowe tło: widoczne, gdy przeglądarka nie ma WebGPU */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 z-0"
-          style={{
-            backgroundImage:
-              "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0) 26%, rgba(5,5,7,0) 74%, #050507 100%)",
-          }}
-        />
+        {/* całe tło wyłączone: sekcja przykrywa FlowBackdrop, zostają tylko gwiazdy */}
+        <div aria-hidden="true" className="absolute inset-0 z-0 bg-[#050507]" />
         {servicesNear && (
           <StarField className="absolute inset-0 z-0 h-full w-full" />
         )}
