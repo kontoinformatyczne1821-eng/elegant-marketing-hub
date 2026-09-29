@@ -936,6 +936,22 @@ const ESSENCE_BG_SRC = "";
 /* SIGNATURE: cyjan i czerwien na czerni (referencja) — pusty string = warstwa gradientowa */
 const SIGNATURE_BG_SRC = "";
 
+/* gradienty motywow pakietow; pierwszy stop = miekkie wejscie motywu od gory ekranu */
+const ESSENCE_TINT =
+  "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.62) 9%, rgba(5,5,7,0.24) 20%, rgba(5,5,7,0) 34%)," +
+  "radial-gradient(90% 70% at 22% 18%, rgba(214,164,86,0.40), transparent 55%)," +
+  "radial-gradient(80% 62% at 78% 28%, rgba(146,86,214,0.36), transparent 58%)," +
+  "radial-gradient(70% 58% at 42% 86%, rgba(122,66,178,0.32), transparent 60%)," +
+  "radial-gradient(56% 44% at 86% 84%, rgba(230,182,110,0.22), transparent 62%)," +
+  "linear-gradient(180deg, #0A0608 0%, #060406 100%)";
+const SIGNATURE_TINT =
+  "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.62) 9%, rgba(5,5,7,0.24) 20%, rgba(5,5,7,0) 34%)," +
+  "radial-gradient(85% 66% at 20% 26%, rgba(56,189,248,0.30), transparent 56%)," +
+  "radial-gradient(78% 60% at 80% 20%, rgba(226,59,59,0.28), transparent 58%)," +
+  "radial-gradient(70% 56% at 30% 88%, rgba(59,130,246,0.24), transparent 58%)," +
+  "radial-gradient(60% 46% at 88% 78%, rgba(240,82,82,0.20), transparent 60%)," +
+  "linear-gradient(180deg, #050A10 0%, #04060A 100%)";
+
 function FlowArt() {
   /* na dotyku pomijamy filtry SVG (feGaussianBlur) — to najdroższa część tła */
   const light = typeof window !== "undefined" &&
@@ -1081,7 +1097,7 @@ function useSectionSpy(ids: string[]) {
   return active;
 }
 
-function FlowBackdrop() {
+function FlowBackdrop({ plan, zone }: { plan: number; zone: boolean }) {
   const { scrollYProgress } = useScroll();
   /* niska sprężystość = tło ciągnie się za scrollem zamiast skakać */
   const p = useSpring(scrollYProgress, { stiffness: 40, damping: 16, mass: 0.8 });
@@ -1104,6 +1120,33 @@ function FlowBackdrop() {
           <img src={FLOW_BG_SRC} alt="" className="h-full w-full object-cover" />
         ) : (
           <FlowArt />
+        )}
+      </motion.div>
+      {/* motyw pakietu: dol strony od cen do konca (zone). ESSENCE = bursztyn/fiolet,
+          SIGNATURE = cyjan/czerwien, PRESTIGE zostawia bazowe biale luki.
+          Pierwszy stop gradientu wlada motyw miękko — zaczyna się nisko i subtelnie. */}
+      <motion.div
+        className="absolute inset-0"
+        initial={false}
+        animate={{ opacity: zone && plan === 0 ? 1 : 0 }}
+        transition={{ duration: 1.1, ease: "easeInOut" }}
+      >
+        {ESSENCE_BG_SRC ? (
+          <img src={ESSENCE_BG_SRC} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <div className="absolute inset-0" style={{ background: ESSENCE_TINT }} />
+        )}
+      </motion.div>
+      <motion.div
+        className="absolute inset-0"
+        initial={false}
+        animate={{ opacity: zone && plan === 1 ? 1 : 0 }}
+        transition={{ duration: 1.1, ease: "easeInOut" }}
+      >
+        {SIGNATURE_BG_SRC ? (
+          <img src={SIGNATURE_BG_SRC} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <div className="absolute inset-0" style={{ background: SIGNATURE_TINT }} />
         )}
       </motion.div>
       {/* siatka 88px to druga warstwa repaintu przy scrollu — tylko desktop */}
@@ -1146,9 +1189,32 @@ export default function Landing() {
   /* biała karta frontowa PLANY — ślad kursora robi się czarny */
   const [overWhiteCard, setOverWhiteCard] = useState(false);
   const darkCursor = inProcess || overWhiteCard;
-  /* który plan stoi z przodu karuzeli — steruje motywem tła sekcji PLANY */
+  /* który plan stoi z przodu karuzeli — steruje motywem tła dolu strony */
   const [planFront, setPlanFront] = useState(1);
   const handleActiveChange = useCallback((i: number) => setPlanFront(i), []);
+  /* strefa motywu: wlacza sie przy wejsciu w sekcje PLANY i trzyma sie do konca strony */
+  const [pricingZone, setPricingZone] = useState(false);
+  useEffect(() => {
+    let raf = 0;
+    const check = () => {
+      const el = document.getElementById("pricing");
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setPricingZone(r.top <= window.innerHeight * 0.62);
+    };
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(check);
+    };
+    raf = requestAnimationFrame(check);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
   /* wybrany pakiet PLANY: podświetla kafel i trafia do zapytania w KONTAKCIE */
   const [chosenPlan, setChosenPlan] = useState<number | null>(null);
   const atPageEnd = useAtPageEnd();
@@ -1261,7 +1327,7 @@ export default function Landing() {
     <div className="min-h-screen text-[#F2F2F0] antialiased selection:bg-white selection:text-black">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap'); html{scroll-behavior:smooth} @keyframes qmarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}} @keyframes qmsheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}} @keyframes qmbreathe{0%,100%{opacity:.35}50%{opacity:.9}}`}</style>
       <motion.div className="fixed top-0 inset-x-0 h-[1px] bg-white/80 z-50 origin-left" style={{ scaleX: progress }} />
-      <FlowBackdrop />
+      <FlowBackdrop plan={planFront} zone={pricingZone} />
       <GradualBlur
         target="page"
         position="bottom"
@@ -1871,58 +1937,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="pricing" className="relative mx-auto max-w-[1280px] px-6 lg:px-8 py-24 lg:py-32">
-        {/* motyw wybranego planu zyje tylko tutaj: ESSENCE = bursztyn/fiolet,
-            SIGNATURE = cyjan/czerwien, PRESTIGE zostawia bazowe biale luki */}
-        <div aria-hidden="true" className="pointer-events-none absolute -inset-x-6 -inset-y-16 overflow-hidden">
-          <motion.div
-            className="absolute inset-0"
-            initial={false}
-            animate={{ opacity: planFront === 0 ? 1 : 0 }}
-            transition={{ duration: 1.1, ease: "easeInOut" }}
-          >
-            {ESSENCE_BG_SRC ? (
-              <img src={ESSENCE_BG_SRC} alt="" className="h-full w-full object-cover" />
-            ) : (
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "radial-gradient(90% 70% at 22% 18%, rgba(214,164,86,0.40), transparent 55%)," +
-                    "radial-gradient(80% 62% at 78% 28%, rgba(146,86,214,0.36), transparent 58%)," +
-                    "radial-gradient(70% 58% at 42% 86%, rgba(122,66,178,0.32), transparent 60%)," +
-                    "radial-gradient(56% 44% at 86% 84%, rgba(230,182,110,0.22), transparent 62%)," +
-                    "linear-gradient(180deg, #0A0608 0%, #060406 100%)",
-                }}
-              />
-            )}
-          </motion.div>
-          <motion.div
-            className="absolute inset-0"
-            initial={false}
-            animate={{ opacity: planFront === 1 ? 1 : 0 }}
-            transition={{ duration: 1.1, ease: "easeInOut" }}
-          >
-            {SIGNATURE_BG_SRC ? (
-              <img src={SIGNATURE_BG_SRC} alt="" className="h-full w-full object-cover" />
-            ) : (
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "radial-gradient(85% 66% at 20% 26%, rgba(56,189,248,0.30), transparent 56%)," +
-                    "radial-gradient(78% 60% at 80% 20%, rgba(226,59,59,0.28), transparent 58%)," +
-                    "radial-gradient(70% 56% at 30% 88%, rgba(59,130,246,0.24), transparent 58%)," +
-                    "radial-gradient(60% 46% at 88% 78%, rgba(240,82,82,0.20), transparent 60%)," +
-                    "linear-gradient(180deg, #050A10 0%, #04060A 100%)",
-                }}
-              />
-            )}
-          </motion.div>
-          {/* mieskie wygaszenie krawedzi: motyw rozmywa sie w tlo strony, nie konczy sie cialem */}
-          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.72) 9%, rgba(5,5,7,0.40) 20%, rgba(5,5,7,0.16) 32%, rgba(5,5,7,0.04) 46%, rgba(5,5,7,0) 58%, rgba(5,5,7,0) 66%, rgba(5,5,7,0.10) 78%, rgba(5,5,7,0.32) 87%, rgba(5,5,7,0.62) 94%, #050507 100%)" }} />
-          <div className="absolute inset-0 hidden lg:block" style={{ background: "linear-gradient(90deg, #050507 0%, rgba(5,5,7,0.25) 9%, rgba(5,5,7,0) 22%, rgba(5,5,7,0) 78%, rgba(5,5,7,0.25) 91%, #050507 100%)" }} />
-        </div>
+      <section id="pricing" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-24 lg:py-32">
         <Reveal><div className="text-center max-w-xl mx-auto"><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.2em] text-white/30">03 — PLANY</div><h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[27px] sm:text-[50px] tracking-[-0.02em] leading-none"><EditableText ek="qraft.pricing.h" def="Jasne ceny." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.pricing.sub" def="Miesiąc do miesiąca po 90 dniach. Bez zobowiązań. W odcieniach czerni — wyrafinowane." className="mt-4 block font-[Inter] font-light text-[14px] sm:text-[15px] leading-7 text-white/50 max-w-[480px] mx-auto" isEditing={isEditing} as="p" /></div></Reveal>
         <Reveal><PlanShowcase
           isEditing={isEditing}
