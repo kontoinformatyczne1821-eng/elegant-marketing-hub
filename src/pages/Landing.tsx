@@ -1651,6 +1651,15 @@ export default function Landing() {
             </motion.div>
           </div>
         </div>
+        {/* dołek HERO: tło wygasa w czerń — SYSTEM wchodzi bez szwu */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-40 sm:h-64"
+          style={{
+            backgroundImage:
+              "linear-gradient(0deg, #050507 0%, rgba(5,5,7,0.86) 30%, rgba(5,5,7,0.45) 62%, rgba(5,5,7,0) 100%)",
+          }}
+        />
       </section>
 
       {/* SYSTEM na polu odłamków — to samo „kosmiczne" tło co w MANIFEŚCIE,
@@ -1658,18 +1667,50 @@ export default function Landing() {
       <div ref={servicesRef} className="relative isolate">
         {/* całe tło wyłączone: sekcja przykrywa FlowBackdrop, zostają tylko gwiazdy */}
         <div aria-hidden="true" className="absolute inset-0 z-0 bg-[#050507]" />
-        {servicesNear && (
+        {servicesNear && !shardsFailed && (
           <StarField className="absolute inset-0 z-0 h-full w-full" />
         )}
-        {/* wejście w pole: czerń rozpuszcza się w głąb, jak w MANIFEŚCIE */}
+        {/* wejście w pole: dłuższa, jedwabna maska — shardy wyłaniają się z czerni bez ostrego cięcia */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-32 sm:h-44"
+          className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-64 sm:h-96"
           style={{
             backgroundImage:
-              "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.72) 30%, rgba(5,5,7,0.4) 55%, rgba(5,5,7,0) 100%)",
+              "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.82) 22%, rgba(5,5,7,0.55) 45%, rgba(5,5,7,0.22) 68%, rgba(5,5,7,0) 100%)",
           }}
         />
+        {/* część odłamków z tła strony „wjeżdża” w SYSTEM: cichy pas nad gwiazdami */}
+        {servicesNear && !shardsFailed && (
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-[52vh] overflow-hidden opacity-70">
+            <AeroShards
+              backgroundColor="#050507"
+              shardColor="#8E8A96"
+              accentColor="#FF3E0A"
+              placement="center"
+              flow="stream"
+              material="pearl"
+              detail="balanced"
+              effect="none"
+              scale={1}
+              spread={0.55}
+              depth={0.6}
+              speed={0.28}
+              spin={0.3}
+              interaction="repel"
+              density={finePointer ? 0.5 : 0.35}
+              shardSize={0.8}
+              stretch={1}
+              turbulence={0.7}
+              glow={0.5}
+              bloom={finePointer ? 0.25 : 0.16}
+              grain={0}
+              interactionRadius={1}
+              interactionStrength={0.2}
+              rippleIntensity={0.4}
+              onError={() => setShardsFailed(true)}
+            />
+          </div>
+        )}
         <section id="services" className="relative z-10 mx-auto max-w-[1280px] px-6 lg:px-8 pt-20 lg:pt-28 pb-16 lg:pb-32">
         <Reveal>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 border-b border-white/[0.06] pb-12 lg:pb-16">
