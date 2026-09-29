@@ -1,10 +1,12 @@
 import { useEffect, useRef } from "react";
 
-/* Czyste pole gwiazd — lekkie tło pod sekcją SYSTEM. Jedno płótno, jedna pętla
-   rAF, zero zależności. Gwiazdy różnej wielkości i jasności delikatnie migoczą.
-   Przy prefers-reduced-motion zostaje statyczne niebo. */
+/* Pole gwiazd z okazjonalnymi spadającymi gwiazdami — lekkie tło pod sekcją SYSTEM.
+   Jedno płótno, jedna pętla rAF, zero zależności. Gwiazdy delikatnie migoczą,
+   meteory przelatują losowo co kilka-kilkanaście sekund. Przy
+   prefers-reduced-motion zostaje statyczne niebo bez meteorów. */
 
 type Star = { x: number; y: number; r: number; a: number; tw: number; ph: number };
+type Meteor = { x: number; y: number; vx: number; vy: number; len: number; born: number; life: number };
 
 export default function StarField({ className = "" }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -23,6 +25,8 @@ export default function StarField({ className = "" }: { className?: string }) {
     let w = 0;
     let h = 0;
     let stars: Star[] = [];
+    let meteors: Meteor[] = [];
+    let nextMeteorAt = performance.now() + 2600;
     let raf = 0;
 
     const seed = () => {
@@ -40,17 +44,36 @@ export default function StarField({ className = "" }: { className?: string }) {
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
+      /* zerowe wymiary (np. przed layoutem) — nie rysujemy, żeby nie rozciągnąć
+         jednopikselowego płótna na całą sekcję jako białą plamę */
+      const nw = Math.round(rect.width);
+      const nh = Math.round(rect.height);
+      if (nw < 2 || nh < 2) return;
       const dpr = Math.min(2, window.devicePixelRatio || 1);
-      w = Math.max(1, Math.round(rect.width));
-      h = Math.max(1, Math.round(rect.height));
+      w = nw;
+      h = nh;
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       seed();
     };
 
+    const spawnMeteor = (now: number) => {
+      const fromLeft = Math.random() < 0.5;
+      const speed = 420 + Math.random() * 280;
+      const slope = 0.3 + Math.random() * 0.22; /* kąt padania w dół */
+      meteors.push({
+        x: w * (0.12 + Math.random() * 0.72),
+        y: h * (0.04 + Math.random() * 0.32),
+        vx: (fromLeft ? 1 : -1) * Math.cos(slope) * speed,
+        vy: Math.sin(slope) * speed,
+        len: 90 + Math.random() * 100,
+        born: now,
+        life: 850 + Math.random() * 550,
+      });
+    };
+
     const paintStars = (t: number) => {
-      ctx.clearRect(0, 0, w, h);
       for (const s of stars) {
         const a = reduce ? s.a : s.a * (0.72 + 0.28 * Math.sin(t * s.tw + s.ph));
         ctx.globalAlpha = a;
@@ -62,17 +85,67 @@ export default function StarField({ className = "" }: { className?: string }) {
       ctx.globalAlpha = 1;
     };
 
-    const loop = (now: number) => {
+    const paintMeteors = (now: number) => {
+      if (now >= nextMeteorAt && meteors.length < 2) {
+        spawnMeteor(now);
+        nextMeteorAt = now + 3500 + Math.random() * 6000;
+      }
+      meteors = meteors.filter((m) => now - m.born < m.life);
+      for (const m of meteors) {
+        const age = (now - m.born) / 1000;
+        const hx = m.x + m.vx * age;
+        const hy = m.y + m.vy * age;
+        const sp = Math.hypot(m.vx, m.vy);
+        const nx = m.vx / sp;
+        const ny = m.vy / sp;
+        /* koperta alfy: meteor wchodzi i wychodzi miękko */
+        const fade = Math.sin(Math.min(1, (now - m.born) / m.life) * Math.PI);
+        const tail = m.len * (0.4 + 0.6 * fade);
+        const tx = hx - nx * tail;
+        const ty = hy - ny * tail;
+        const grad = ctx.createLinearGradient(tx, ty, hx, hy);
+        grad.addColorStop(0, "rgba(255,255,255,0)");
+        grad.addColorStop(0.7, `rgba(255,236,214,${0.5 * fade})`);
+        grad.addColorStop(1, `rgba(255,255,255,${0.9 * fade})`);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.4;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(hx, hy);
+        ctx.stroke();
+        ctx.globalAlpha = fade;
+        ctx.fillStyle = "#FFFFFF";
+        ctx.beginPath();
+        ctx.arc(hx, hy, 1.6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    };
+
+    const draw = (now: number) => {
+      ctx.clearRect(0, 0, w, h);
       paintStars(now / 1000);
-      raf = requestAnimationFrame(loop);
+      paintMeteors(now);
+      raf = requestAnimationFrame(draw);
+    };
+
+    const drawStatic = () => {
+      ctx.clearRect(0, 0, w, h);
+      paintStars(0);
     };
 
     resize();
-    if (reduce) paintStars(0);
-    else raf = requestAnimationFrame(loop);
+    /* po pierwszym ułożeniu layoutu przesianie jeszcze raz — bez tego płótno
+       może zostać rozciągnięte i gwiazdy robią się wielkimi białymi pasami */
+    const ro = new ResizeObserver(() => resize());
+    ro.observe(canvas);
+    if (reduce) drawStatic();
+    else raf = requestAnimationFrame(draw);
     window.addEventListener("resize", resize);
     return () => {
       cancelAnimationFrame(raf);
+      ro.disconnect();
       window.removeEventListener("resize", resize);
     };
   }, []);
