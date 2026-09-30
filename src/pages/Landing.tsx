@@ -1843,6 +1843,67 @@ export default function Landing() {
       </section>
       </div>
 
+      {/* SPECJALIZACJA: pracujemy wyłącznie B2B — czarna wstawka między SYSTEMEM a MANIFESTEM, styki czarne na czarne */}
+      <section id="b2b" className="relative bg-[#050507]">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(64% 42% at 50% 0%, rgba(255,255,255,0.045), transparent 70%)" }}
+        />
+        <div className="relative mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-28">
+          <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-start">
+            <Reveal>
+              <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.2em] text-white/50">
+                DLACZEGO QRAFT
+              </div>
+              <h2 className="mt-5 leading-[0.92] tracking-[-0.02em]">
+                <EditableText ek="qraft.b2b.h1" def="Biznes do biznesu." className="block font-[Cormorant_Garamond] font-light text-[26px] sm:text-[52px]" isEditing={isEditing} as="span" />
+                <EditableText ek="qraft.b2b.h2" def="i nic więcej." className="block font-[Cormorant_Garamond] font-light italic text-white/40 text-[26px] sm:text-[52px]" isEditing={isEditing} as="span" />
+              </h2>
+              <EditableText
+                ek="qraft.b2b.desc"
+                def="QRAFT pracuje wyłącznie w modelu B2B. Naszym klientem jest firma — restauracja, gabinet, studio, warsztat — a nie przypadkowy przechodzień. Dlatego mówimy językiem przychodów, marży i wracających klientów, a nie lajków i zasięgów dla samych zasięgów."
+                className="mt-6 block max-w-[460px] font-[Inter] font-light text-[14.5px] sm:text-[16px] leading-8 text-white/45"
+                isEditing={isEditing}
+                as="p"
+              />
+              <div className="mt-8 flex flex-wrap gap-3">
+                <span className="inline-flex items-center gap-2 rounded-full border border-[#7DF0AE]/40 bg-[#7DF0AE]/10 px-4 py-2 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.16em] text-[#9BF3C0]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#7DF0AE]" />
+                  <EditableText ek="qraft.b2b.chip1" def="B2B — NASZ TEREN" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" />
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.16em] text-white/30">
+                  <span className="h-1.5 w-1.5 rounded-full bg-white/25" />
+                  <EditableText ek="qraft.b2b.chip2" def="B2C — NIE PRACUJEMY" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" />
+                </span>
+              </div>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <ul
+                className="divide-y divide-white/[0.06] overflow-hidden rounded-[22px] border border-white/[0.08] bg-white/[0.02]"
+                style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.25)" }}
+              >
+                {[
+                  ["Decydent po drugiej stronie", "Rozmawiamy z właścicielem lub zarządem — nie z przypadkowym konsumentem."],
+                  ["Cel mierzalny", "Rezerwacje, zamówienia, powracający klienci — nie lajki i puste zasięgi."],
+                  ["Lokalna przewaga", "Mapy, lokalne SEO i kampanie w promieniu — tam, gdzie szuka klient Twojego biznesu."],
+                ].map(([t, d], i) => (
+                  <li key={t} className="flex items-start gap-4 p-5 sm:p-6">
+                    <span className="mt-0.5 h-8 w-8 shrink-0 grid place-items-center rounded-full border border-white/10 text-white/40">
+                      <Check className="h-3.5 w-3.5" />
+                    </span>
+                    <div>
+                      <EditableText ek={`qraft.b2b.${i}.t`} def={t} className="block font-[Cormorant_Garamond] font-light text-[17px] sm:text-[19px] leading-none tracking-[-0.01em]" isEditing={isEditing} as="span" />
+                      <EditableText ek={`qraft.b2b.${i}.d`} def={d} className="mt-2 block font-[Inter] font-light text-[13px] sm:text-[13.5px] leading-6 text-white/50" isEditing={isEditing} as="span" />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
       {/* MANIFEST — cała sekcja poświęcona jednej myśli; tło: pole odłamków (AeroShards, WebGPU) */}
       <section
         ref={manifestRef}
