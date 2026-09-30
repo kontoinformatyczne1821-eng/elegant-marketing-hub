@@ -1,6 +1,6 @@
 import { motion, AnimatePresence, useScroll, useSpring, useTransform, useInView, useMotionValue, useMotionValueEvent } from "framer-motion";
 import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Check, Minus, Plus, Clock, Terminal, Pencil, Save, RefreshCw } from "lucide-react";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import Lenis from "lenis";
 import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
@@ -14,7 +14,7 @@ import StaggeredMenu from "@/components/StaggeredMenu";
 import AeroShards from "@/components/AeroShards";
 import StarField from "@/components/StarField";
 import { Volume2, VolumeX } from "lucide-react";
-import { setMuted, sfxConfirm, sfxPop, sfxTap, sfxWhoosh, unlockAudio } from "@/lib/sound";
+import { setMuted, sfxPop, sfxTap, sfxWhoosh, unlockAudio } from "@/lib/sound";
 import type { StaggeredMenuItem } from "@/components/StaggeredMenu";
 
 const REDUCE_MOTION =
@@ -115,18 +115,14 @@ const serviceDefaults = [
   { n: "06", title: "Retencja", meta: "STALE", dostajesz: "system opinii, lojalności i raport tygodniowy.", cel: "klienci wracają i polecają Cię znajomym.", pts: ["System opinii", "Program poleceń", "Raport tygodniowy"] },
 ];
 
-const plans = [
-  { name: "ESSENCE", price: "1 200 zł", sub: "/ mies.", line: "Fundamenty, by dać się znaleźć.", pts: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"], featured: false, cta: "Wybierz Essence" },
-  { name: "SIGNATURE", price: "1 999 zł", sub: "/ mies.", line: "Pełny system. Wypełnia kalendarz.", pts: ["Wszystko z Essence", "Zasięg + płatne w promieniu", "Silnik treści + lista"], featured: true, cta: "Wybierz Signature" },
-  { name: "PRESTIGE", price: "2 300 zł", sub: "/ mies.", line: "Starty, rebrandingi, wiele lokalizacji.", pts: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"], featured: false, cta: "Wybierz Prestige" },
-];
+
 
 /* okienko audytu — wybór usługi przesuwa pasek */
 const auditServices = [
   { id: "audyt", label: "AUDYT", note: "bezpłatny · 20 min", items: ["Ogląd firmy z zewnątrza", "Pierwsza największa dźwignia", "Lista rzeczy do naprawy"] },
-  { id: "essence", label: "ESSENCE", note: "1 200 zł / mies.", items: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"] },
-  { id: "signature", label: "SIGNATURE", note: "1 999 zł / mies.", items: ["Wszystko z Essence", "Zasięg + płatne w promieniu", "Silnik treści + lista"] },
-  { id: "prestige", label: "PRESTIGE", note: "2 300 zł / mies.", items: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"] },
+  { id: "essence", label: "ESSENCE", note: "wycena po audycie", items: ["Uporządkowanie marki", "Strona + Mapy", "Opieka i raport"] },
+  { id: "signature", label: "SIGNATURE", note: "wycena po audycie", items: ["Wszystko z Essence", "Zasięg + płatne w promieniu", "Silnik treści + lista"] },
+  { id: "prestige", label: "PRESTIGE", note: "wycena po audycie", items: ["Od zera", "Atelier foto & film", "Sprinty co tydzień"] },
 ];
 
 /* 1 baner = 1 etap procesu */
@@ -211,74 +207,6 @@ function BtnDark({ children, onClick, className = "" }: { children: React.ReactN
   );
 }
 
-function FloatingField() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* miękkie orb-y w odcieniach czerni/szarości */}
-      {[
-        { left: "6%", top: "14%", size: 420, dur: 16 },
-        { left: "62%", top: "8%", size: 360, dur: 18 },
-        { left: "38%", top: "42%", size: 520, dur: 20 },
-        { left: "78%", top: "48%", size: 300, dur: 15 },
-      ].map((o,i)=>(
-        <motion.div key={i} className="absolute rounded-full"
-          style={{
-            left: o.left, top: o.top, width: o.size, height: o.size,
-            background: "radial-gradient(circle at center, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.015) 35%, transparent 70%)",
-            filter: "blur(28px)",
-          }}
-          animate={{ y: [0, -20, 0], x: [0, 10, 0], opacity: [0.6, 0.9, 0.6] }}
-          transition={{ duration: o.dur, repeat: Infinity, ease: "easeInOut", delay: i*0.6 }}
-        />
-      ))}
-      {/* latający pył — 12 drobin */}
-      {Array.from({ length: 12 }).map((_, i) => (
-        <motion.div
-          key={"dust"+i}
-          className="absolute rounded-full bg-white"
-          style={{
-            left: `${8 + (i * 7.8) % 84}%`,
-            top: `${12 + (i % 4) * 18 + (i % 3)*6}%`,
-            width: i % 3 === 0 ? 2 : 1.2,
-            height: i % 3 === 0 ? 2 : 1.2,
-            opacity: 0.18 + (i % 4)*0.06,
-            boxShadow: i % 4 === 0 ? "0 0 6px rgba(255,255,255,0.5)" : "none",
-          }}
-          animate={{
-            y: [0, -22 - (i % 5)*4, 0],
-            x: [0, 8 - (i % 3)*4, -6, 0],
-            opacity: [0.18, 0.38, 0.18],
-          }}
-          transition={{ duration: 10 + i*0.7, repeat: Infinity, ease: "easeInOut", delay: i*0.35 }}
-        />
-      ))}
-      {/* cienkie latające pierścienie */}
-      {[
-        { l: "14%", t: "22%", s: 44 },
-        { l: "82%", t: "18%", s: 32 },
-        { l: "68%", t: "62%", s: 56 },
-      ].map((r,i)=>(
-        <motion.div key={"ring"+i} className="absolute rounded-full border border-white/[0.06]"
-          style={{ left: r.l, top: r.t, width: r.s, height: r.s }}
-          animate={{ y: [0, -14, 0], rotate: [0, 12, 0], opacity: [0.12, 0.2, 0.12] }}
-          transition={{ duration: 13 + i*2, repeat: Infinity, ease: "easeInOut", delay: i*0.7 }}
-        />
-      ))}
-      {/* subtelne kreski */}
-      {[
-        { l: "22%", t: "68%", w: 28 },
-        { l: "74%", t: "28%", w: 36 },
-      ].map((k,i)=>(
-        <motion.div key={"line"+i} className="absolute h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"
-          style={{ left: k.l, top: k.t, width: k.w }}
-          animate={{ x: [0, 10, 0], opacity: [0.18, 0.32, 0.18] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: i*1.1 }}
-        />
-      ))}
-    </div>
-  );
-}
-
 function Reveal({ children, delay=0, y=18 }: { children: React.ReactNode; delay?: number; y?: number }) {
   return (
     <motion.div initial={{ opacity: 0, y, filter: "blur(6px)" }} whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} viewport={{ once: true, margin: "-12%" }} transition={{ duration: 0.9, delay, ease: [0.22,1,0.36,1] }}>{children}</motion.div>
@@ -327,41 +255,6 @@ function CountUp({ to, suffix = "", decimals = 0 }: { to: number; suffix?: strin
   );
 }
 
-/* ---------------- spiral plan showcase (desktop) ------------------ */
-
-function useDesktop() {
-  const [on, setOn] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches,
-  );
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const sync = () => setOn(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-  return on;
-}
-
-/** off = -1 / 0 / 1 — position on a cylinder wound into a spiral. */
-const SPIRAL_R = 340;
-function spiralAt(off: number) {
-  const a = off * 0.7;
-  return {
-    x: Math.sin(a) * SPIRAL_R,
-    y: (1 - Math.cos(a)) * 150,
-    rotate: Math.sin(a) * 11,
-    scale: off === 0 ? 1.02 : 1 - Math.abs(off) * 0.07,
-    opacity: off === 0 ? 1 : 0.55,
-    filter: off === 0 ? "blur(0px)" : "blur(1px)",
-    zIndex: 20 - Math.abs(off) * 10,
-  };
-}
-
-/* Szklany przycisk strzałki (plany: poziomy, proces: pionowy). Klik =
-   wciśnięcie szkła, błysk przebiegający przez obręcz, fala od środka
-   i strzałka wysuwająca się w kierunku podróży. tone="light" — wariant
-   na jasnym tle sekcji PROCES. */
 const GLASS_SKIN = {
   dark: {
     bg: "linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0.03) 55%), rgba(10,10,13,0.36)",
@@ -469,276 +362,6 @@ function GlassArrow({
         <Icon className="h-4 w-4" />
       </motion.span>
     </motion.button>
-  );
-}
-
-function PlanShowcase({
-  isEditing,
-  onPick,
-  recommended = 1,
-  pickedCount = 0,
-  onWhiteHover,
-  onActiveChange,
-}: {
-  isEditing: boolean;
-  onPick: (index: number) => void;
-  onWhiteHover: (on: boolean) => void;
-  recommended?: number;
-  pickedCount?: number;
-  onActiveChange?: (index: number) => void;
-}) {
-  const L = plans.length;
-  const [active, setActive] = useState(recommended);
-  const isDesktop = useDesktop();
-  const stageRef = useRef<HTMLDivElement>(null);
-  /* wjeżdżając w sekcję planów podpowiadamy pakiet dobrany do liczby modułów */
-  const inView = useInView(stageRef, { amount: 0.25, margin: "0px 0px -12% 0px" });
-  const onActiveRef = useRef(onActiveChange);
-  useEffect(() => {
-    onActiveRef.current = onActiveChange;
-  });
-  useEffect(() => {
-    if (inView) {
-      setActive(recommended);
-      onActiveRef.current?.(recommended);
-    }
-  }, [inView, recommended]);
-  const signed = (n: number) => {
-    const m = ((n % L) + L) % L;
-    return m > L / 2 ? m - L : m;
-  };
-  /* ESSENCE = bursztyn/fiolet, SIGNATURE = cyjan/czerwień, PRESTIGE = neutralne szkło */
-  const essence = active === 0;
-  const signature = active === 1;
-  const turn = (d: number) => {
-    const next = ((active + d) % L + L) % L;
-    setActive(next);
-    onActiveChange?.(next);
-  };
-
-  return (
-    <>
-      <div ref={stageRef} className="relative mt-8 sm:mt-14 flex flex-col lg:block lg:h-[660px]">
-        {/* szklane strzałki obok wybranego planu — animowane kliknięciem */}
-        <GlassArrow
-          dir={-1}
-          onClick={() => turn(-1)}
-          label="Poprzedni plan"
-          className="hidden lg:grid absolute top-1/2 -translate-y-1/2 left-[24px]"
-        />
-        <GlassArrow
-          dir={1}
-          onClick={() => turn(1)}
-          label="Następny plan"
-          className="hidden lg:grid absolute top-1/2 -translate-y-1/2 right-[24px]"
-        />
-        {/* guide rings + floor light (desktop only) */}
-        <div
-          className="pointer-events-none absolute left-1/2 top-1/2 hidden lg:block"
-          style={{ width: 920, height: 480, transform: "translate(-50%,-50%)" }}
-        >
-          <div className="absolute inset-0 rounded-[50%] border border-white/[0.05]" />
-          <div className="absolute inset-[70px_-50px] rounded-[50%] border border-dashed border-white/[0.035]" />
-        </div>
-        <div
-          className="pointer-events-none absolute left-1/2 bottom-20 hidden lg:block rounded-[50%] blur-2xl -translate-x-1/2"
-          style={{
-            width: 640,
-            height: 90,
-            background: essence
-              ? "radial-gradient(ellipse at center, rgba(236,192,120,0.20), rgba(170,110,215,0.10) 55%, transparent 72%)"
-              : signature
-                ? "radial-gradient(ellipse at center, rgba(86,200,242,0.16), rgba(226,59,59,0.08) 55%, transparent 72%)"
-                : "radial-gradient(ellipse at center, rgba(255,255,255,0.12), transparent 70%)",
-          }}
-        />
-
-        {plans.map((p, i) => {
-          const off = signed(i - active);
-          const front = off === 0;
-          const pos = isDesktop
-            ? spiralAt(off)
-            : { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, filter: "blur(0px)", zIndex: 1 };
-          const cta = (
-            <EditableText
-              ek={`qraft.plan.${i}.cta2`}
-              def={p.cta}
-              className="font-[JetBrains_Mono] font-light tracking-[0.14em]"
-              isEditing={isEditing}
-              as="span"
-            />
-          );
-          return (
-            <motion.div
-              key={p.name}
-              onClick={() => (off === 1 ? turn(1) : off === -1 ? turn(-1) : undefined)}
-              onPointerEnter={() => { if (front) onWhiteHover(true); }}
-              onPointerLeave={() => { if (front) onWhiteHover(false); }}
-              initial={false}
-              animate={pos}
-              transition={{ type: "spring", stiffness: 70, damping: 15, mass: 1.1 }}
-              style={{ transformOrigin: "50% 50%" }}
-              className={`relative mb-6 last:mb-0 lg:absolute lg:mb-0 lg:left-1/2 lg:top-1/2 lg:w-[360px] lg:-ml-[180px] lg:-mt-[300px] ${
-                off === 0 ? "cursor-default" : "cursor-pointer"
-              } ${front ? "shadow-[0_10px_26px_rgba(0,0,0,0.28)]" : "shadow-[0_8px_22px_rgba(0,0,0,0.28)]"}`}
-            >
-              {/* poświat poza kaflem — statyczna, bez pulsowania */}
-              <motion.div
-                aria-hidden
-                className="pointer-events-none absolute -inset-x-10 -top-10 -bottom-14"
-                initial={false}
-                animate={{ opacity: front ? 1 : 0.26 }}
-                transition={{ duration: 0.5 }}
-                style={{
-                  background: essence
-                    ? "radial-gradient(58% 52% at 50% 58%, rgba(233,190,118,0.30), rgba(190,130,220,0.12) 56%, transparent 76%)"
-                    : signature
-                      ? "radial-gradient(58% 52% at 50% 58%, rgba(125,211,252,0.28), rgba(226,59,59,0.10) 56%, transparent 76%)"
-                      : "radial-gradient(58% 52% at 50% 58%, rgba(255,255,255,0.18), rgba(255,255,255,0.05) 56%, transparent 76%)",
-                  filter: "blur(30px)",
-                }}
-              />
-              <div
-                className={`relative overflow-hidden rounded-[22px] sm:rounded-[28px] border p-5 sm:p-8 flex flex-col h-full transition-colors duration-500 ${
-                  front
-                    ? "bg-[#F7F7F5] text-black border-[#F7F7F5]"
-                    : `bg-white/[0.07] text-white border-white/[0.14] backdrop-blur-2xl backdrop-saturate-[1.4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.16)] ${essence ? "border-[#E3B66A]/45 shadow-[inset_0_1px_1px_rgba(255,226,176,0.28)]" : signature ? "border-[#56C8F2]/45 shadow-[inset_0_1px_1px_rgba(190,232,255,0.28)]" : ""}`
-                }`}
-              >
-                {/* szklany polysk na kartach bocznych */}
-                {!front && (
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
-                )}
-                {/* pakiet dobrany do liczby zaznaczonych modułów */}
-                {i === recommended && (
-                  <div className="absolute right-0 top-0 z-20 flex items-center gap-2 rounded-bl-[22px] rounded-tr-[28px] bg-[#7DF0AE] px-4 py-2.5 font-[JetBrains_Mono] font-light text-[8px] sm:text-[9px] tracking-[0.16em] text-black">
-                    <span className="h-1.5 w-1.5 rounded-full bg-black/55" />
-                    IDEALNY DLA CIEBIE
-                  </div>
-                )}
-                <div className="flex items-center justify-between">
-                  <span
-                    className={`font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.16em] ${
-                      front ? "text-black/65" : "text-white/60"
-                    }`}
-                  >
-                    <EditableText
-                      ek={`qraft.plan.${i}.name2`}
-                      def={p.name}
-                      className="font-[JetBrains_Mono] font-light"
-                      isEditing={isEditing}
-                      as="span"
-                    />
-                  </span>
-                  {p.featured && i !== recommended && (
-                    <span
-                      className={`font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] rounded-full px-3 py-1 ${
-                        front
-                          ? "bg-black text-white"
-                          : "bg-white/10 text-white/80 border border-white/15"
-                      }`}
-                    >
-                      WYRÓŻNIONY
-                    </span>
-                  )}
-                </div>
-                <div className="mt-5 sm:mt-8 flex items-baseline gap-2">
-                  <span className="font-[Cormorant_Garamond] font-light text-[26px] sm:text-[30px] tracking-[-0.02em]">
-                    <EditableText
-                      ek={`qraft.plan.${i}.price`}
-                      def={p.price}
-                      className="font-[Cormorant_Garamond] font-light"
-                      isEditing={isEditing}
-                      as="span"
-                      pop
-                      popKey={off === 0 ? String(active) : "off"}
-                    />
-                  </span>
-                  <span
-                    className={`font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] ${
-                      front ? "text-black/55" : "text-white/55"
-                    }`}
-                  >
-                    <EditableText
-                      ek={`qraft.plan.${i}.sub`}
-                      def={p.sub}
-                      className="font-[JetBrains_Mono] font-light"
-                      isEditing={isEditing}
-                      as="span"
-                    />
-                  </span>
-                </div>
-                <EditableText
-                  ek={`qraft.plan.${i}.line`}
-                  def={p.line}
-                  className={`mt-2 block font-[Inter] font-light text-[13px] sm:text-[14px] ${
-                    front ? "text-black/70" : "text-white/70"
-                  }`}
-                  isEditing={isEditing}
-                  as="div"
-                />
-                <ul className="mt-8 space-y-3 flex-1">
-                  {p.pts.map((x, idx) => (
-                    <li
-                      key={x}
-                      className={`flex gap-3 font-[Inter] font-light text-[13px] sm:text-[14px] ${
-                        front ? "text-black/85" : "text-white/85"
-                      }`}
-                    >
-                      <Check
-                        className={`h-4 w-4 mt-0.5 shrink-0 ${
-                          front ? "text-black/45" : "text-white/60"
-                        }`}
-                      />
-                      <EditableText
-                        ek={`qraft.plan.${i}.pt${idx}`}
-                        def={x}
-                        className="font-[Inter] font-light"
-                        isEditing={isEditing}
-                        as="span"
-                      />
-                    </li>
-                  ))}
-                </ul>
-                {/* guzik wyboru musi być czytelny na obu wariantach karty:
-                    front jest biały → przycisk ciemny, karty boczne szklane → jasny */}
-                <div onClick={(e) => e.stopPropagation()} className="mt-10">
-                  {front ? (
-                    <BtnDark onClick={() => onPick(i)} className="w-full h-11 text-[10px] sm:text-[11px]">
-                      {cta}
-                    </BtnDark>
-                  ) : (
-                    <BtnPrimary onClick={() => onPick(i)} className="w-full h-11 text-[10px] sm:text-[11px]">
-                      {cta}
-                    </BtnPrimary>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* desktop: zamiast przycisków wyboru — typograficzne domknięcie sekcji */}
-      <div className="mt-12 hidden lg:flex flex-col items-center text-center select-none">
-        <div className="flex items-center gap-4">
-          <span className="h-px w-14 bg-gradient-to-r from-transparent to-white/20" />
-          <span className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.32em] text-white/30">
-            PRECISION BUILDS BRANDS
-          </span>
-          <span className="h-px w-14 bg-gradient-to-l from-transparent to-white/20" />
-        </div>
-        <p className="mt-4 font-[Cormorant_Garamond] font-light text-[17px] sm:text-[20px] leading-none text-white/50">
-          Cały proces zajmuje{" "}
-          <span className={`font-[Instrument_Serif] italic ${essence ? "text-[#E9C68C]" : signature ? "text-[#7DD3FC]" : "text-[#7DF0AE]"}`}>od 90 dni</span>.
-        </p>
-        {pickedCount > 0 && (
-          <p className="mt-4 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.24em] text-white/25">
-            DOPASOWANE DO {pickedCount} MODUŁÓW
-          </p>
-        )}
-      </div>
-    </>
   );
 }
 
@@ -931,28 +554,6 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
 
 const FLOW_BG_SRC = "";
 
-/* zdjęcie tła dla motywu ESSENCE (bursztyn/fiolet); puste = warstwa gradientowa */
-const ESSENCE_BG_SRC = "";
-
-/* SIGNATURE: cyjan i czerwien na czerni (referencja) — pusty string = warstwa gradientowa */
-const SIGNATURE_BG_SRC = "";
-
-/* gradienty motywow pakietow; pierwszy stop = miekkie wejscie motywu od gory ekranu */
-const ESSENCE_TINT =
-  "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.62) 9%, rgba(5,5,7,0.24) 20%, rgba(5,5,7,0) 34%)," +
-  "radial-gradient(90% 70% at 22% 18%, rgba(214,164,86,0.40), transparent 55%)," +
-  "radial-gradient(80% 62% at 78% 28%, rgba(146,86,214,0.36), transparent 58%)," +
-  "radial-gradient(70% 58% at 42% 86%, rgba(122,66,178,0.32), transparent 60%)," +
-  "radial-gradient(56% 44% at 86% 84%, rgba(230,182,110,0.22), transparent 62%)," +
-  "linear-gradient(180deg, #0A0608 0%, #060406 100%)";
-const SIGNATURE_TINT =
-  "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.62) 9%, rgba(5,5,7,0.24) 20%, rgba(5,5,7,0) 34%)," +
-  "radial-gradient(85% 66% at 20% 26%, rgba(56,189,248,0.30), transparent 56%)," +
-  "radial-gradient(78% 60% at 80% 20%, rgba(226,59,59,0.28), transparent 58%)," +
-  "radial-gradient(70% 56% at 30% 88%, rgba(59,130,246,0.24), transparent 58%)," +
-  "radial-gradient(60% 46% at 88% 78%, rgba(240,82,82,0.20), transparent 60%)," +
-  "linear-gradient(180deg, #050A10 0%, #04060A 100%)";
-
 function FlowArt() {
   /* na dotyku pomijamy filtry SVG (feGaussianBlur) — to najdroższa część tła */
   const light = typeof window !== "undefined" &&
@@ -1051,7 +652,7 @@ function useAtPageEnd(threshold = 24) {
 /* pozycje bocznego paska nawigacji */
 const SIDEBAR = [
   { label: "SYSTEM", id: "services" },
-  { label: "PLANY", id: "pricing" },
+  { label: "ATELIER", id: "atelier" },
   { label: "PROCES", id: "process" },
   { label: "FAQ", id: "faq" },
   { label: "KONTAKT", id: "contact" },
@@ -1061,7 +662,7 @@ const SIDEBAR_IDS = SIDEBAR.map((s) => s.id);
 /* menu z boku: kolejność zgodna z ławkiem bocznym */
 const MENU_ITEMS: StaggeredMenuItem[] = [
   { label: "System", ariaLabel: "Przejdź do sekcji SYSTEM", link: "#services" },
-  { label: "Plany", ariaLabel: "Przejdź do sekcji PLANY", link: "#pricing" },
+  { label: "Atelier", ariaLabel: "Przejdź do sekcji ATELIER", link: "#atelier" },
   { label: "Proces", ariaLabel: "Przejdź do sekcji PROCES", link: "#process" },
   { label: "FAQ", ariaLabel: "Przejdź do sekcji FAQ", link: "#faq" },
   { label: "Kontakt", ariaLabel: "Przejdź do sekcji KONTAKT", link: "#contact" },
@@ -1098,7 +699,7 @@ function useSectionSpy(ids: string[]) {
   return active;
 }
 
-function FlowBackdrop({ plan, zone }: { plan: number; zone: boolean }) {
+function FlowBackdrop() {
   const { scrollYProgress } = useScroll();
   /* niska sprężystość = tło ciągnie się za scrollem zamiast skakać */
   const p = useSpring(scrollYProgress, { stiffness: 40, damping: 16, mass: 0.8 });
@@ -1123,33 +724,7 @@ function FlowBackdrop({ plan, zone }: { plan: number; zone: boolean }) {
           <FlowArt />
         )}
       </motion.div>
-      {/* motyw pakietu: dol strony od cen do konca (zone). ESSENCE = bursztyn/fiolet,
-          SIGNATURE = cyjan/czerwien, PRESTIGE zostawia bazowe biale luki.
-          Pierwszy stop gradientu wlada motyw miękko — zaczyna się nisko i subtelnie. */}
-      <motion.div
-        className="absolute inset-0"
-        initial={false}
-        animate={{ opacity: zone && plan === 0 ? 1 : 0 }}
-        transition={{ duration: 1.1, ease: "easeInOut" }}
-      >
-        {ESSENCE_BG_SRC ? (
-          <img src={ESSENCE_BG_SRC} alt="" className="h-full w-full object-cover" />
-        ) : (
-          <div className="absolute inset-0" style={{ background: ESSENCE_TINT }} />
-        )}
-      </motion.div>
-      <motion.div
-        className="absolute inset-0"
-        initial={false}
-        animate={{ opacity: zone && plan === 1 ? 1 : 0 }}
-        transition={{ duration: 1.1, ease: "easeInOut" }}
-      >
-        {SIGNATURE_BG_SRC ? (
-          <img src={SIGNATURE_BG_SRC} alt="" className="h-full w-full object-cover" />
-        ) : (
-          <div className="absolute inset-0" style={{ background: SIGNATURE_TINT }} />
-        )}
-      </motion.div>
+      
       {/* siatka 88px to druga warstwa repaintu przy scrollu — tylko desktop */}
       <div
         className="absolute inset-0 opacity-[0.03] hidden lg:block"
@@ -1187,37 +762,7 @@ export default function Landing() {
   const [isEditing, setIsEditing] = useState(false);
   /* w sekcji PROCES tło jest jasne — kursor przechodzi na czarne światło */
   const [inProcess, setInProcess] = useState(false);
-  /* biała karta frontowa PLANY — ślad kursora robi się czarny */
-  const [overWhiteCard, setOverWhiteCard] = useState(false);
-  const darkCursor = inProcess || overWhiteCard;
-  /* który plan stoi z przodu karuzeli — steruje motywem tła dolu strony */
-  const [planFront, setPlanFront] = useState(1);
-  const handleActiveChange = useCallback((i: number) => setPlanFront(i), []);
-  /* strefa motywu: wlacza sie przy wejsciu w sekcje PLANY i trzyma sie do konca strony */
-  const [pricingZone, setPricingZone] = useState(false);
-  useEffect(() => {
-    let raf = 0;
-    const check = () => {
-      const el = document.getElementById("pricing");
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      setPricingZone(r.top <= window.innerHeight * 0.62);
-    };
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(check);
-    };
-    raf = requestAnimationFrame(check);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, []);
-  /* wybrany pakiet PLANY: podświetla kafel i trafia do zapytania w KONTAKCIE */
-  const [chosenPlan, setChosenPlan] = useState<number | null>(null);
+  const darkCursor = inProcess;
   const atPageEnd = useAtPageEnd();
   /* ikona głośnika musi się odświeża, więc stan trzymamy w Reaccie */
   const [soundOn, setSoundOn] = useState(true);
@@ -1249,17 +794,13 @@ export default function Landing() {
   /* bez WebGPU chowamy płótno i zostawiamy samo tło gradientowe */
   const [shardsFailed, setShardsFailed] = useState(false);
   /* zaznaczone moduły w SYSTEM napędzają rekomendowany pakiet */
+  /* zaznaczone moduły w SYSTEM */
   const [picked, setPicked] = useState<number[]>([]);
   const toggleModule = (i: number) => {
-    const next = picked.includes(i)
-      ? picked.filter((x) => x !== i)
-      : [...picked, i];
-    setPicked(next);
-    /* wiecej niz 4 moduly -> automatycznie pakiet PRESTIGE; zejscie wraca do SIGNATURE */
-    if (next.length > 4) setChosenPlan(2);
-    else if (chosenPlan === 2) setChosenPlan(1);
+    setPicked((prev) =>
+      prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i],
+    );
   };
-  const recommended = picked.length > 4 ? 2 : 1;
   const cinemaRef = useRef<HTMLElement>(null);
   const { scrollY, scrollYProgress } = useScroll();
   const { scrollYProgress: cinemaProgress } = useScroll({ target: cinemaRef, offset: ["start end", "end start"] });
@@ -1309,16 +850,10 @@ export default function Landing() {
     target?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
   /* wybrany pakiet trafia od razu do zapytania o audyt */
-  const pickPlan = (i: number) => {
-    sfxConfirm();
-    setChosenPlan(i);
-    setForm((f) => ({ ...f, service: plans[i].name.toLowerCase() }));
-    go("pricing");
-  };
-  /* anulowanie wyboru odblokowuje znowu pasek pakietów */
-  const clearPlan = () => {
+  /* ATELIER: ceny poznajesz na audycie — CTA prowadzi prosto do formularza */
+  const goContact = () => {
     sfxTap();
-    setChosenPlan(null);
+    go("contact");
   };
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1333,7 +868,7 @@ export default function Landing() {
     <div className="min-h-screen text-[#F2F2F0] antialiased selection:bg-white selection:text-black">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap'); html{scroll-behavior:smooth} @keyframes qmarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}} @keyframes qmsheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}} @keyframes qmbreathe{0%,100%{opacity:.35}50%{opacity:.9}}`}</style>
       <motion.div className="fixed top-0 inset-x-0 h-[1px] bg-white/80 z-50 origin-left" style={{ scaleX: progress }} />
-      <FlowBackdrop plan={planFront} zone={pricingZone} />
+      <FlowBackdrop />
       <GradualBlur
         target="page"
         position="bottom"
@@ -1454,7 +989,6 @@ export default function Landing() {
         </motion.aside>
       </div>
 
-      <FloatingField />
 
       <motion.header
         animate={{ y: barHidden && !isEditing ? "-104%" : "0%" }}
@@ -1828,8 +1362,8 @@ export default function Landing() {
             <p className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.16em] text-[#9BF3C0]">
               5+ MODUŁÓW — DOBRALIŚMY CI PAKIET PRESTIGE
             </p>
-            <BtnGhost onClick={()=>go("pricing")} className="h-9 shrink-0 border-[#7DF0AE]/50 px-4 text-[9px] text-[#9BF3C0]">
-              ZOBACZ PLANY
+            <BtnGhost onClick={()=>go("atelier")} className="h-9 shrink-0 border-[#7DF0AE]/50 px-4 text-[9px] text-[#9BF3C0]">
+              ZOBACZ ATELIER
             </BtnGhost>
           </div>
         )}
@@ -2034,17 +1568,73 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="pricing" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-24 lg:py-32">
-        <Reveal><div className="text-center max-w-xl mx-auto"><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.2em] text-white/30">03 — PLANY</div><h2 className="mt-4 font-[Cormorant_Garamond] font-light text-[27px] sm:text-[50px] tracking-[-0.02em] leading-none"><EditableText ek="qraft.pricing.h" def="Jasne ceny." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.pricing.sub" def="Miesiąc do miesiąca po 90 dniach. Bez zobowiązań. W odcieniach czerni — wyrafinowane." className="mt-4 block font-[Inter] font-light text-[14px] sm:text-[15px] leading-7 text-white/50 max-w-[480px] mx-auto" isEditing={isEditing} as="p" /></div></Reveal>
-        <Reveal><PlanShowcase
-          isEditing={isEditing}
-          onPick={pickPlan}
-          recommended={recommended}
-          pickedCount={picked.length}
-          onWhiteHover={setOverWhiteCard}
-          onActiveChange={handleActiveChange}
-        /></Reveal>
-        <div className="mt-8 text-center font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.06em] text-white/20"><EditableText ek="qraft.pricing.note2" def="Start bez sesji zdjęciowej — dostępna od Signature. Szczegóły na audycie." className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div>
+      <section id="atelier" className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <motion.div
+            initial={{ scale: 1.18 }}
+            whileInView={{ scale: 1.02 }}
+            viewport={{ once: true, margin: "-15%" }}
+            transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-0"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=2200&q=80&auto=format&fit=crop"
+              alt="Rzemiosło w wykonaniu — detal dopracowany do perfekcji"
+              className="h-full w-full object-cover grayscale contrast-110 brightness-[0.5]"
+            />
+          </motion.div>
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.35) 22%, rgba(5,5,7,0.25) 55%, rgba(5,5,7,0.78) 88%, #050507 100%)" }} />
+          <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_50%,transparent_30%,rgba(5,5,7,0.55)_100%)]" />
+        </div>
+
+        <div className="relative mx-auto max-w-[1280px] px-6 lg:px-8 py-28 lg:py-40">
+          <Reveal>
+            <div className="text-center">
+              <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.32em] text-white/50">03 — ATELIER</div>
+              <h2 className="mt-6 leading-[0.9] tracking-[-0.02em]">
+                <EditableText ek="qraft.atelier.h1" def="Detal, którego" className="block font-[Cormorant_Garamond] font-light text-[30px] sm:text-[64px]" isEditing={isEditing} as="span" />
+                <EditableText ek="qraft.atelier.h2" def="nie da się sfałszować." className="block font-[Cormorant_Garamond] font-light italic text-white/45 text-[30px] sm:text-[64px]" isEditing={isEditing} as="span" />
+              </h2>
+              <EditableText
+                ek="qraft.atelier.sub"
+                def="Zanim cokolwiek zaplanujemy, przyglądamy się Twojemu rzemiosłu. Światło, materiał, sposób podania — wszystko, co robimy, wyrasta z tego, co Ty robisz najlepiej. Stąd też cena: nigdy z cennika — zawsze z zakresu."
+                className="mx-auto mt-6 block max-w-[520px] font-[Inter] font-light text-[14px] sm:text-[15.5px] leading-8 text-white/55"
+                isEditing={isEditing}
+                as="p"
+              />
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.12}>
+            <div
+              className="mx-auto mt-14 grid max-w-[880px] grid-cols-3 rounded-[24px] border border-white/12 bg-black/25 backdrop-blur-xl backdrop-saturate-[1.3]"
+              style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.07), 0 18px 50px rgba(0,0,0,0.4)" }}
+            >
+              {[
+                ["Zdjęć w miesiącu", 24, "+"],
+                ["Godzin warsztatu", 90, ""],
+                ["Detali w kadrze", 340, "+"],
+              ].map(([label, to, suffix], idx) => (
+                <div key={String(label)} className="border-r border-white/10 px-4 py-8 text-center last:border-r-0 sm:py-10">
+                  <div className="font-[Cormorant_Garamond] font-light text-[26px] sm:text-[40px] leading-none text-white">
+                    <CountUp to={Number(to)} suffix={String(suffix)} />
+                  </div>
+                  <div className="mt-3 font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.18em] text-white/45">
+                    <EditableText ek={`qraft.atelier.stat${idx}`} def={String(label)} className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.18}>
+            <div className="mt-12 text-center">
+              <BtnGhost onClick={() => goContact()} className="h-12 px-8 text-[10px] sm:text-[11px]">
+                ZOBACZ, CO WYCZUJEMY NA AUDYCIE <ArrowRight className="h-3.5 w-3.5 opacity-60" />
+              </BtnGhost>
+            </div>
+          </Reveal>
+        </div>
       </section>
 
       <section id="faq" className="mx-auto max-w-[1280px] px-6 lg:px-8 pb-12">
@@ -2066,50 +1656,13 @@ export default function Landing() {
               </div>
 
               <div className="mt-7">
-                <AnimatePresence mode="wait" initial={false}>
-                  {chosenPlan !== null ? (
-                    <motion.div
-                      key="picked"
-                      initial={{ opacity: 0, y: -8, filter: "blur(4px)" }}
-                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                      exit={{ opacity: 0, y: 8, filter: "blur(4px)" }}
-                      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                      className="flex items-center justify-between gap-3 rounded-[14px] border border-[#7DF0AE]/45 bg-[#0A120E] px-4 py-3"
-                    >
-                      <span className="min-w-0">
-                        <span className="block font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.18em] text-[#7DF0AE]">
-                          PAKIET WYBRANY
-                        </span>
-                        <span className="mt-1 block font-[Instrument_Serif] font-light text-[14px] sm:text-[16px] text-white">
-                          {svc.label}
-                          <span className="text-white/45"> · {svc.note}</span>
-                        </span>
-                      </span>
-                      <button
-                        onClick={clearPlan}
-                        className="shrink-0 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.14em] text-white/50 underline underline-offset-4 transition-colors duration-300 hover:text-white"
-                      >
-                        ZMIEŁ
-                      </button>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="tabs"
-                      initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
-                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                      exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
-                      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                      <SlidingTabs
-                        items={auditServices.map((s) => ({ id: s.id, label: s.label }))}
-                        value={form.service}
-                        onChange={(id) => { sfxPop(); setForm({ ...form, service: id }); }}
-                        className="t-tabs--fill"
-                        tabClassName="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.12em]"
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <SlidingTabs
+                  items={auditServices.map((s) => ({ id: s.id, label: s.label }))}
+                  value={form.service}
+                  onChange={(id) => { sfxPop(); setForm({ ...form, service: id }); }}
+                  className="t-tabs--fill"
+                  tabClassName="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.12em]"
+                />
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <span className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.12em] text-white/40">W ZAKRESIE</span>
                   <span className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.1em] text-white/45 text-right">
