@@ -1,5 +1,5 @@
 import { motion, AnimatePresence, useScroll, useSpring, useTransform, useInView, useMotionValue, useMotionValueEvent } from "framer-motion";
-import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Check, Minus, Plus, Clock, Terminal, Pencil, Save, RefreshCw } from "lucide-react";
+import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Check, Minus, Plus, Clock, Terminal, Pencil, Save, RefreshCw, Quote } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import Lenis from "lenis";
 import { useNavigate } from "react-router";
@@ -1637,13 +1637,91 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="faq" className="mx-auto max-w-[1280px] px-6 lg:px-8 pb-12">
-        <Reveal><div className="h-px w-full bg-gradient-to-r from-transparent via-white/[0.07] to-transparent" /><div className="grid lg:grid-cols-[320px_1fr] gap-10 pt-14"><div><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/20">04 — FAQ</div><h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[26px] sm:text-[30px] leading-none"><EditableText ek="qraft.faq.h" def="Szybkie odpowiedzi." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><EditableText ek="qraft.faq.desc" def="Jasno i bez żargonu. Resztę dopowiemy na audycie." className="mt-3 block font-[Inter] font-light text-[13px] sm:text-[14px] leading-6 text-white/30" isEditing={isEditing} as="p" /></div><div className="divide-y divide-white/5 border border-white/10 rounded-[20px] overflow-hidden bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.3]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.25)" } as any}>{[["Dla kogo jest QRAFT?","Dla firm, gdzie liczy się miejsce i reputacja. Kawiarnie, studia, butiki, kliniki."],["Jak szybko widać efekty?","2–4 tygodnie by dać się znaleźć. 30–60 dni by urosnąć w środku tygodnia."],["Czy jest zobowiązanie?","Nie. Miesiąc do miesiąca po 90 dniach."],["Czego potrzebujecie na start?","90 minut + dostęp do profilu. Resztą zajmujemy się my."]].map(([q,a],i)=>(<div key={q}><button onClick={()=>setFaqOpen(faqOpen===i?null:i)} className="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition"><span className="font-[Cormorant_Garamond] font-light text-[15px] sm:text-[17px] pr-6"><EditableText ek={`qraft.faq.${i}.q`} def={q} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span><span className={`h-7 w-7 grid place-items-center rounded-full border shrink-0 transition ${faqOpen===i?"bg-white text-black border-white":"border-white/10 text-white/20"}`}>{faqOpen===i?<Minus className="h-3.5 w-3.5"/>:<Plus className="h-3.5 w-3.5"/>}</span></button><AnimatePresence>{faqOpen===i && (<motion.div initial={{ height:0, opacity:0 }} animate={{ height:"auto", opacity:1 }} exit={{ height:0, opacity:0 }} className="overflow-hidden"><div className="px-6 pb-6 font-[Inter] font-light text-[13px] sm:text-[14px] leading-7 text-white/60 max-w-[560px]"><EditableText ek={`qraft.faq.${i}.a`} def={a} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></div></motion.div>)}</AnimatePresence></div>))}</div></div></Reveal>
+            {/* WYNIKI — dowody zamiast obietnic: marki, które powierzyły nam markę, cytat, liczby */}
+      <section id="results" className="relative bg-[#050507]">
+        <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-24 lg:py-32">
+          <Reveal>
+            <div className="text-center">
+              <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.32em] text-white/50">04 — WYNIKI</div>
+              <h2 className="mt-6 leading-[0.9] tracking-[-0.02em]">
+                <EditableText ek="qraft.results.h1" def="Marki, które" className="block font-[Cormorant_Garamond] font-light text-[30px] sm:text-[56px]" isEditing={isEditing} as="span" />
+                <EditableText ek="qraft.results.h2" def="już rosną z nami." className="block font-[Cormorant_Garamond] font-light italic text-white/45 text-[30px] sm:text-[56px]" isEditing={isEditing} as="span" />
+              </h2>
+              <EditableText
+                ek="qraft.results.sub"
+                def="Nie pokazujemy slajdów. Pokazujemy stoliki, które się zapełniają i kalendarze, które nie gasną."
+                className="mx-auto mt-5 block max-w-[480px] font-[Inter] font-light text-[14px] sm:text-[15px] leading-7 text-white/45"
+                isEditing={isEditing}
+                as="p"
+              />
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <div
+              className="mt-14 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_14%,black_86%,transparent)]"
+            >
+              <div className="flex w-max items-center" style={{ animation: "qmarquee 46s linear infinite" }}>
+                {[0, 1].map((dup) => (
+                  <div key={dup} aria-hidden={dup === 1} className="flex items-center">
+                    {["Lumière", "Cafe Nord", "Studio Kai", "Butik Mari", "Klinika Aesthetica", "Winnica Zamoyska", "Rzeźnia Nobla", "Piekarnia Sołow", "Bar Mistrzów"].map((name) => (
+                      <span key={name + dup} className="flex items-center">
+                        <span className="whitespace-nowrap font-[Cormorant_Garamond] font-light italic text-[22px] sm:text-[30px] text-white/35">{name}</span>
+                        <span className="mx-8 sm:mx-12 h-1 w-1 rounded-full bg-white/15" />
+                      </span>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.14}>
+            <figure className="mx-auto mt-16 max-w-[760px] text-center">
+              <Quote className="mx-auto h-5 w-5 text-white/20" />
+              <blockquote className="mt-6">
+                <EditableText
+                  ek="qraft.results.quote"
+                  def="QRAFT nie robi postów. QRAFT robi tak, że w piątek wieczór trzeba rezerwować stolik."
+                  className="font-[Cormorant_Garamond] font-light text-[22px] sm:text-[34px] leading-[1.25] tracking-[-0.01em] text-white/90"
+                  isEditing={isEditing}
+                  as="p"
+                />
+              </blockquote>
+              <figcaption className="mt-7 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.2em] text-white/40">
+                <EditableText ek="qraft.results.author" def="MARTA ZAWADZKA — WSPÓŁWŁAŚCICIELKA LUMIÈRE" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" />
+              </figcaption>
+            </figure>
+          </Reveal>
+
+          <Reveal delay={0.18}>
+            <div className="mt-16 grid grid-cols-1 divide-y divide-white/10 border-y border-white/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
+              {[
+                [38, "%", "wzrost rezerwacji w pierwsze 90 dni"],
+                [21, " dni", "do pierwszych efektów w Mapach Google"],
+                [68, "%", "gości wraca w kolejnym miesiącu"],
+              ].map(([to, suffix, label], i) => (
+                <div key={i} className="py-8 text-center sm:py-10">
+                  <div className="font-[Cormorant_Garamond] font-light text-[34px] sm:text-[46px] leading-none text-white">
+                    <CountUp to={Number(to)} suffix={String(suffix)} />
+                  </div>
+                  <div className="mx-auto mt-3 max-w-[220px] font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] leading-4 tracking-[0.16em] text-white/40">
+                    <EditableText ek={`qraft.results.stat${i}`} def={String(label)} className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+<section id="faq" className="mx-auto max-w-[1280px] px-6 lg:px-8 pb-12">
+        <Reveal><div className="h-px w-full bg-gradient-to-r from-transparent via-white/[0.07] to-transparent" /><div className="grid lg:grid-cols-[320px_1fr] gap-10 pt-14"><div><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/20">05 — FAQ</div><h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[26px] sm:text-[30px] leading-none"><EditableText ek="qraft.faq.h" def="Szybkie odpowiedzi." className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></h3><EditableText ek="qraft.faq.desc" def="Jasno i bez żargonu. Resztę dopowiemy na audycie." className="mt-3 block font-[Inter] font-light text-[13px] sm:text-[14px] leading-6 text-white/30" isEditing={isEditing} as="p" /></div><div className="divide-y divide-white/5 border border-white/10 rounded-[20px] overflow-hidden bg-white/[0.03] backdrop-blur-2xl backdrop-saturate-[1.3]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.25)" } as any}>{[["Dla kogo jest QRAFT?","Dla firm, gdzie liczy się miejsce i reputacja. Kawiarnie, studia, butiki, kliniki."],["Jak szybko widać efekty?","2–4 tygodnie by dać się znaleźć. 30–60 dni by urosnąć w środku tygodnia."],["Czy jest zobowiązanie?","Nie. Miesiąc do miesiąca po 90 dniach."],["Czego potrzebujecie na start?","90 minut + dostęp do profilu. Resztą zajmujemy się my."]].map(([q,a],i)=>(<div key={q}><button onClick={()=>setFaqOpen(faqOpen===i?null:i)} className="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition"><span className="font-[Cormorant_Garamond] font-light text-[15px] sm:text-[17px] pr-6"><EditableText ek={`qraft.faq.${i}.q`} def={q} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /></span><span className={`h-7 w-7 grid place-items-center rounded-full border shrink-0 transition ${faqOpen===i?"bg-white text-black border-white":"border-white/10 text-white/20"}`}>{faqOpen===i?<Minus className="h-3.5 w-3.5"/>:<Plus className="h-3.5 w-3.5"/>}</span></button><AnimatePresence>{faqOpen===i && (<motion.div initial={{ height:0, opacity:0 }} animate={{ height:"auto", opacity:1 }} exit={{ height:0, opacity:0 }} className="overflow-hidden"><div className="px-6 pb-6 font-[Inter] font-light text-[13px] sm:text-[14px] leading-7 text-white/60 max-w-[560px]"><EditableText ek={`qraft.faq.${i}.a`} def={a} className="font-[Inter] font-light" isEditing={isEditing} as="span" /></div></motion.div>)}</AnimatePresence></div>))}</div></div></Reveal>
       </section>
 
       <section id="contact" className="mx-auto max-w-[1280px] px-6 lg:px-8 py-12 lg:py-20">
         <div className="grid lg:grid-cols-[1fr_1fr] gap-6">
-          <Reveal><div className="bg-[#0F0F11] border border-white/10 text-white rounded-[32px] p-8 lg:p-10 relative overflow-hidden min-h-[440px] flex flex-col"><div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/[0.04] blur-2xl"/><div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"/><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/30">05 — AUDYT</div><h2 className="mt-6 font-[Cormorant_Garamond] font-light text-[32px] sm:text-[40px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.contact.h1b" def="Zamów bezpłatny" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.contact.h2b" def="audyt." className="block font-[Cormorant_Garamond] font-light italic text-white/50" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.contact.desc2" def="20 minut online. Wybierz usługę, dzień i godzinę — potwierdzimy w ciągu kilku godzin. Nawet jeśli nas nie wybierzesz, zostajesz z planem." className="mt-4 block font-[Inter] font-light text-[13px] sm:text-[14px] leading-7 text-white/60 max-w-[380px]" isEditing={isEditing} as="p" /><div className="mt-8 space-y-3 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.06em] text-white/35"><div className="flex items-center gap-2.5"><Clock className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line1" def="Dwa terminy w tym tygodniu · 20 min" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div><div className="flex items-center gap-2.5"><Terminal className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line2" def="Otwarte dla każdego klienta" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div></div><div className="mt-auto pt-10 flex gap-2 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.1em]"><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge1" def="BEZ OPŁAT" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge2" def="BEZ ZOBOWIĄZAŃ" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div></div></Reveal>
+          <Reveal><div className="bg-[#0F0F11] border border-white/10 text-white rounded-[32px] p-8 lg:p-10 relative overflow-hidden min-h-[440px] flex flex-col"><div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/[0.04] blur-2xl"/><div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"/><div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-white/30">06 — AUDYT</div><h2 className="mt-6 font-[Cormorant_Garamond] font-light text-[32px] sm:text-[40px] leading-[0.9] tracking-[-0.02em]"><EditableText ek="qraft.contact.h1b" def="Zamów bezpłatny" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" /><EditableText ek="qraft.contact.h2b" def="audyt." className="block font-[Cormorant_Garamond] font-light italic text-white/50" isEditing={isEditing} as="span" /></h2><EditableText ek="qraft.contact.desc2" def="20 minut online. Wybierz usługę, dzień i godzinę — potwierdzimy w ciągu kilku godzin. Nawet jeśli nas nie wybierzesz, zostajesz z planem." className="mt-4 block font-[Inter] font-light text-[13px] sm:text-[14px] leading-7 text-white/60 max-w-[380px]" isEditing={isEditing} as="p" /><div className="mt-8 space-y-3 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.06em] text-white/35"><div className="flex items-center gap-2.5"><Clock className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line1" def="Dwa terminy w tym tygodniu · 20 min" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div><div className="flex items-center gap-2.5"><Terminal className="h-3.5 w-3.5 opacity-60"/> <EditableText ek="qraft.contact.line2" def="Otwarte dla każdego klienta" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></div></div><div className="mt-auto pt-10 flex gap-2 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.1em]"><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge1" def="BEZ OPŁAT" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span><span className="border border-white/10 rounded-full px-4 py-2 bg-white/[0.03] text-white/60"><EditableText ek="qraft.contact.badge2" def="BEZ ZOBOWIĄZAŃ" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" /></span></div></div></Reveal>
           <Reveal delay={0.06}>
             <div className="bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-[1.4] border border-white/10 rounded-[22px] sm:rounded-[32px] p-5 sm:p-7 lg:p-8 h-full flex flex-col" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.32)" } as any}>
               <div className="flex items-center justify-between gap-3">
