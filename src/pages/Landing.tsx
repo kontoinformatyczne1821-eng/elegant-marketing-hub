@@ -1553,7 +1553,12 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* PROCES przejmuje ciepło, którym kończy się sekcja perfekcji — stąd łagodne przejście */}
+      {/* WYNIKI przyjmuje ciepło, którym kończy się sekcja perfekcji — stąd łagodne przejście */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-[6]">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(0deg, transparent 0%, rgba(5,5,7,0.25) 40%, #050507 100%)" }} />
+      </div>
+
       <section
         id="process"
         className="bg-[#ECE8E2] border-t border-white/5 text-[#0A0A0A]"
@@ -1591,6 +1596,92 @@ export default function Landing() {
           <Reveal>
             <div className="text-center">
               <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.32em] text-white/50">03 — ATELIER</div>
+              <div className="mt-6 h-px w-full bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+              <h2 className="mt-6 leading-[0.9] tracking-[-0.02em]">
+                <EditableText ek="qraft.atelier.h1" def="Detal, którego" className="block font-[Cormorant_Garamond] font-light text-[30px] sm:text-[64px]" isEditing={isEditing} as="span" />
+                <EditableText ek="qraft.atelier.h2" def="nie da się sfałszować." className="block font-[Cormorant_Garamond] font-light italic text-white/45 text-[30px] sm:text-[64px]" isEditing={isEditing} as="span" />
+              </h2>
+              <EditableText
+                ek="qraft.atelier.sub"
+                def="Zanim cokolwiek zaplanujemy, przyglądamy się Twojemu rzemiosłu. Światło, materiał, sposób podania — wszystko, co robimy, wyrasta z tego, co Ty robisz najlepiej. Stąd też cena: nigdy z cennika — zawsze z zakresu."
+                className="mx-auto mt-6 block max-w-[520px] font-[Inter] font-light text-[14px] sm:text-[15.5px] leading-8 text-white/55"
+                isEditing={isEditing}
+                as="p"
+              />
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.12}>
+            <div
+              className="mx-auto mt-14 grid max-w-[880px] grid-cols-3 rounded-[24px] border border-white/12 bg-black/25 backdrop-blur-xl backdrop-saturate-[1.3]"
+              style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.07), 0 18px 50px rgba(0,0,0,0.4)" }}
+            >
+              {[
+                ["Zdjęć w miesiącu", 24, "+"],
+                ["Godzin warsztatu", 90, ""],
+                ["Detali w kadrze", 340, "+"],
+              ].map(([label, to, suffix], idx) => (
+                <div key={String(label)} className="border-r border-white/10 px-4 py-8 text-center last:border-r-0 sm:py-10">
+                  <div className="font-[Cormorant_Garamond] font-light text-[26px] sm:text-[40px] leading-none text-white">
+                    <CountUp to={Number(to)} suffix={String(suffix)} />
+                  </div>
+                  <div className="mt-3 font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.18em] text-white/45">
+                    <EditableText ek={`qraft.atelier.stat${idx}`} def={String(label)} className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.18}>
+            <div className="mt-12 text-center">
+              <BtnGhost onClick={() => goContact()} className="h-12 px-8 text-[10px] sm:text-[11px]">
+                ZOBACZ, CO WYCZUJEMY NA AUDYCIE <ArrowRight className="h-3.5 w-3.5 opacity-60" />
+              </BtnGhost>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* WYNIKI — dowody zamiast obietnic: marki, które powierzyły nam markę, cytat, liczby */}
+      <section
+        id="process"
+        className="bg-[#ECE8E2] border-t border-white/5 text-[#0A0A0A]"
+        style={{
+          backgroundImage:
+            "radial-gradient(120% 62% at 50% -10%, rgba(255,62,10,0.18), rgba(255,62,10,0) 62%)," +
+            "linear-gradient(180deg, #F6CFA0 0%, #F4D6B2 16%, #F1E0CC 38%, #EFE4D6 64%, #ECE8E2 100%)",
+        }}
+      >
+        <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-24">
+          <Reveal><ProcessStack isEditing={isEditing} onZoneChange={setInProcess} /></Reveal>
+        </div>
+      </section>
+
+      <section id="atelier" className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <motion.div
+            initial={{ scale: 1.18 }}
+            whileInView={{ scale: 1.02 }}
+            viewport={{ once: true, margin: "-15%" }}
+            transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-0"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=2200&q=80&auto=format&fit=crop"
+              alt="Rzemiosło w wykonaniu — detal dopracowany do perfekcji"
+              className="h-full w-full object-cover grayscale contrast-110 brightness-[0.5]"
+            />
+          </motion.div>
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.35) 22%, rgba(5,5,7,0.25) 55%, rgba(5,5,7,0.78) 88%, #050507 100%)" }} />
+          <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_50%,transparent_30%,rgba(5,5,7,0.55)_100%)]" />
+        </div>
+
+        <div className="relative mx-auto max-w-[1280px] px-6 lg:px-8 py-28 lg:py-40">
+          <Reveal>
+            <div className="text-center">
+              <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.32em] text-white/50">03 — ATELIER</div>
+              <div className="mt-6 h-px w-full bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
               <h2 className="mt-6 leading-[0.9] tracking-[-0.02em]">
                 <EditableText ek="qraft.atelier.h1" def="Detal, którego" className="block font-[Cormorant_Garamond] font-light text-[30px] sm:text-[64px]" isEditing={isEditing} as="span" />
                 <EditableText ek="qraft.atelier.h2" def="nie da się sfałszować." className="block font-[Cormorant_Garamond] font-light italic text-white/45 text-[30px] sm:text-[64px]" isEditing={isEditing} as="span" />
@@ -1715,7 +1806,17 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* PODZIAL ROL: klient sprzedaje, QRAFT ogarnia marketing */}
+      {/* PODZIAL ROL przyjmuje ciepło, któremu kończy się sekcja wyniki — stąd łagodne przejście */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-[6]">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(0deg, transparent 0%, rgba(5,5,7,0.25) 40%, #050507 100%)" }} />
+      </div>
+
+      <section id="podzial" className="relative bg-[#050507]">
+        <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-28">
+          <Reveal>
+            <div className="text-center">
+              <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.32em] text-white/50">{"05 \u2014 PODZIA\u0141 R\u00d3L"}</div>
       <section id="podzial" className="relative bg-[#050507]">
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-28">
           <Reveal>
