@@ -90,7 +90,8 @@ function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, po
   if (!isEditing && pop && /\d/.test(val))
     return (
       <span ref={popRef} className={`t-digit-group ${className || ""}`}>
-        <DigitChars text={val} />
+        <DigitChars text={val}/>
+
       </span>
     );
   if (!isEditing) return <Tag className={className}>{val}</Tag>;
@@ -153,7 +154,8 @@ function BtnPrimary({ children, onClick, className = "", type = "button" }: { ch
         animate={{ scaleX: hover ? 1 : 0 }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         style={{ originX: 0 }}
-      />
+     />
+
       <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
     </button>
   );
@@ -201,7 +203,8 @@ function BtnDark({ children, onClick, className = "" }: { children: React.ReactN
         animate={{ scaleX: hover ? 1 : 0 }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         style={{ originX: 0 }}
-      />
+     />
+
       <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
     </button>
   );
@@ -250,7 +253,8 @@ function CountUp({ to, suffix = "", decimals = 0 }: { to: number; suffix?: strin
             maximumFractionDigits: decimals,
           }) + suffix
         }
-      />
+     />
+
     </span>
   );
 }
@@ -303,8 +307,7 @@ function GlassArrow({
     onClick();
     setBurst((b) => b + 1);
   };
-  const Icon =
-    axis === "y" ? (dir === 1 ? ArrowDown : ArrowUp) : dir === 1 ? ArrowRight : ArrowLeft;
+  const Icon =                    axis === "y" ? (dir === 1 ? ArrowDown : ArrowUp) : dir === 1 ? ArrowRight : ArrowLeft;
   return (
     <motion.button
       type="button"
@@ -334,7 +337,8 @@ function GlassArrow({
           initial={{ opacity: 0.85, scale: 0.35 }}
           animate={{ opacity: 0, scale: 1.65 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        />
+       />
+
       )}
       {/* błysk na obręczy */}
       {burst > 0 && (
@@ -346,7 +350,8 @@ function GlassArrow({
           initial={{ rotate: 0, opacity: 0.9 }}
           animate={{ rotate: 360, opacity: 0 }}
           transition={{ duration: 0.75, ease: "easeOut" }}
-        />
+       />
+
       )}
       {/* strzałka wysuwa się w kierunku podróży */}
       <motion.span
@@ -360,6 +365,8 @@ function GlassArrow({
         style={{ filter: skin.glow }}
       >
         <Icon className="h-4 w-4" />
+
+
       </motion.span>
     </motion.button>
   );
@@ -406,9 +413,15 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
         <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.18em] text-black/30">02 — PROCES</div>
         <h3 className="mt-4 font-[Cormorant_Garamond] font-light text-[26px] sm:text-[30px] lg:text-[44px] leading-[0.9] tracking-[-0.02em]">
           <EditableText ek="qraft.process.h1" def="Cztery tygodnie" className="block font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
+
+
           <EditableText ek="qraft.process.h2" def="do rozpędu." className="block font-[Cormorant_Garamond] font-light italic text-black/30" isEditing={isEditing} as="span" />
+
+
         </h3>
         <EditableText ek="qraft.process.desc" def="Otwarty proces. Cotygodniowe dowody. Bez teatru." className="mt-5 block font-[Inter] font-light text-[15px] sm:text-[17px] leading-8 text-black/75" isEditing={isEditing} as="p" />
+
+
 
         <div className="mt-10 flex items-center gap-3">
           <GlassArrow
@@ -418,7 +431,8 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
             onClick={() => step(active - 1, -1)}
             label="Poprzedni etap"
             className="hidden sm:grid"
-          />
+         />
+
           <GlassArrow
             dir={1}
             axis="y"
@@ -426,10 +440,13 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
             onClick={() => step(active + 1, 1)}
             label="Następny etap"
             className="hidden sm:grid"
-          />
+         />
+
           <div className="ml-1 flex items-baseline gap-2 font-[JetBrains_Mono] font-light text-[11px] sm:text-[12px] tracking-[0.16em] text-black/50">
             ETAP
             <PopNumber text={`0${active + 1}`} className="text-black/70" />
+
+
             <span className="opacity-50">/ 0{n}</span>
           </div>
         </div>
@@ -439,13 +456,16 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
         {/* czarna podświetlana kreska z 4 punktami */}
         <div className="relative w-6 shrink-0">
           <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-black/12" />
+
+
           <motion.div
             className="absolute left-1/2 top-0 w-[2px] -translate-x-1/2 rounded-full bg-black"
             initial={false}
             animate={{ height: `${(active / (n - 1)) * 100}%` }}
             transition={{ type: "spring", stiffness: 110, damping: 18 }}
             style={{ boxShadow: "0 0 16px 3px rgba(0,0,0,0.30)" }}
-          />
+         />
+
           <div className="relative flex h-full flex-col items-center justify-between py-[7px]">
             {processSteps.map((s, i) => (
               <button
@@ -464,7 +484,8 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                     border: `1px solid ${i <= active ? "#0a0a0a" : "rgba(0,0,0,0.28)"}`,
                     boxShadow: i === active ? "0 0 18px 4px rgba(0,0,0,0.30)" : "none",
                   }}
-                />
+               />
+
               </button>
             ))}
           </div>
@@ -508,7 +529,8 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                       className="font-[Cormorant_Garamond] font-light"
                       isEditing={isEditing}
                       as="span"
-                    />
+                   />
+
                   </h4>
                   <EditableText
                     ek={`qraft.process.${i}.desc`}
@@ -516,7 +538,8 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                     className="mt-3 sm:mt-5 block font-[Inter] font-light text-[13px] sm:text-[17px] leading-6 sm:leading-8 opacity-100 line-clamp-3 sm:line-clamp-none"
                     isEditing={isEditing}
                     as="p"
-                  />
+                 />
+
                   <div className="mt-auto">
                     <div className="flex gap-2">
                       {processSteps.map((_, k) => (
@@ -524,7 +547,8 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                           key={k}
                           className="h-[3px] flex-1 rounded-full transition-colors duration-500"
                           style={{ backgroundColor: k <= active ? "#0a0a0a" : "rgba(0,0,0,0.12)" }}
-                        />
+                       />
+
                       ))}
                     </div>
                     {front && (
@@ -533,6 +557,8 @@ function ProcessStack({ isEditing, onZoneChange }: { isEditing: boolean; onZoneC
                           TAPNIJ — NASTĘPNY ETAP
                         </span>
                         <ArrowRight className="h-3 w-3 text-black/40" />
+
+
                       </div>
                     )}
                   </div>
@@ -569,56 +595,116 @@ function FlowArt() {
       <defs>
         <linearGradient id="qSheen" x1="0" y1="0" x2="1" y2="0.35">
           <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+
+
           <stop offset="26%" stopColor="#cfcfcf" stopOpacity="0.26" />
+
+
           <stop offset="48%" stopColor="#ffffff" stopOpacity="0.7" />
+
+
           <stop offset="62%" stopColor="#8e8e8e" stopOpacity="0.32" />
+
+
           <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+
+
         </linearGradient>
         <linearGradient id="qSheenSoft" x1="0" y1="0" x2="1" y2="0.6">
           <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+
+
           <stop offset="34%" stopColor="#6f6f74" stopOpacity="0.5" />
+
+
           <stop offset="58%" stopColor="#b9b9be" stopOpacity="0.75" />
+
+
           <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+
+
         </linearGradient>
         <radialGradient id="qLamp" cx="62%" cy="34%" r="52%">
           <stop offset="0%" stopColor="#ffffff" stopOpacity="0.2" />
+
+
           <stop offset="55%" stopColor="#ffffff" stopOpacity="0.05" />
+
+
           <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+
+
         </radialGradient>
         <filter id="qSoft" x="-30%" y="-30%" width="160%" height="160%">
           <feGaussianBlur stdDeviation="26" />
+
+
         </filter>
         <filter id="qGlow" x="-30%" y="-30%" width="160%" height="160%">
           <feGaussianBlur stdDeviation="7" result="b" />
+
+
           <feMerge>
             <feMergeNode in="b" />
+
+
             <feMergeNode in="b" />
+
+
             <feMergeNode in="SourceGraphic" />
+
+
           </feMerge>
         </filter>
       </defs>
 
       <rect width="1920" height="1080" fill="#050507" />
+
+
       <rect width="1920" height="1080" fill="url(#qLamp)" />
+
+
 
       <g fill="none" strokeLinecap="round" filter={light ? undefined : "url(#qSoft)"}>
         <path d="M -260 830 C 240 1250, 1120 1230, 2180 630" stroke="url(#qSheenSoft)" strokeWidth="300" opacity="0.5" />
+
+
         <path d="M -260 630 C 220 1090, 1080 1050, 2180 440" stroke="url(#qSheenSoft)" strokeWidth="180" opacity="0.55" />
+
+
         <path d="M -260 440 C 200 910, 1040 860, 2180 260" stroke="url(#qSheen)" strokeWidth="86" opacity="0.6" />
+
+
         <path d="M -260 255 C 240 710, 1000 630, 2180 70" stroke="url(#qSheen)" strokeWidth="34" opacity="0.7" />
+
+
       </g>
 
       <g fill="none" strokeLinecap="round" filter="url(#qGlow)">
         <path d="M -260 120 C 260 520, 940 470, 2180 -40" stroke="url(#qSheen)" strokeWidth="3.5" />
+
+
         <path d="M -260 255 C 240 710, 1000 630, 2180 70" stroke="url(#qSheen)" strokeWidth="2.4" opacity="0.9" />
+
+
         <path d="M -260 440 C 200 910, 1040 860, 2180 260" stroke="url(#qSheen)" strokeWidth="2" opacity="0.7" />
+
+
         <path d="M -260 630 C 220 1090, 1080 1050, 2180 440" stroke="url(#qSheen)" strokeWidth="1.6" opacity="0.5" />
+
+
       </g>
 
       <g fill="none" stroke="#ffffff" strokeWidth="1" opacity="0.12">
         <path d="M -260 60 C 280 430, 980 380, 2180 -110" />
+
+
         <path d="M -260 700 C 240 1160, 1100 1120, 2180 510" />
+
+
         <path d="M -260 900 C 260 1300, 1140 1290, 2180 700" />
+
+
       </g>
     </svg>
   );
@@ -720,8 +806,11 @@ function FlowBackdrop() {
       >
         {FLOW_BG_SRC ? (
           <img src={FLOW_BG_SRC} alt="" className="h-full w-full object-cover" />
+
+
         ) : (
-          <FlowArt />
+          <FlowArt/>
+
         )}
       </motion.div>
       
@@ -733,14 +822,16 @@ function FlowBackdrop() {
             "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
           backgroundSize: "88px 88px",
         }}
-      />
+     />
+
       <div
         className="absolute inset-0"
         style={{
           background:
             "radial-gradient(125% 95% at 50% 0%, transparent 35%, rgba(5,5,7,0.72) 100%)",
         }}
-      />
+     />
+
     </div>
   );
 }
@@ -867,8 +958,10 @@ export default function Landing() {
   return (
     <div className="min-h-screen text-[#F2F2F0] antialiased selection:bg-white selection:text-black">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap'); html{scroll-behavior:smooth} @keyframes qmarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}} @keyframes qmsheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}} @keyframes qmbreathe{0%,100%{opacity:.35}50%{opacity:.9}}`}</style>
-      <motion.div className="fixed top-0 inset-x-0 h-[1px] bg-white/80 z-50 origin-left" style={{ scaleX: progress }} />
-      <FlowBackdrop />
+      <motion.div className="fixed top-0 inset-x-0 h-[1px] bg-white/80 z-50 origin-left" style={{ scaleX: progress }}/>
+
+      <FlowBackdrop/>
+
       <GradualBlur
         target="page"
         position="bottom"
@@ -883,7 +976,8 @@ export default function Landing() {
         duration="0.4s"
         easing="ease-out"
         style={{ zIndex: 30 }}
-      />
+     />
+
 
       {/* globalny, świecący kursor — zmienia barwę przy sekcji procesu */}
       <GlowCursor
@@ -915,7 +1009,8 @@ export default function Landing() {
           zIndex: 60,
           pointerEvents: "none",
         }}
-      />
+     />
+
 
       {/* boczny pasek nawigacji (LineSidebar) — otwiera go kliknięcie Q w nagłówku */}
       <div className="hidden min-[1640px]:block fixed left-3 top-1/2 z-40 -translate-y-1/2">
@@ -936,14 +1031,16 @@ export default function Landing() {
         >
           <div className="flex items-start justify-between gap-3">
             <div className="flex flex-col gap-3">
-              <QraftMark className={inProcess ? "text-black" : "text-white"} height={19} />
+              <QraftMark className={inProcess ? "text-black" : "text-white"} height={19}/>
+
               <span
                 className={`font-[JetBrains_Mono] font-light text-[7px] sm:text-[8px] leading-[1.7] tracking-[0.2em] ${
                   inProcess ? "text-black/40" : "text-white/30"
                 }`}
               >
                 PRECISION
-                <br />
+                <br/>
+
                 BUILDS BRANDS
               </span>
             </div>
@@ -956,7 +1053,8 @@ export default function Landing() {
             </span>
           </div>
 
-          <div className={`my-6 h-px w-full ${inProcess ? "bg-black/10" : "bg-white/10"}`} />
+          <div className={`my-6 h-px w-full ${inProcess ? "bg-black/10" : "bg-white/10"}`}/>
+
 
           <LineSidebar
             items={SIDEBAR.map((x) => x.label)}
@@ -973,9 +1071,11 @@ export default function Landing() {
             fontSize={0.66}
             smoothing={120}
             className="font-[JetBrains_Mono] font-light tracking-[0.16em]"
-          />
+         />
 
-          <div className={`my-6 h-px w-full ${inProcess ? "bg-black/10" : "bg-white/10"}`} />
+
+          <div className={`my-6 h-px w-full ${inProcess ? "bg-black/10" : "bg-white/10"}`}/>
+
 
           <button
             onClick={() => go("contact")}
@@ -985,6 +1085,8 @@ export default function Landing() {
           >
             ZACZNIJMY
             <ArrowUpRight className="h-3.5 w-3.5" />
+
+
           </button>
         </motion.aside>
       </div>
@@ -1022,16 +1124,23 @@ export default function Landing() {
               onClick={()=>setIsEditing(!isEditing)}
               className={`hidden lg:inline-flex items-center gap-2 px-4 h-9 rounded-full border font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.12em] transition-all duration-500 backdrop-blur ${isEditing ? "bg-white text-black border-white" : "border-white/15 bg-white/[0.02] text-white/60 hover:border-white/45 hover:bg-white/[0.08] hover:text-white"}`}
             >
-              {isEditing ? <><Save className="h-3.5 w-3.5"/> ZAKOŃCZ EDYCJĘ</> : <><Pencil className="h-3.5 w-3.5"/> EDYTUJ TEKSTY</>}
+              {isEditing ? <><Save className="h-3.5 w-3.5" />
+ ZAKOŃCZ EDYCJĘ</> : <><Pencil className="h-3.5 w-3.5" />
+ EDYTUJ TEKSTY</>}
             </button>
-            <span className="hidden md:inline-flex items-center gap-1.5 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.14em] text-white/20"><Terminal className="h-3 w-3 opacity-60"/> qraft.build</span>
+            <span className="hidden md:inline-flex items-center gap-1.5 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.14em] text-white/20"><Terminal className="h-3 w-3 opacity-60" />
+ qraft.build</span>
             <button
               onClick={() => { const next = !soundOn; setSoundOn(next); setMuted(!next); if (next) sfxTap(); }}
               aria-label={soundOn ? "Wycisz dźwięki" : "Włącz dźwięki"}
               aria-pressed={!soundOn}
               className="hidden sm:grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/15 bg-white/[0.02] text-white/55 transition-colors duration-300 hover:border-white/45 hover:text-white"
             >
-              {soundOn ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+              {soundOn ? <Volume2 className="h-3.5 w-3.5" />
+
+ : <VolumeX className="h-3.5 w-3.5" />
+
+}
             </button>
             <BtnPrimary onClick={()=>go("contact")} className="hidden sm:inline-flex text-[10px] sm:text-[11px] tracking-[0.16em] px-6 h-9">ROZPOCZNIJ</BtnPrimary>
           </motion.div>
@@ -1054,13 +1163,15 @@ export default function Landing() {
         onMenuOpen={() => sfxWhoosh(true)}
         onMenuClose={() => sfxWhoosh(false)}
         onItemClick={handleMenuItem}
-      />
+     />
+
 
       {isEditing && (
         <div className="sticky top-[72px] z-30 bg-[#111113] border-y border-white/10 text-white">
           <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-2.5 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.04em] text-white/70">
-              <Pencil className="h-3.5 w-3.5 text-white/50"/> Tryb edycji — kliknij w dowolny tekst, aby go zmienić. Zapis automatyczny w przeglądarce.
+              <Pencil className="h-3.5 w-3.5 text-white/50" />
+ Tryb edycji — kliknij w dowolny tekst, aby go zmienić. Zapis automatyczny w przeglądarce.
             </div>
             <button onClick={()=>setIsEditing(false)} className="hidden sm:inline-flex bg-white text-black font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.08em] px-4 h-7 rounded-full">GOTOWE</button>
           </div>
@@ -1075,7 +1186,8 @@ export default function Landing() {
               src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=2000&q=80&auto=format&fit=crop"
               alt="Góra pod gwiazdami nocą"
               className="h-full w-full object-cover grayscale contrast-110 brightness-[0.38]"
-            />
+           />
+
           </motion.div>
 
           <motion.div
@@ -1083,32 +1195,41 @@ export default function Landing() {
             style={{ background: "linear-gradient(to bottom, rgba(5,5,7,0.50) 0%, transparent 34%, transparent 76%, rgba(5,5,7,0.55) 91%, #050507 100%)" }}
             animate={{ opacity: [0.55, 0.85, 0.55] }}
             transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
-          />
+         />
+
           <motion.div
             className="absolute -left-1/4 top-1/3 h-[46vh] w-[160%] opacity-40"
             style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.10), transparent 72%)", filter: "blur(30px)" }}
             animate={{ x: ["-8%", "8%", "-8%"] }}
             transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
-          />
+         />
+
         </div>
 
         <div className="absolute inset-0 bg-[radial-gradient(130%_100%_at_50%_6%,transparent_0%,rgba(5,5,7,0.30)_64%,rgba(5,5,7,0.88)_100%)]" />
-        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "88px 88px" }} />
+
+
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "88px 88px" }}/>
+
 
         <div className="absolute inset-0">
           <div className="absolute left-1/2 top-[-10%] h-[120%] w-px -translate-x-1/2 bg-white/90 shadow-[0_0_30px_5px_rgba(255,255,255,0.6),0_0_110px_24px_rgba(255,255,255,0.24)]" />
+
+
           <motion.div
             className="absolute left-1/2 top-0 h-full w-[420px] -translate-x-1/2"
             style={{ background: "linear-gradient(to right, transparent, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.24) 50%, rgba(255,255,255,0.08) 60%, transparent)" }}
             animate={{ opacity: [0.28, 0.8, 0.28] }}
             transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          />
+         />
+
           <motion.div
             className="absolute left-1/2 top-0 h-[32%] w-[680px] -translate-x-1/2"
             style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.18), transparent)" }}
             animate={{ y: ["0%", "212%"] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          />
+         />
+
         </div>
 
         {/* pixelowy ślad kursora w hero — tylko dla myszy/trackpada */}
@@ -1123,7 +1244,8 @@ export default function Landing() {
               gooeyFilter={{ id: "qraft-goo", strength: 2.4 }}
               canvasProps={{ dpr: [1, 1.25] }}
               style={{ touchAction: "auto" }}
-            />
+           />
+
           </div>
         )}
 
@@ -1148,7 +1270,8 @@ export default function Landing() {
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 1.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              />
+             />
+
 
               <motion.div
                 className="mt-6 sm:mt-10 flex flex-wrap items-center gap-3 sm:gap-4"
@@ -1158,10 +1281,14 @@ export default function Landing() {
               >
                 <BtnPrimary onClick={() => go("contact")} className="h-[52px] px-8 text-[10px] sm:text-[11px] pointer-events-auto">
                   ZAMÓW DARMOWY AUDYT <ArrowRight className="h-3.5 w-3.5 opacity-60" />
+
+
                 </BtnPrimary>
                 <BtnGhost onClick={() => go("services")} className="h-[52px] pl-2 pr-6 text-[10px] sm:text-[11px] pointer-events-auto">
                   <span className="h-9 w-9 grid place-items-center rounded-full border border-white/15 transition-colors duration-300 group-hover:bg-white/10">
                     <ArrowUpRight className="h-3.5 w-3.5" />
+
+
                   </span>
                   ZOBACZ SYSTEM
                 </BtnGhost>
@@ -1174,9 +1301,14 @@ export default function Landing() {
                 transition={{ duration: 0.9, delay: 0.8 }}
               >
                 {[
-                  { v: <CountUp to={340} suffix="+" />, l: "Zbudowanych" },
-                  { v: <CountUp to={4.9} decimals={1} />, l: "Ocena" },
-                  { v: <CountUp to={14} suffix=" mies." />, l: "Średnio" },
+                  { v: <CountUp to={340} suffix="+" />
+
+, l: "Zbudowanych" },
+                  { v: <CountUp to={4.9} decimals={1}/>
+, l: "Ocena" },
+                  { v: <CountUp to={14} suffix=" mies." />
+
+, l: "Średnio" },
                 ].map((s, i) => (
                   <div key={i}>
                     <div className="font-[Cormorant_Garamond] font-light text-[22px] sm:text-[26px] leading-none">{s.v}</div>
@@ -1195,8 +1327,11 @@ export default function Landing() {
             backgroundImage:
               "linear-gradient(0deg, #050507 0%, rgba(5,5,7,0.86) 30%, rgba(5,5,7,0.45) 62%, rgba(5,5,7,0) 100%)",
           }}
-        />
+       />
+
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-px bg-white/10" />
+
+
       </section>
 
       {/* SYSTEM na polu odłamków — to samo „kosmiczne" tło co w MANIFEŚCIE,
@@ -1204,8 +1339,12 @@ export default function Landing() {
       <div ref={servicesRef} className="relative isolate">
         {/* całe tło wyłączone: sekcja przykrywa FlowBackdrop, zostają tylko gwiazdy */}
         <div aria-hidden="true" className="absolute inset-0 z-0 bg-[#050507]" />
+
+
         {servicesNear && !shardsFailed && (
           <StarField className="absolute inset-0 z-0 h-full w-full" />
+
+
         )}
         {/* wejście w pole: maska kończy się wcześniej, by 1px hero został widoczny */}
         <div
@@ -1215,8 +1354,11 @@ export default function Landing() {
             backgroundImage:
               "linear-gradient(180deg, rgba(5,5,7,0.92) 0%, rgba(5,5,7,0.4) 46%, rgba(5,5,7,0) 100%)",
           }}
-        />
+       />
+
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-px bg-white/10" />
+
+
         <section id="services" className="relative z-10 mx-auto max-w-[1280px] px-6 lg:px-8 pt-20 lg:pt-28 pb-16 lg:pb-32">
         <Reveal>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 border-b border-white/[0.06] pb-12 lg:pb-16">
@@ -1224,6 +1366,8 @@ export default function Landing() {
               <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.2em] text-white/50">01 — SYSTEM</div>
               <h2 className="mt-5 leading-[0.9] tracking-[-0.02em]">
                 <EditableText ek="qraft.system.h1" def="Jeden system. Sześć modułów." className="block font-[Cormorant_Garamond] font-light text-[26px] sm:text-[52px]" isEditing={isEditing} as="span" />
+
+
               </h2>
             </div>
             <EditableText
@@ -1232,7 +1376,8 @@ export default function Landing() {
               className="max-w-[460px] font-[Inter] font-light text-[14.5px] sm:text-[16px] leading-8 text-white/45"
               isEditing={isEditing}
               as="p"
-            />
+           />
+
           </div>
         </Reveal>
         <div className="mt-6 sm:mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
@@ -1266,24 +1411,35 @@ export default function Landing() {
                 draggable={!isEditing}
                 front={(
                   <div className="relative flex h-full w-full flex-col p-4 sm:p-6 lg:p-7">
-                    <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(74% 54% at 50% 0%, rgba(255,255,255,0.08), transparent 72%)" }} />
-                    <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.08]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06)" }} />
+                    <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(74% 54% at 50% 0%, rgba(255,255,255,0.08), transparent 72%)" }}/>
+
+                    <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.08]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06)" }}/>
+
                     <div className="relative flex items-center justify-between">
                       <PopNumber text={s.n} className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.16em] text-white/25" />
-                      <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10 text-white/25"><ArrowUpRight className="h-3.5 w-3.5"/></span>
+
+
+                      <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10 text-white/25"><ArrowUpRight className="h-3.5 w-3.5" />
+</span>
                     </div>
                     <h3 className="relative mt-3 sm:mt-5 font-[Cormorant_Garamond] font-light text-[19px] sm:text-[21px] tracking-[-0.01em] leading-none">
                       <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
+
+
                     </h3>
                     <div className="relative mt-auto space-y-2 pt-4">
                       <p className="font-[Inter] font-light text-[13.5px] sm:text-[14.5px] leading-6 text-white/55">
                         <span className="font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.14em] text-white/30 mr-2">DOSTAJESZ</span>
                         <EditableText ek={`qraft.service.${i}.d`} def={s.dostajesz} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
+
+
                       </p>
                       {isEditing && (
                         <p className="font-[Inter] font-light text-[13.5px] sm:text-[14.5px] leading-6 text-white/80">
                           <span className="font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.14em] text-white/45 mr-2">CEL</span>
                           <EditableText ek={`qraft.service.${i}.c`} def={s.cel} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
+
+
                         </p>
                       )}
                       <div className="flex items-center justify-between gap-3 pt-3">
@@ -1297,13 +1453,15 @@ export default function Landing() {
                                 : "border-white/12 text-white/35"
                             }`}
                           >
-                            <span className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${picked.includes(i) ? "bg-[#7DF0AE]" : "bg-white/25"}`} />
+                            <span className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${picked.includes(i) ? "bg-[#7DF0AE]" : "bg-white/25"}`}/>
+
                             {picked.includes(i) ? "W TWOIM SYSTEMIE" : "DODAJ DO SYSTEMU"}
                           </span>
                         )}
                         {!isEditing && (
                           <span className="flex items-center gap-2 font-[JetBrains_Mono] font-light text-[8px] sm:text-[9px] tracking-[0.18em] text-white/25">
-                            <RefreshCw className="h-3 w-3"/> OBR\u00d3\u0106
+                            <RefreshCw className="h-3 w-3" />
+ OBR\u00d3\u0106
                           </span>
                         )}
                       </div>
@@ -1312,20 +1470,27 @@ export default function Landing() {
                 )}
                 back={(
                   <div className="relative flex h-full w-full flex-col p-4 sm:p-6 lg:p-7">
-                    <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(86% 62% at 50% 108%, rgba(255,255,255,0.10), transparent 70%)" }} />
-                    <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.12]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.08)" }} />
+                    <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(86% 62% at 50% 108%, rgba(255,255,255,0.10), transparent 70%)" }}/>
+
+                    <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.12]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.08)" }}/>
+
                     <div className="relative font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.18em] text-white/30">{s.meta}</div>
                     <h3 className="relative mt-3 font-[Cormorant_Garamond] font-light text-[17px] sm:text-[19px] leading-none tracking-[-0.01em]">
                       <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
+
+
                     </h3>
                     <p className="relative mt-4 font-[Inter] font-light text-[13.5px] leading-5 text-white/80">
                       <span className="font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.14em] text-white/45 mr-2">CEL</span>
                       <EditableText ek={`qraft.service.${i}.c`} def={s.cel} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
+
+
                     </p>
                     <ul className="relative mt-3 space-y-1">
                       {s.pts.map((p,k)=>(
                         <li key={k} className="flex items-start gap-2 font-[Inter] font-light text-[12px] sm:text-[13px] leading-5 text-white/55">
-                          <Check className="mt-[3px] h-3 w-3 shrink-0 text-white/30"/>{p}
+                          <Check className="mt-[3px] h-3 w-3 shrink-0 text-white/30" />
+{p}
                         </li>
                       ))}
                     </ul>
@@ -1337,7 +1502,9 @@ export default function Landing() {
                             : "border-white/20 text-white/75"
                         }`}
                       >
-                        {picked.includes(i) ? <><Check className="h-3.5 w-3.5"/> W TWOIM SYSTEMIE</> : <>DODAJ DO SYSTEMU <ArrowRight className="h-3 w-3 opacity-60"/></>}
+                        {picked.includes(i) ? <><Check className="h-3.5 w-3.5" />
+ W TWOIM SYSTEMIE</> : <>DODAJ DO SYSTEMU <ArrowRight className="h-3 w-3 opacity-60" />
+</>}
                       </span>
                       <div className="flex items-center justify-between font-[JetBrains_Mono] font-light text-[8px] sm:text-[9px] tracking-[0.18em]">
                         <span className="text-white/25">COFNIJ</span>
@@ -1352,7 +1519,8 @@ export default function Landing() {
                     </div>
                   </div>
                 )}
-              />
+             />
+
             </motion.div>
           ))}
         </div>
@@ -1367,12 +1535,15 @@ export default function Landing() {
             </BtnGhost>
           </div>
         )}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-40 sm:h-56" style={{ backgroundImage: "linear-gradient(180deg, rgba(5,5,7,0) 0%, rgba(5,5,7,0.55) 45%, #050507 100%)" }} />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-40 sm:h-56" style={{ backgroundImage: "linear-gradient(180deg, rgba(5,5,7,0) 0%, rgba(5,5,7,0.55) 45%, #050507 100%)" }}/>
+
         <div className="mt-10 flex flex-col sm:flex-row justify-between gap-4 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px]">
           <EditableText ek="qraft.system.footerL" def="OTWARTE DLA KAŻDEGO KLIENTA." className="text-white/20 tracking-[0.08em]" isEditing={isEditing} as="span" />
+
+
           <BtnGhost onClick={()=>go("contact")} className="h-11 px-6 text-[10px] sm:text-[11px]">
             <EditableText ek="qraft.system.footerR" def="DIAGNOSTYKA →" className="font-[JetBrains_Mono] font-light tracking-[0.14em]" isEditing={isEditing} as="span" />
-          </BtnGhost>
+</BtnGhost>
         </div>
       </section>
       </div>
@@ -1383,7 +1554,8 @@ export default function Landing() {
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
           style={{ background: "radial-gradient(64% 42% at 50% 0%, rgba(255,255,255,0.045), transparent 70%)" }}
-        />
+       />
+
         <div className="relative mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-28">
           <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-start">
             <Reveal>
@@ -1392,7 +1564,11 @@ export default function Landing() {
               </div>
               <h2 className="mt-5 leading-[0.92] tracking-[-0.02em]">
                 <EditableText ek="qraft.b2b.h1" def="Biznes do biznesu." className="block font-[Cormorant_Garamond] font-light text-[26px] sm:text-[52px]" isEditing={isEditing} as="span" />
+
+
                 <EditableText ek="qraft.b2b.h2" def="i nic więcej." className="block font-[Cormorant_Garamond] font-light italic text-white/40 text-[26px] sm:text-[52px]" isEditing={isEditing} as="span" />
+
+
               </h2>
               <EditableText
                 ek="qraft.b2b.desc"
@@ -1400,15 +1576,24 @@ export default function Landing() {
                 className="mt-6 block max-w-[460px] font-[Inter] font-light text-[14.5px] sm:text-[16px] leading-8 text-white/45"
                 isEditing={isEditing}
                 as="p"
-              />
+             />
+
               <div className="mt-8 flex flex-wrap gap-3">
                 <span className="inline-flex items-center gap-2 rounded-full border border-[#7DF0AE]/40 bg-[#7DF0AE]/10 px-4 py-2 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.16em] text-[#9BF3C0]">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#7DF0AE]" />
+
+
                   <EditableText ek="qraft.b2b.chip1" def="B2B — NASZ TEREN" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" />
+
+
                 </span>
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.16em] text-white/30">
                   <span className="h-1.5 w-1.5 rounded-full bg-white/25" />
+
+
                   <EditableText ek="qraft.b2b.chip2" def="B2C — NIE PRACUJEMY" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" />
+
+
                 </span>
               </div>
             </Reveal>
@@ -1425,10 +1610,16 @@ export default function Landing() {
                   <li key={t} className="flex items-start gap-4 p-5 sm:p-6">
                     <span className="mt-0.5 h-8 w-8 shrink-0 grid place-items-center rounded-full border border-white/10 text-white/40">
                       <Check className="h-3.5 w-3.5" />
+
+
                     </span>
                     <div>
                       <EditableText ek={`qraft.b2b.${i}.t`} def={t} className="block font-[Cormorant_Garamond] font-light text-[17px] sm:text-[19px] leading-none tracking-[-0.01em]" isEditing={isEditing} as="span" />
+
+
                       <EditableText ek={`qraft.b2b.${i}.d`} def={d} className="mt-2 block font-[Inter] font-light text-[13px] sm:text-[13.5px] leading-6 text-white/50" isEditing={isEditing} as="span" />
+
+
                     </div>
                   </li>
                 ))}
@@ -1452,7 +1643,8 @@ export default function Landing() {
             backgroundImage:
               "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0) 22%, rgba(5,5,7,0) 78%, #050507 100%)",
           }}
-        />
+       />
+
         {manifestNear && !shardsFailed && (
           <div className="absolute inset-0 pointer-events-none">
             <AeroShards
@@ -1481,7 +1673,8 @@ export default function Landing() {
               interactionStrength={0.45}
               rippleIntensity={0.9}
               onError={() => setShardsFailed(true)}
-            />
+           />
+
           </div>
         )}
 
@@ -1493,7 +1686,8 @@ export default function Landing() {
             backgroundImage:
               "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.72) 30%, rgba(5,5,7,0.4) 55%, rgba(5,5,7,0.12) 78%, rgba(5,5,7,0) 100%)",
           }}
-        />
+       />
+
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-28 sm:h-40"
@@ -1501,7 +1695,8 @@ export default function Landing() {
             backgroundImage:
               "linear-gradient(0deg, #050507 0%, rgba(5,5,7,0.86) 26%, rgba(5,5,7,0.5) 58%, rgba(5,5,7,0) 100%)",
           }}
-        />
+       />
+
         {/* ciepła łuna marki — ta sama w obu stanach (z WebGPU i bez) */}
         <div
           aria-hidden="true"
@@ -1510,14 +1705,19 @@ export default function Landing() {
             backgroundImage:
               "radial-gradient(70% 55% at 50% 112%, rgba(255,62,10,0.17), rgba(255,62,10,0) 72%)",
           }}
-        />
+       />
+
 
         <div className="relative z-10 mx-auto w-full max-w-[1280px] px-6 py-24 text-center sm:py-32 lg:px-8 lg:py-40">
           <Reveal>
             <div className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.24em] text-white/35 sm:text-[11px]">MANIFEST</div>
             <h2 className="mt-6 font-[Cormorant_Garamond] font-light leading-[0.9] tracking-[-0.03em] text-[clamp(30px,7.4vw,96px)]">
               <EditableText ek="qraft.manifest.l1" def="Perfekcji" className="block text-white/95" isEditing={isEditing} as="span" />
+
+
               <EditableText ek="qraft.manifest.l2" def="nie można" className="block text-white/95" isEditing={isEditing} as="span" />
+
+
               <span
                 className="block font-[Instrument_Serif] italic text-transparent"
                 style={{ WebkitTextStroke: "1.1px rgba(255,255,255,0.75)" }}
@@ -1531,19 +1731,23 @@ export default function Landing() {
               className="mx-auto mt-7 block max-w-[540px] font-[Inter] font-light text-[14px] leading-7 text-white/45 sm:text-[15px]"
               isEditing={isEditing}
               as="p"
-            />
+           />
+
             <EditableText
               ek="qraft.manifest.start"
               def="START ZAJMUJE 90 DNI — BEZ POŚPIECHU"
               className="mt-8 inline-block rounded-full border border-white/10 px-5 py-2 font-[JetBrains_Mono] font-light text-[9px] tracking-[0.2em] text-white/45 sm:text-[10px]"
               isEditing={isEditing}
               as="span"
-            />
+           />
+
           </Reveal>
           <Reveal delay={0.1}>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               <BtnGhost onClick={() => go("process")} className="h-11 px-6 text-[10px] sm:text-[11px]">
                 ZOBACZ PROCES <ArrowRight className="h-3 w-3 opacity-60" />
+
+
               </BtnGhost>
               <BtnGhost onClick={() => go("contact")} className="h-11 px-6 text-[10px] sm:text-[11px]">
                 ZAMÓW AUDYT
@@ -1563,7 +1767,8 @@ export default function Landing() {
         }}
       >
         <div className="mx-auto max-w-[1280px] px-6 lg:px-8 py-20 lg:py-24">
-          <Reveal><ProcessStack isEditing={isEditing} onZoneChange={setInProcess} /></Reveal>
+          <Reveal><ProcessStack isEditing={isEditing} onZoneChange={setInProcess}/>
+</Reveal>
         </div>
       </section>
 
@@ -1580,10 +1785,14 @@ export default function Landing() {
               src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=2200&q=80&auto=format&fit=crop"
               alt="Rzemiosło w wykonaniu — detal dopracowany do perfekcji"
               className="h-full w-full object-cover grayscale contrast-110 brightness-[0.5]"
-            />
+           />
+
           </motion.div>
-          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.35) 22%, rgba(5,5,7,0.25) 55%, rgba(5,5,7,0.78) 88%, #050507 100%)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, #050507 0%, rgba(5,5,7,0.35) 22%, rgba(5,5,7,0.25) 55%, rgba(5,5,7,0.78) 88%, #050507 100%)" }}/>
+
           <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_50%,transparent_30%,rgba(5,5,7,0.55)_100%)]" />
+
+
         </div>
 
         <div className="relative mx-auto max-w-[1280px] px-6 lg:px-8 py-28 lg:py-40">
@@ -1591,9 +1800,15 @@ export default function Landing() {
             <div className="text-center">
               <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.32em] text-white/50">03 — ATELIER</div>
               <div className="mt-6 h-px w-full bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+
+
               <h2 className="mt-6 leading-[0.9] tracking-[-0.02em]">
                 <EditableText ek="qraft.atelier.h1" def="Detal, którego" className="block font-[Cormorant_Garamond] font-light text-[30px] sm:text-[64px]" isEditing={isEditing} as="span" />
+
+
                 <EditableText ek="qraft.atelier.h2" def="nie da się sfałszować." className="block font-[Cormorant_Garamond] font-light italic text-white/45 text-[30px] sm:text-[64px]" isEditing={isEditing} as="span" />
+
+
               </h2>
               <EditableText
                 ek="qraft.atelier.sub"
@@ -1601,7 +1816,8 @@ export default function Landing() {
                 className="mx-auto mt-6 block max-w-[520px] font-[Inter] font-light text-[14px] sm:text-[15.5px] leading-8 text-white/55"
                 isEditing={isEditing}
                 as="p"
-              />
+             />
+
             </div>
           </Reveal>
 
@@ -1617,10 +1833,13 @@ export default function Landing() {
               ].map(([label, to, suffix], idx) => (
                 <div key={String(label)} className="border-r border-white/10 px-4 py-8 text-center last:border-r-0 sm:py-10">
                   <div className="font-[Cormorant_Garamond] font-light text-[26px] sm:text-[40px] leading-none text-white">
-                    <CountUp to={Number(to)} suffix={String(suffix)} />
+                    <CountUp to={Number(to)} suffix={String(suffix)}/>
+
                   </div>
                   <div className="mt-3 font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.18em] text-white/45">
                     <EditableText ek={`qraft.atelier.stat${idx}`} def={String(label)} className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" />
+
+
                   </div>
                 </div>
               ))}
@@ -1631,6 +1850,8 @@ export default function Landing() {
             <div className="mt-12 text-center">
               <BtnGhost onClick={() => goContact()} className="h-12 px-8 text-[10px] sm:text-[11px]">
                 ZOBACZ, CO WYCZUJEMY NA AUDYCIE <ArrowRight className="h-3.5 w-3.5 opacity-60" />
+
+
               </BtnGhost>
             </div>
           </Reveal>
@@ -1645,7 +1866,11 @@ export default function Landing() {
               <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.32em] text-white/50">04 — WYNIKI</div>
               <h2 className="mt-6 leading-[0.9] tracking-[-0.02em]">
                 <EditableText ek="qraft.results.h1" def="Marki, które" className="block font-[Cormorant_Garamond] font-light text-[30px] sm:text-[56px]" isEditing={isEditing} as="span" />
+
+
                 <EditableText ek="qraft.results.h2" def="już rosną z nami." className="block font-[Cormorant_Garamond] font-light italic text-white/45 text-[30px] sm:text-[56px]" isEditing={isEditing} as="span" />
+
+
               </h2>
               <EditableText
                 ek="qraft.results.sub"
@@ -1653,7 +1878,8 @@ export default function Landing() {
                 className="mx-auto mt-5 block max-w-[480px] font-[Inter] font-light text-[14px] sm:text-[15px] leading-7 text-white/45"
                 isEditing={isEditing}
                 as="p"
-              />
+             />
+
             </div>
           </Reveal>
 
@@ -1668,6 +1894,8 @@ export default function Landing() {
                       <span key={name + dup} className="flex items-center">
                         <span className="whitespace-nowrap font-[Cormorant_Garamond] font-light italic text-[22px] sm:text-[30px] text-white/35">{name}</span>
                         <span className="mx-8 sm:mx-12 h-1 w-1 rounded-full bg-white/15" />
+
+
                       </span>
                     ))}
                   </div>
@@ -1679,6 +1907,8 @@ export default function Landing() {
           <Reveal delay={0.14}>
             <figure className="mx-auto mt-16 max-w-[760px] text-center">
               <Quote className="mx-auto h-5 w-5 text-white/20" />
+
+
               <blockquote className="mt-6">
                 <EditableText
                   ek="qraft.results.quote"
@@ -1686,10 +1916,13 @@ export default function Landing() {
                   className="font-[Cormorant_Garamond] font-light text-[22px] sm:text-[34px] leading-[1.25] tracking-[-0.01em] text-white/90"
                   isEditing={isEditing}
                   as="p"
-                />
+               />
+
               </blockquote>
               <figcaption className="mt-7 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.2em] text-white/40">
                 <EditableText ek="qraft.results.author" def="MARTA ZAWADZKA — WSPÓŁWŁAŚCICIELKA LUMIÈRE" className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" />
+
+
               </figcaption>
             </figure>
           </Reveal>
@@ -1703,10 +1936,13 @@ export default function Landing() {
               ].map(([to, suffix, label], i) => (
                 <div key={i} className="py-8 text-center sm:py-10">
                   <div className="font-[Cormorant_Garamond] font-light text-[34px] sm:text-[46px] leading-none text-white">
-                    <CountUp to={Number(to)} suffix={String(suffix)} />
+                    <CountUp to={Number(to)} suffix={String(suffix)}/>
+
                   </div>
                   <div className="mx-auto mt-3 max-w-[220px] font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] leading-4 tracking-[0.16em] text-white/40">
                     <EditableText ek={`qraft.results.stat${i}`} def={String(label)} className="font-[JetBrains_Mono] font-light" isEditing={isEditing} as="span" />
+
+
                   </div>
                 </div>
               ))}
@@ -1738,7 +1974,8 @@ export default function Landing() {
                   className="block font-[Cormorant_Garamond] font-light text-[30px] text-white sm:text-[56px]"
                   isEditing={isEditing}
                   as="span"
-                />
+               />
+
               </h2>
               <EditableText
                 ek="qraft.podzial.sub"
@@ -1746,7 +1983,8 @@ export default function Landing() {
                 className="mx-auto mt-5 block max-w-[480px] font-[Inter] font-light text-[14px] leading-7 text-white/45 sm:text-[15px]"
                 isEditing={isEditing}
                 as="p"
-              />
+             />
+
             </div>
           </Reveal>
 
@@ -1808,14 +2046,13 @@ export default function Landing() {
                 className="block font-[Cormorant_Garamond] font-light text-[30px] text-white sm:text-[56px]"
                 isEditing={isEditing}
                 as="span"
-              />
+             />
+
             </h2>
           </Reveal>
 
-          <div className="mt-12 divide-y divide-white/[0.08] border-y border-white/[0.08]">
-            {[
-              [
-                "Ile trwa pierwszy projekt?",
+          <div className="mt-12 divide-y divide-white/[0.08] border-y border-white/[0.08]">               {[
+                ["Ile trwa pierwszy projekt?", 
                 "Audyt zajmuje 20 minut i kończy się jedną stroną. Właściwa praca zaczyna się potem — blueprint dostajesz w ciągu tygodnia.",
               ],
               [
@@ -1850,7 +2087,7 @@ export default function Landing() {
                     <span
                       className={`grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/12 text-white/50 transition-transform duration-500 ${open ? "rotate-45" : ""}`}
                     >
-                      <Plus className="h-3.5 w-3.5" />
+                      {open ? <Minus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
                     </span>
                   </button>
                   <div
@@ -1866,6 +2103,51 @@ export default function Landing() {
               );
             })}
           </div>
+        </div>
+      </section>
+
+      {/* PROŚĆ — punkt kontaktu z sercem strony */}
+      <section className="relative border-t border-white/5 bg-[#050507]">
+        <div className="mx-auto max-w-[1280px] px-6 py-24 lg:px-8 lg:py-32">
+          <Reveal>
+            <div className="max-w-[680px] mx-auto text-center">
+              <div className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.32em] text-white/50 sm:text-[11px]">
+                Przetwarzanie
+              </div>
+              <h2 className="mt-6 leading-[1.05] tracking-[-0.02em]">
+                <EditableText
+                  ek="qraft.request.h1"
+                  def="Poszukujesz partnera, który usłyszy i stworzy coś, co zadziała?"
+                  className="block font-[Cormorant_Garamond] font-light text-[28px] leading-[1.15] tracking-[-0.02em] text-white sm:text-[48px]"
+                  isEditing={isEditing}
+                  as="span"
+               />
+
+              </h2>
+              <p className="mx-auto mt-5 max-w-[420px] font-[Inter] font-light text-[14px] leading-7 text-white/40 sm:text-[15.5px]">
+                <EditableText
+                  ek="qraft.request.sub"
+                  def="Nie wiem, jaki projekt potrzebujesz. Zgadzam się to przetworzyć w jednym audycie."
+                  className="font-[Inter] font-light text-[14px] leading-7 text-white/40"
+                  isEditing={isEditing}
+                  as="p"
+               />
+
+              </p>
+              <button
+                type="button"
+                onClick={() => go("contact")}
+                className="mt-9 inline-flex h-[52px] items-center justify-center gap-2 rounded-full bg-white text-black font-[JetBrains_Mono] font-light text-[10px] tracking-[0.16em] transition-colors duration-300 hover:bg-[#FF3E0A] hover:text-white sm:text-[11px]"
+              >
+                ZMGOTOWAŃ AUDYT BEZPŁATNY <ArrowUpRight className="h-3.5 w-3.5" />
+
+
+              </button>
+              <p className="mt-4 text-white/20 font-[JetBrains_Mono] font-light text-[9px] tracking-[0.14em]">
+                Brak przerw — tenth parkuje, ten sprint kończy się. Przeczekaj 20 minut, zanim zaczniemy.
+              </p>
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -1891,14 +2173,16 @@ export default function Landing() {
                   className="block font-[Cormorant_Garamond] font-light text-[30px] text-white sm:text-[56px]"
                   isEditing={isEditing}
                   as="span"
-                />
+               />
+
                 <EditableText
                   ek="qraft.contact.h2"
                   def="dwudziestu minut."
                   className="block font-[Cormorant_Garamond] font-light text-[30px] italic text-white/45 sm:text-[56px]"
                   isEditing={isEditing}
                   as="span"
-                />
+               />
+
               </h2>
               <EditableText
                 ek="qraft.contact.sub"
@@ -1906,7 +2190,8 @@ export default function Landing() {
                 className="mt-6 block max-w-[420px] font-[Inter] font-light text-[14px] leading-7 text-white/45 sm:text-[15px]"
                 isEditing={isEditing}
                 as="p"
-              />
+             />
+
 
               <ul className="mt-10 space-y-4">
                 {[
@@ -1916,6 +2201,8 @@ export default function Landing() {
                 ].map(([Icon, label], i) => (
                   <li key={i} className="flex items-center gap-3 font-[Inter] font-light text-[13px] text-white/45">
                     <Icon className="h-3.5 w-3.5 shrink-0 text-[#FF3E0A]" />
+
+
                     {label as string}
                   </li>
                 ))}
@@ -1934,12 +2221,14 @@ export default function Landing() {
                   onChange={(id) => { sfxTap(); setForm((f) => ({ ...f, service: id })); }}
                   className="mb-7 flex flex-wrap gap-1 rounded-full border border-white/10 p-1"
                   tabClassName="flex-1 rounded-full px-3 py-2 font-[JetBrains_Mono] font-light text-[9px] tracking-[0.14em] text-white/45 transition-colors duration-300 hover:text-white aria-selected:bg-white aria-selected:text-black"
-                />
+               />
+
 
                 <div className="mb-6 min-h-[54px]">
                   <div className="flex items-baseline justify-between gap-4">
                     <span className="font-[Cormorant_Garamond] font-light text-[22px] text-white">
-                      <TextSwap text={svc.label} />
+                      <TextSwap text={svc.label}/>
+
                     </span>
                     <span className="font-[JetBrains_Mono] font-light text-[9px] tracking-[0.14em] text-white/35">
                       {svc.note}
@@ -1949,6 +2238,8 @@ export default function Landing() {
                     {svc.items.map((it) => (
                       <li key={it} className="flex items-center gap-2 font-[Inter] font-light text-[12.5px] text-white/40">
                         <Check className="h-3 w-3 shrink-0 text-white/25" />
+
+
                         {it}
                       </li>
                     ))}
@@ -1956,11 +2247,16 @@ export default function Landing() {
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <ClearField name="name" label="IMIĘ" placeholder="Jak mamy Cię nazywać?" autoComplete="name" value={form.name} onChange={(v) => setForm((f) => ({ ...f, name: v }))} />
-                  <ClearField name="business" label="FIRMA" placeholder="Nazwa lokalu lub studia" autoComplete="organization" value={form.business} onChange={(v) => setForm((f) => ({ ...f, business: v }))} />
-                  <ClearField name="email" label="E-MAIL" placeholder="imie@firma.pl" type="email" autoComplete="email" value={form.email} onChange={(v) => setForm((f) => ({ ...f, email: v }))} />
-                  <ClearField name="phone" label="TELEFON" placeholder="+48 000 000 000" type="tel" required autoComplete="tel" value={form.phone} onChange={(v) => setForm((f) => ({ ...f, phone: v }))} />
-                  <ClearField name="date" label="PREFEROWANY DZIEŃ" placeholder="np. 12.05" value={form.date} onChange={(v) => setForm((f) => ({ ...f, date: v }))} />
+                  <ClearField name="name" label="IMIĘ" placeholder="Jak mamy Cię nazywać?" autoComplete="name" value={form.name} onChange={(v) => setForm((f) => ({ ...f, name: v }))}/>
+
+                  <ClearField name="business" label="FIRMA" placeholder="Nazwa lokalu lub studia" autoComplete="organization" value={form.business} onChange={(v) => setForm((f) => ({ ...f, business: v }))}/>
+
+                  <ClearField name="email" label="E-MAIL" placeholder="imie@firma.pl" type="email" autoComplete="email" value={form.email} onChange={(v) => setForm((f) => ({ ...f, email: v }))}/>
+
+                  <ClearField name="phone" label="TELEFON" placeholder="+48 000 000 000" type="tel" required autoComplete="tel" value={form.phone} onChange={(v) => setForm((f) => ({ ...f, phone: v }))}/>
+
+                  <ClearField name="date" label="PREFEROWANY DZIEŃ" placeholder="np. 12.05" value={form.date} onChange={(v) => setForm((f) => ({ ...f, date: v }))}/>
+
                   <label className="block space-y-2">
                     <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.12em] text-white/45">GODZINA</span>
                     <select
@@ -1989,7 +2285,8 @@ export default function Landing() {
                     onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
                     placeholder="Dwie linijki wystarczą."
                     className="w-full resize-none rounded-[18px] border border-white/10 bg-white/[0.02] px-5 py-3 font-[Inter] font-light text-sm text-white placeholder:text-white/20 outline-none transition-colors duration-300 focus:border-white/30"
-                  />
+                 />
+
                 </label>
 
                 <button
@@ -2000,11 +2297,15 @@ export default function Landing() {
                 >
                   {sent ? (
                     <>
-                      <Check className="h-3.5 w-3.5" /> ZAPISANE — ODPISZEMY JUTRO
+                      <Check className="h-3.5 w-3.5" />
+
+ ZAPISANE — ODPISZEMY JUTRO
                     </>
                   ) : (
                     <>
                       ZAMÓW BEZPŁATNY AUDYT <ArrowUpRight className="h-3.5 w-3.5 opacity-60" />
+
+
                     </>
                   )}
                 </button>
@@ -2021,7 +2322,8 @@ export default function Landing() {
       <footer className="relative border-t border-white/[0.08] bg-[#050507]">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-8 px-6 py-12 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <div className="flex flex-col gap-4">
-            <QraftMark className="text-white" height={18} />
+            <QraftMark className="text-white" height={18}/>
+
             <span className="font-[JetBrains_Mono] font-light text-[9px] tracking-[0.2em] text-white/25">
               PRECISION BUILDS BRANDS
             </span>
@@ -2045,7 +2347,11 @@ export default function Landing() {
             aria-pressed={!soundOn}
             className="grid h-9 w-9 cursor-pointer place-items-center self-start rounded-full border border-white/15 bg-white/[0.02] text-white/55 transition-colors duration-300 hover:border-white/45 hover:text-white lg:self-auto"
           >
-            {soundOn ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+            {soundOn ? <Volume2 className="h-3.5 w-3.5" />
+
+ : <VolumeX className="h-3.5 w-3.5" />
+
+}
           </button>
         </div>
         <div className="mx-auto max-w-[1280px] border-t border-white/[0.06] px-6 py-6 lg:px-8">
