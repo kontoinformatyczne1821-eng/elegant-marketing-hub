@@ -1022,7 +1022,7 @@ export default function Landing() {
       <GradualBlur
         target="page"
         position="bottom"
-        height={finePointer ? "8rem" : "5rem"}
+        height={finePointer ? "14rem" : "9rem"}
         strength={finePointer ? 3 : 1.5}
         divCount={finePointer ? 10 : 3}
         curve="bezier"
