@@ -3,9 +3,13 @@ import { useInView, useMotionValue, useSpring } from "framer-motion";
 
 export interface CountUpProps {
   /** The target number to count up to. */
-  to: number;
+  to?: number;
   /** The initial number from which the count starts. */
   from?: number;
+  /** Alias for `to`. */
+  end?: number;
+  /** Alias for `from`. */
+  start?: number;
   /** "up" counts from → to, "down" counts to → from. */
   direction?: "up" | "down";
   /** Delay in seconds before the counting starts. */
@@ -33,6 +37,8 @@ const getDecimalPlaces = (num: number) => {
 export default function CountUp({
   to,
   from = 0,
+  end,
+  start,
   direction = "up",
   delay = 0,
   duration = 2,
@@ -42,8 +48,10 @@ export default function CountUp({
   onStart,
   onEnd,
 }: CountUpProps) {
+  const resolvedTo = end ?? to ?? 0;
+  const resolvedFrom = start ?? from ?? 0;
   const ref = useRef<HTMLSpanElement>(null);
-  const motionValue = useMotionValue(direction === "down" ? to : from);
+  const motionValue = useMotionValue(direction === "down" ? resolvedTo : resolvedFrom);
 
   const damping = 20 + 40 * (1 / duration);
   const stiffness = 100 * (1 / duration);
@@ -52,7 +60,7 @@ export default function CountUp({
 
   const isInView = useInView(ref, { once: true, margin: "0px" });
 
-  const maxDecimals = Math.max(getDecimalPlaces(from), getDecimalPlaces(to));
+  const maxDecimals = Math.max(getDecimalPlaces(resolvedFrom), getDecimalPlaces(resolvedTo));
 
   const formatValue = useCallback(
     (latest: number) => {
@@ -70,15 +78,15 @@ export default function CountUp({
 
   useEffect(() => {
     if (ref.current) {
-      ref.current.textContent = formatValue(direction === "down" ? to : from);
+      ref.current.textContent = formatValue(direction === "down" ? resolvedTo : resolvedFrom);
     }
-  }, [from, to, direction, formatValue]);
+  }, [resolvedFrom, resolvedTo, direction, formatValue]);
 
   useEffect(() => {
     if (!isInView || !startWhen) return;
     onStart?.();
     const timeoutId = setTimeout(() => {
-      motionValue.set(direction === "down" ? from : to);
+      motionValue.set(direction === "down" ? resolvedFrom : resolvedTo);
     }, delay * 1000);
     const durationTimeoutId = setTimeout(() => {
       onEnd?.();
@@ -87,7 +95,7 @@ export default function CountUp({
       clearTimeout(timeoutId);
       clearTimeout(durationTimeoutId);
     };
-  }, [isInView, startWhen, motionValue, direction, from, to, delay, onStart, onEnd, duration]);
+  }, [isInView, startWhen, motionValue, direction, resolvedFrom, resolvedTo, delay, onStart, onEnd, duration]);
 
   useEffect(() => {
     const unsubscribe = springValue.on("change", (latest: number) => {

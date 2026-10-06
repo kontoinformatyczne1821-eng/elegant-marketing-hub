@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { Faq4 } from "@/components/ui/faq-4";
-import { GradualBlur } from "@/components/GradualBlur";
-import { JellyRadio } from "@/components/JellyRadio";
-import { LineSidebar } from "@/components/LineSidebar";
+import GradualBlur from "@/components/GradualBlur";
+import JellyRadio from "@/components/JellyRadio";
+import LineSidebar from "@/components/LineSidebar";
 import { LogoDropdown } from "@/components/LogoDropdown";
-import { PixelTrail } from "@/components/PixelTrail";
-import { StaggeredMenu } from "@/components/StaggeredMenu";
-import { QraftMark } from "@/components/QraftMark";
-import { CountUp } from "@/components/CountUp";
-import { FlipCard } from "@/components/FlipCard";
+import PixelTrail from "@/components/PixelTrail";
+import StaggeredMenu from "@/components/StaggeredMenu";
+import QraftMark from "@/components/QraftMark";
+import CountUp from "@/components/CountUp";
+import FlipCard from "@/components/FlipCard";
 import { PopNumber } from "@/components/transitions";
 import { ArrowRight, Mail, Phone, ShieldCheck, Zap } from "lucide-react";
 
@@ -64,7 +64,7 @@ function NavLink({ href, children, active, onClick }: {
   );
 }
 
-function terminalChip({ lines = 3 }: { lines?: number }) {
+function TerminalChip({ lines = 3 }: { lines?: number }) {
   const [cursor, setCursor] = useState(true);
   useEffect(() => { const t = setInterval(() => setCursor((c) => !c), 530); return () => clearInterval(t); }, []);
   return (
@@ -73,7 +73,7 @@ function terminalChip({ lines = 3 }: { lines?: number }) {
         <span className="h-2 w-2 rounded-full bg-[#FF3E0A] animate-pulse" />
         <span className="text-white/70">TIMEOUT</span>
       </span>
-      <span className="text-white/20">}&thinsp;</span>
+      <span className="text-white/20">{'}'}&thinsp;</span>
       <span className="h-4 w-4 rounded border border-white/20 flex items-center justify-center text-[8px] font-bold">
         {cursor ? "\u0001" : " "}
       </span>
@@ -290,7 +290,7 @@ export default function Landing() {
             <NavLink href="/lab" active={activeNav === "/lab"} onClick={() => setActiveNav("/lab")}>
               LAB
             </NavLink>
-            <terminalChip />
+            <TerminalChip />
           </nav>
         </div>
       </header>
@@ -379,11 +379,11 @@ export default function Landing() {
               <div className="space-y-4">
                 <div className="bg-[#FF3E0A] text-white rounded-[18px] p-6 shadow-[0_30px_50px_rgba(255,62,10,0.4)]">
                   <div className="text-center">
-                    <div className="font-[JetBrains_Mono] text-[11px] tracking-[0.16em] text-white/60">AUDYTWE RACHU</span>
+                    <div className="font-[JetBrains_Mono] text-[11px] tracking-[0.16em] text-white/60">AUDYTWE RACHU</div>
                     <div className="mt-3 font-[Space_Grotesk] text-[44px] sm:text-[56px] font-bold leading-none">
                       <PopNumber text={`${(2.2 + 4.2).toFixed(1)}k`} className="text-[44px] sm:text-[56px]" />
                     </div>
-                    <p className="mt-2 text-[13px] text-white/70 text-center">o początku — bez ukrytych kosztłów.</p>
+                    <p className="mt-2 text-[13px] text-white/70 text-center">o początku — bez ukrytych kosztów.</p>
                   </div>
                   <button
                     onClick={handleAuditClick}
