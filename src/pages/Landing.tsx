@@ -1541,11 +1541,11 @@ export default function Landing() {
 
             <div className="relative flex h-full flex-col">
               <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.18em] text-white/45">TWÓJ SZACUNEK</span>
-              <div className="mt-2 flex items-start">
-                <span className="mt-4 font-[Cormorant_Garamond] font-light italic text-[40px] sm:text-[56px] leading-none text-white/40">~</span>
+              <div className="mt-3 flex items-start">
+                <span className="mt-3 font-[Cormorant_Garamond] font-light italic text-[30px] sm:text-[42px] leading-none text-white/40">~</span>
                 <PopNumber
                   text={String(estClients)}
-                  className="font-[Cormorant_Garamond] font-light leading-[0.82] tracking-[-0.02em] text-white text-[104px] sm:text-[148px]"
+                  className="font-[Cormorant_Garamond] font-light leading-[0.85] tracking-[-0.02em] text-white text-[72px] sm:text-[96px]"
                 />
               </div>
               <div className="mt-5 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] leading-[1.7] tracking-[0.16em] text-white/45">
