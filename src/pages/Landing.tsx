@@ -143,7 +143,7 @@ function estimateClients(sizeId: string, needs: string[], termId: string): numbe
   const sizeMul = sizeId === "1" ? 0.8 : sizeId === "6" ? 1 : sizeId === "21" ? 1.3 : 1.6;
   const termMul = termId === "3" ? 1 : termId === "6" ? 1.8 : 3;
   const weight = needs.reduce((acc, id) => acc + (NEED_WEIGHT[id as keyof typeof NEED_WEIGHT] ?? 0), 0);
-  const raw = (1.6 + weight * 3.1) * sizeMul * termMul;
+  const raw = (2.2 + weight * 4.2) * sizeMul * termMul;
   return Math.max(1, Math.round(raw));
 }
 
@@ -1529,23 +1529,30 @@ export default function Landing() {
 
           {/* wynik — szacunek dodatkowych klientów */}
           <div className="relative overflow-hidden rounded-[26px] border border-white/10 bg-white/[0.02] p-6 sm:p-8" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.05), 0 24px 70px rgba(0,0,0,0.4)" }}>
-            <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(90% 60% at 50% 110%, rgba(255,62,10,0.16), rgba(255,62,10,0) 70%)" }} />
+            <motion.div
+              key={`glow-${estClients}`}
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0"
+              style={{ background: "radial-gradient(90% 60% at 50% 110%, rgba(255,62,10,0.16), rgba(255,62,10,0) 70%)" }}
+              initial={{ opacity: 0.3 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            />
 
             <div className="relative flex h-full flex-col">
               <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.18em] text-white/45">TWÓJ SZACUNEK</span>
-              <div className="mt-6 flex items-baseline gap-3">
-                <span
-                  key={estClients}
-                  className="font-[Cormorant_Garamond] font-light leading-[0.8] text-white text-[72px] sm:text-[96px]"
-                >
-                  <TextSwap text={`~${estClients}`} />
-                </span>
-                <span className="font-[JetBrains_Mono] font-light text-[10px] leading-4 tracking-[0.16em] text-white/45">
-                  DODATKOWYCH
-                  <br />
+              <div className="mt-2 flex items-start">
+                <span className="mt-4 font-[Cormorant_Garamond] font-light italic text-[40px] sm:text-[56px] leading-none text-white/40">~</span>
+                <PopNumber
+                  text={String(estClients)}
+                  className="font-[Cormorant_Garamond] font-light leading-[0.82] tracking-[-0.02em] text-white text-[104px] sm:text-[148px]"
+                />
+              </div>
+              <div className="mt-5 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] leading-[1.7] tracking-[0.16em] text-white/45">
+                DODATKOWYCH KLIENTÓW
+                <br />
 
-                  KLIENTÓW / MIES.
-                </span>
+                KAŻDEGO MIESIĄCA
               </div>
               <p className="mt-5 font-[Inter] font-light text-[13px] leading-6 text-white/45">
                 Liczba jest ostrożna — zakłada start od 90 dni i Twoje rzemiosło bez zmian. Resztę doprecyzujemy na audycie.
