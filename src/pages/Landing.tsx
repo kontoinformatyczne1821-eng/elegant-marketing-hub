@@ -1,11 +1,10 @@
 import { motion, AnimatePresence, useScroll, useSpring, useTransform, useInView, useMotionValue, useMotionValueEvent } from "framer-motion";
 import { ArrowUpRight, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, Check, Minus, Plus, Clock, Terminal, Pencil, Save, RefreshCw, Quote, Handshake, Megaphone } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Lenis from "lenis";
 import { useNavigate } from "react-router";
 import { ClearField, DigitChars, PopNumber, SlidingTabs, TextSwap, usePopIn } from "@/components/transitions";
 import GradualBlur from "@/components/GradualBlur";
-import FlipCard from "@/components/FlipCard";
 import LineSidebar from "@/components/LineSidebar";
 import QraftMark from "@/components/QraftMark";
 import GlowCursor from "@/components/GlowCursor";
@@ -14,7 +13,7 @@ import StaggeredMenu from "@/components/StaggeredMenu";
 import AeroShards from "@/components/AeroShards";
 import StarField from "@/components/StarField";
 import { Volume2, VolumeX } from "lucide-react";
-import { setMuted, sfxPop, sfxTap, sfxWhoosh, unlockAudio } from "@/lib/sound";
+import { setMuted, sfxConfirm, sfxPop, sfxTap, sfxWhoosh, unlockAudio } from "@/lib/sound";
 import type { StaggeredMenuItem } from "@/components/StaggeredMenu";
 
 const REDUCE_MOTION =
@@ -107,14 +106,53 @@ function EditableText({ ek, def, className, as: Tag = "span", isEditing, pop, po
   );
 }
 
-const serviceDefaults = [
-  { n: "01", title: "System Marki", meta: "TYGODNIE 1–2", dostajesz: "spójny system wizualny, hasło i szyld.", cel: "rozpoznają Cię zanim ktoś się dowie.", pts: ["Nazwa, hasło, szyld", "Kolor, typografia, materiały", "Szablon social media"] },
-  { n: "02", title: "Strona i Wydajność", meta: "TYGODNIE 2–4", dostajesz: "szybką stronę z rezerwacją i formularzem.", cel: "każdy klik kończy się zamówieniem.", pts: ["Landing pod konkretną usługę", "Rezerwacja i formularz", "Prędkość i SEO techniczne"] },
-  { n: "03", title: "Pozyskiwanie", meta: "TYGODNIE 3–6", dostajesz: "widoczność w Mapach i wyszukiwaniu do 3 km.", cel: "trafiają do Ciebie ludzie z okolicy.", pts: ["Wizytówka w Mapach", "Pozycjonowanie lokalne", "Zasięg w promieniu 3 km"] },
-  { n: "04", title: "Silnik Treści", meta: "CYKLICZNIE", dostajesz: "zdjęcia, wideo i teksty o Twoim rzemiośle.", cel: "klient widzi jakość jeszcze przed wizytą.", pts: ["Sesja foto 2× w miesiącu", "Krótkie wideo z realizacji", "Posty gotowe do publikacji"] },
-  { n: "05", title: "Kampanie", meta: "CYKLICZNIE", dostajesz: "kalendarz ofert i mailingi, które wracają.", cel: "puste godziny w tygodniu się zapełniają.", pts: ["Kalendarz ofert", "Mailing do bazy klientów", "Raport z konwersji"] },
-  { n: "06", title: "Retencja", meta: "STALE", dostajesz: "system opinii, lojalności i raport tygodniowy.", cel: "klienci wracają i polecają Cię znajomym.", pts: ["System opinii", "Program poleceń", "Raport tygodniowy"] },
-];
+/* ---------- KALKULATOR — trzy pytania, jeden szacunek ---------- */
+
+const EST_SIZE = [
+  { id: "1", label: "1–5" },
+  { id: "6", label: "6–20" },
+  { id: "21", label: "21–50" },
+  { id: "50", label: "50+" },
+] as const;
+
+const EST_NEEDS = [
+  { id: "marka", label: "Marka i szyld" },
+  { id: "strona", label: "Strona / rezerwacje" },
+  { id: "pozyskiwanie", label: "Pozyskiwanie klientów" },
+  { id: "tresc", label: "Treść: foto & film" },
+  { id: "kampanie", label: "Kampanie i mailing" },
+  { id: "retencja", label: "Opinie i powroty" },
+] as const;
+
+const EST_TERM = [
+  { id: "3", label: "3 mies." },
+  { id: "6", label: "6 mies." },
+  { id: "12", label: "12 mies." },
+] as const;
+
+const NEED_WEIGHT: Record<(typeof EST_NEEDS)[number]["id"], number> = {
+  marka: 0.3,
+  strona: 0.8,
+  pozyskiwanie: 1.1,
+  tresc: 0.5,
+  kampanie: 0.7,
+  retencja: 0.6,
+};
+
+function estimateClients(sizeId: string, needs: string[], termId: string): number {
+  const sizeMul = sizeId === "1" ? 0.8 : sizeId === "6" ? 1 : sizeId === "21" ? 1.3 : 1.6;
+  const termMul = termId === "3" ? 1 : termId === "6" ? 1.8 : 3;
+  const weight = needs.reduce((acc, id) => acc + (NEED_WEIGHT[id as keyof typeof NEED_WEIGHT] ?? 0), 0);
+  const raw = (1.6 + weight * 3.1) * sizeMul * termMul;
+  return Math.max(1, Math.round(raw));
+}
+
+const computeBrief = (
+  sizeLabel: string,
+  needLabels: string,
+  termLabel: string,
+  clients: number,
+): string => `KALKULATOR: firma ${sizeLabel} os., potrzeby: ${needLabels}, czas: ${termLabel}, szacunek ~${clients} dodatkowych klientów/mies.`;
 
 
 
@@ -737,7 +775,7 @@ function useAtPageEnd(threshold = 24) {
 
 /* pozycje bocznego paska nawigacji */
 const SIDEBAR = [
-  { label: "SYSTEM", id: "services" },
+  { label: "KALKULATOR", id: "services" },
   { label: "ATELIER", id: "atelier" },
   { label: "PROCES", id: "process" },
   { label: "FAQ", id: "faq" },
@@ -747,7 +785,7 @@ const SIDEBAR_IDS = SIDEBAR.map((s) => s.id);
 
 /* menu z boku: kolejność zgodna z ławkiem bocznym */
 const MENU_ITEMS: StaggeredMenuItem[] = [
-  { label: "System", ariaLabel: "Przejdź do sekcji SYSTEM", link: "#services" },
+  { label: "Kalkulator", ariaLabel: "Przejdź do sekcji KALKULATOR", link: "#services" },
   { label: "Atelier", ariaLabel: "Przejdź do sekcji ATELIER", link: "#atelier" },
   { label: "Proces", ariaLabel: "Przejdź do sekcji PROCES", link: "#process" },
   { label: "FAQ", ariaLabel: "Przejdź do sekcji FAQ", link: "#faq" },
@@ -884,14 +922,23 @@ export default function Landing() {
   const manifestNear = useInView(manifestRef, { once: true, margin: "35%" });
   /* bez WebGPU chowamy płótno i zostawiamy samo tło gradientowe */
   const [shardsFailed, setShardsFailed] = useState(false);
-  /* zaznaczone moduły w SYSTEM napędzają rekomendowany pakiet */
-  /* zaznaczone moduły w SYSTEM */
-  const [picked, setPicked] = useState<number[]>([]);
-  const toggleModule = (i: number) => {
-    setPicked((prev) =>
-      prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i],
+  /* KALKULATOR: 3 pytania → szacunek dodatkowych klientów */
+  const [estSize, setEstSize] = useState<string>("6");
+  const [estNeeds, setEstNeeds] = useState<string[]>(["pozyskiwanie"]);
+  const [estTerm, setEstTerm] = useState<string>("6");
+  const estClients = useMemo(
+    () => estimateClients(estSize, estNeeds, estTerm),
+    [estSize, estNeeds, estTerm],
+  );
+  const toggleEstNeed = (id: string) => {
+    sfxTap();
+    setEstNeeds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
+  /* brief z kalkulatora trafia do pola „co chcesz poprawić” */
+  const [briefed, setBriefed] = useState(false);
+  const [contactMe, setContactMe] = useState(true);
   const cinemaRef = useRef<HTMLElement>(null);
   const { scrollY, scrollYProgress } = useScroll();
   const { scrollYProgress: cinemaProgress } = useScroll({ target: cinemaRef, offset: ["start end", "end start"] });
@@ -940,17 +987,27 @@ export default function Landing() {
     }
     target?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
-  /* wybrany pakiet trafia od razu do zapytania o audyt */
-  /* ATELIER: ceny poznajesz na audycie — CTA prowadzi prosto do formularza */
+  /* KALKULATOR → KONTAKT: brief z szacunku trafia do pola „co chcesz poprawić",
+     a stronę przewijamy na dół, do formularza z checkboxem kontaktu */
   const goContact = () => {
     sfxTap();
+    const sizeLabel = EST_SIZE.find((s) => s.id === estSize)?.label ?? estSize;
+    const termLabel = EST_TERM.find((t) => t.id === estTerm)?.label ?? estTerm;
+    const needLabels =
+      estNeeds
+        .map((id) => EST_NEEDS.find((n) => n.id === id)?.label ?? "")
+        .filter(Boolean)
+        .join(", ") || "—";
+    setForm((f) => ({ ...f, message: computeBrief(sizeLabel, needLabels, termLabel, estClients) }));
+    setBriefed(true);
     go("contact");
   };
+  /* wysyłka: telefon wymagany; checkbox decyduje o treści potwierdzenia */
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.phone) return;
+    sfxConfirm();
     setSent(true);
-    setTimeout(()=>setSent(false), 6000);
   };
 
   const svc = auditServices.find((s) => s.id === form.service) || auditServices[0];
@@ -1290,7 +1347,7 @@ export default function Landing() {
 
 
                   </span>
-                  ZOBACZ SYSTEM
+                  POLICZ KLIENTÓW
                 </BtnGhost>
               </motion.div>
 
@@ -1363,179 +1420,150 @@ export default function Landing() {
         <Reveal>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 border-b border-white/[0.06] pb-12 lg:pb-16">
             <div>
-              <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.2em] text-white/50">01 — SYSTEM</div>
+              <div className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.2em] text-white/50">01 — KALKULATOR</div>
               <h2 className="mt-5 leading-[0.9] tracking-[-0.02em]">
-                <EditableText ek="qraft.system.h1" def="Jeden system. Sześć modułów." className="block font-[Cormorant_Garamond] font-light text-[26px] sm:text-[52px]" isEditing={isEditing} as="span" />
+                <EditableText ek="qraft.system.h1" def="Ilu klientów możesz dorzucić?" className="block font-[Cormorant_Garamond] font-light text-[26px] sm:text-[52px]" isEditing={isEditing} as="span" />
 
 
               </h2>
             </div>
             <EditableText
               ek="qraft.system.subtitle"
-              def={"System prowadzi klienta od pierwszego wyszukania aż do powtórnych zakupów. Włączasz moduły po kolei albo wszystkie naraz — każdy działa sam, a razem działają lepiej." + (picked.length ? ` (Twoje zaznaczenie: ${picked.length}/6)` : "")}
+              def="Trzy pytania. Jeden szacunek dodatkowych klientów miesięcznie. Bez zapisów, bez zobowiązań — policz, a potem zapytaj o audyt."
               className="max-w-[460px] font-[Inter] font-light text-[14.5px] sm:text-[16px] leading-8 text-white/45"
               isEditing={isEditing}
               as="p"
-           />
-
-          </div>
+           />          </div>
         </Reveal>
-        <div className="mt-6 sm:mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
-          {serviceDefaults.map((s,i)=>(
-            <motion.div
-              key={s.n}
-              initial={{ opacity:0, y:14 }}
-              whileInView={{ opacity:1, y:0 }}
-              viewport={{ once:true }}
-              transition={{ duration:0.7, delay:i*0.04, ease:[0.22,1,0.36,1]}}
-              className="h-[260px] sm:h-[300px]"
-            >
-              <FlipCard
-                fill
-                editable={isEditing}
-                selected={picked.includes(i)}
-                onActivate={() => { sfxTap(); toggleModule(i); }}
-                axis="y"
-                ariaLabel={`Modu\u0142 ${s.n} \u2014 ${s.title}`}
-                background={picked.includes(i) ? "#0A120E" : "#0A0A0D"}
-                color="#F2F2F0"
-                radius={24}
-                width={420}
-                height={300}
-                perspective={1200}
-                tiltMax={9}
-                hoverScale={1.02}
-                glareOpacity={0.17}
-                shadow={false}
-                flipOnClick={!isEditing}
-                draggable={!isEditing}
-                front={(
-                  <div className="relative flex h-full w-full flex-col p-4 sm:p-6 lg:p-7">
-                    <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(74% 54% at 50% 0%, rgba(255,255,255,0.08), transparent 72%)" }}/>
 
-                    <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.08]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06)" }}/>
+        {/* KALKULATOR: trzy pytania → szacunek dodatkowych klientów */}
+        <div className="mt-12 grid gap-5 lg:grid-cols-[1.25fr_0.75fr]">
+          {/* pytania */}
+          <div className="space-y-7 rounded-[26px] border border-white/10 bg-white/[0.02] p-6 backdrop-blur-xl sm:p-9" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.05), 0 24px 70px rgba(0,0,0,0.4)" }}>
+            {/* 1 — jak duża jest firma */}
+            <div>
+              <div className="flex items-baseline justify-between gap-4">
+                <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.18em] text-white/45">01 — JAK DUŻA JEST FIRMA?</span>
+                <span className="font-[JetBrains_Mono] font-light text-[9px] tracking-[0.14em] text-white/20">LICZBA OSÓB</span>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {EST_SIZE.map((s) => {
+                  const on = estSize === s.id;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => { sfxTap(); setEstSize(s.id); }}
+                      aria-pressed={on}
+                      className={`h-12 cursor-pointer rounded-full border font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] transition-all duration-300 ${
+                        on
+                          ? "border-white bg-white text-black"
+                          : "border-white/12 bg-white/[0.02] text-white/50 hover:border-white/40 hover:text-white"
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-                    <div className="relative flex items-center justify-between">
-                      <PopNumber text={s.n} className="font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px] tracking-[0.16em] text-white/25" />
+            {/* 2 — czego potrzebujesz */}
+            <div>
+              <div className="flex items-baseline justify-between gap-4">
+                <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.18em] text-white/45">02 — CZEGO POTRZEBUJESZ?</span>
+                <span className="font-[JetBrains_Mono] font-light text-[9px] tracking-[0.14em] text-white/20">WYBIERZ DOWOLNIE</span>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {EST_NEEDS.map((n) => {
+                  const on = estNeeds.includes(n.id);
+                  return (
+                    <button
+                      key={n.id}
+                      type="button"
+                      onClick={() => toggleEstNeed(n.id)}
+                      aria-pressed={on}
+                      className={`inline-flex h-10 items-center gap-2 rounded-full border px-5 font-[JetBrains_Mono] font-light text-[10px] tracking-[0.14em] transition-all duration-300 ${
+                        on
+                          ? "border-[#7DF0AE]/60 bg-[#7DF0AE]/12 text-[#9BF3C0]"
+                          : "border-white/12 bg-white/[0.02] text-white/45 hover:border-white/40 hover:text-white"
+                      }`}
+                    >
+                      <span className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${on ? "bg-[#7DF0AE]" : "bg-white/25"}`} />
 
+                      {n.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-                      <span className="h-8 w-8 grid place-items-center rounded-full border border-white/10 text-white/25"><ArrowUpRight className="h-3.5 w-3.5" />
-</span>
-                    </div>
-                    <h3 className="relative mt-3 sm:mt-5 font-[Cormorant_Garamond] font-light text-[19px] sm:text-[21px] tracking-[-0.01em] leading-none">
-                      <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
-
-
-                    </h3>
-                    <div className="relative mt-auto space-y-2 pt-4">
-                      <p className="font-[Inter] font-light text-[13.5px] sm:text-[14.5px] leading-6 text-white/55">
-                        <span className="font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.14em] text-white/30 mr-2">DOSTAJESZ</span>
-                        <EditableText ek={`qraft.service.${i}.d`} def={s.dostajesz} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
-
-
-                      </p>
-                      {isEditing && (
-                        <p className="font-[Inter] font-light text-[13.5px] sm:text-[14.5px] leading-6 text-white/80">
-                          <span className="font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.14em] text-white/45 mr-2">CEL</span>
-                          <EditableText ek={`qraft.service.${i}.c`} def={s.cel} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
-
-
-                        </p>
-                      )}
-                      <div className="flex items-center justify-between gap-3 pt-3">
-                        {isEditing ? (
-                          <span className="font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.18em] text-white/25">TRYB EDYCJI</span>
-                        ) : (
-                          <span
-                            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-[JetBrains_Mono] font-light text-[8px] sm:text-[9px] tracking-[0.16em] transition-colors duration-500 ${
-                              picked.includes(i)
-                                ? "border-[#7DF0AE]/60 bg-[#7DF0AE]/12 text-[#9BF3C0]"
-                                : "border-white/12 text-white/35"
-                            }`}
-                          >
-                            <span className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${picked.includes(i) ? "bg-[#7DF0AE]" : "bg-white/25"}`}/>
-
-                            {picked.includes(i) ? "W TWOIM SYSTEMIE" : "DODAJ DO SYSTEMU"}
-                          </span>
-                        )}
-                        {!isEditing && (
-                          <span className="flex items-center gap-2 font-[JetBrains_Mono] font-light text-[8px] sm:text-[9px] tracking-[0.18em] text-white/25">
-                            <RefreshCw className="h-3 w-3" />
- OBR\u00d3\u0106
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-                back={(
-                  <div className="relative flex h-full w-full flex-col p-4 sm:p-6 lg:p-7">
-                    <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(86% 62% at 50% 108%, rgba(255,255,255,0.10), transparent 70%)" }}/>
-
-                    <div className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/[0.12]" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.08)" }}/>
-
-                    <div className="relative font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.18em] text-white/30">{s.meta}</div>
-                    <h3 className="relative mt-3 font-[Cormorant_Garamond] font-light text-[17px] sm:text-[19px] leading-none tracking-[-0.01em]">
-                      <EditableText ek={`qraft.service.${i}.title`} def={s.title} className="font-[Cormorant_Garamond] font-light" isEditing={isEditing} as="span" />
-
-
-                    </h3>
-                    <p className="relative mt-4 font-[Inter] font-light text-[13.5px] leading-5 text-white/80">
-                      <span className="font-[JetBrains_Mono] font-light text-[8.5px] sm:text-[9.5px] tracking-[0.14em] text-white/45 mr-2">CEL</span>
-                      <EditableText ek={`qraft.service.${i}.c`} def={s.cel} className="font-[Inter] font-light" isEditing={isEditing} as="span" />
-
-
-                    </p>
-                    <ul className="relative mt-3 space-y-1">
-                      {s.pts.map((p,k)=>(
-                        <li key={k} className="flex items-start gap-2 font-[Inter] font-light text-[12px] sm:text-[13px] leading-5 text-white/55">
-                          <Check className="mt-[3px] h-3 w-3 shrink-0 text-white/30" />
-{p}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="relative mt-auto space-y-3 pt-6">
-                      <span
-                        className={`flex h-10 w-full items-center justify-center gap-2 rounded-full border font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.16em] transition-colors duration-500 ${
-                          picked.includes(i)
-                            ? "border-[#7DF0AE] bg-[#7DF0AE] text-black"
-                            : "border-white/20 text-white/75"
-                        }`}
-                      >
-                        {picked.includes(i) ? <><Check className="h-3.5 w-3.5" />
- W TWOIM SYSTEMIE</> : <>DODAJ DO SYSTEMU <ArrowRight className="h-3 w-3 opacity-60" />
-</>}
-                      </span>
-                      <div className="flex items-center justify-between font-[JetBrains_Mono] font-light text-[8px] sm:text-[9px] tracking-[0.18em]">
-                        <span className="text-white/25">COFNIJ</span>
-                        <button
-                          onPointerDown={(e)=>e.stopPropagation()}
-                          onClick={(e)=>{ e.stopPropagation(); go("contact"); }}
-                          className="text-white/50 transition-colors duration-300 hover:text-white"
-                        >
-                          SPRAWDZIMY NA AUDYCIE →
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-             />
-
-            </motion.div>
-          ))}
-        </div>
-        {/* przy wiecej niz 4 modulach pakiet PRESTIGE dobiera sie automatycznie */}
-        {picked.length > 4 && (
-          <div className="mt-6 flex items-center justify-between gap-4 rounded-[20px] border border-[#7DF0AE]/40 bg-[#7DF0AE]/10 p-4 sm:p-5">
-            <p className="font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.16em] text-[#9BF3C0]">
-              5+ MODUŁÓW — DOBRALIŚMY CI PAKIET PRESTIGE
-            </p>
-            <BtnGhost onClick={()=>go("atelier")} className="h-9 shrink-0 border-[#7DF0AE]/50 px-4 text-[9px] text-[#9BF3C0]">
-              ZOBACZ ATELIER
-            </BtnGhost>
+            {/* 3 — na ile chcesz współpracować */}
+            <div>
+              <div className="flex items-baseline justify-between gap-4">
+                <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.18em] text-white/45">03 — NA JAK DŁUGO WSPÓŁPRACA?</span>
+                <span className="font-[JetBrains_Mono] font-light text-[9px] tracking-[0.14em] text-white/20">BEZ WYŁĄCZNOŚCI</span>
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                {EST_TERM.map((t) => {
+                  const on = estTerm === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => { sfxTap(); setEstTerm(t.id); }}
+                      aria-pressed={on}
+                      className={`h-12 cursor-pointer rounded-full border font-[JetBrains_Mono] font-light text-[11px] tracking-[0.14em] transition-all duration-300 ${
+                        on
+                          ? "border-white bg-white text-black"
+                          : "border-white/12 bg-white/[0.02] text-white/50 hover:border-white/40 hover:text-white"
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-        )}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-40 sm:h-56" style={{ backgroundImage: "linear-gradient(180deg, rgba(5,5,7,0) 0%, rgba(5,5,7,0.55) 45%, #050507 100%)" }}/>
+
+          {/* wynik — szacunek dodatkowych klientów */}
+          <div className="relative overflow-hidden rounded-[26px] border border-white/10 bg-white/[0.02] p-6 sm:p-8" style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.05), 0 24px 70px rgba(0,0,0,0.4)" }}>
+            <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(90% 60% at 50% 110%, rgba(255,62,10,0.16), rgba(255,62,10,0) 70%)" }} />
+
+            <div className="relative flex h-full flex-col">
+              <span className="font-[JetBrains_Mono] font-light text-[10px] tracking-[0.18em] text-white/45">TWÓJ SZACUNEK</span>
+              <div className="mt-6 flex items-baseline gap-3">
+                <span
+                  key={estClients}
+                  className="font-[Cormorant_Garamond] font-light leading-[0.8] text-white text-[72px] sm:text-[96px]"
+                >
+                  <TextSwap text={`~${estClients}`} />
+                </span>
+                <span className="font-[JetBrains_Mono] font-light text-[10px] leading-4 tracking-[0.16em] text-white/45">
+                  DODATKOWYCH
+                  <br />
+
+                  KLIENTÓW / MIES.
+                </span>
+              </div>
+              <p className="mt-5 font-[Inter] font-light text-[13px] leading-6 text-white/45">
+                Liczba jest ostrożna — zakłada start od 90 dni i Twoje rzemiosło bez zmian. Resztę doprecyzujemy na audycie.
+              </p>
+              <div className="mt-auto pt-8">
+                <BtnPrimary onClick={goContact} className="h-[52px] w-full px-6 text-[10px] sm:text-[11px]">
+                  POPROŚ O AUDYT <ArrowRight className="h-3.5 w-3.5 opacity-60" />
+                </BtnPrimary>
+                <p className="mt-3 text-center font-[JetBrains_Mono] font-light text-[8.5px] tracking-[0.14em] text-white/25">
+                  PRZEWINIEMY CIĘ DO FORMULARZA
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-40 sm:h-56" style={{ backgroundImage: "linear-gradient(180deg, rgba(5,5,7,0) 0%, rgba(5,5,7,0.55) 45%, #050507 100%)" }} />
 
         <div className="mt-10 flex flex-col sm:flex-row justify-between gap-4 font-[JetBrains_Mono] font-light text-[10px] sm:text-[11px]">
           <EditableText ek="qraft.system.footerL" def="OTWARTE DLA KAŻDEGO KLIENTA." className="text-white/20 tracking-[0.08em]" isEditing={isEditing} as="span" />
@@ -2289,6 +2317,28 @@ export default function Landing() {
 
                 </label>
 
+                {briefed && (
+                  <div className="mt-5 flex items-start gap-3 rounded-[18px] border border-[#FF3E0A]/35 bg-[#FF3E0A]/[0.07] px-4 py-3">
+                    <span className="mt-[3px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#FF3E0A]" />
+
+                    <p className="font-[Inter] font-light text-[12px] leading-5 text-white/70">
+                      Brief z kalkulatora jest już w Twoim zgłoszeniu — szacunek ~{estClients} klientów/mies. Uzupełnij tylko telefon.
+                    </p>
+                  </div>
+                )}
+
+                <label className="mt-5 flex cursor-pointer items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={contactMe}
+                    onChange={(e) => { sfxTap(); setContactMe(e.target.checked); }}
+                    className="mt-[2px] h-4 w-4 shrink-0 cursor-pointer appearance-none rounded-[5px] border border-white/25 bg-white/[0.02] outline-none transition-colors duration-300 checked:border-white checked:bg-white focus-visible:ring-2 focus-visible:ring-white/50"
+                  />
+                  <span className="font-[Inter] font-light text-[12.5px] leading-5 text-white/60">
+                    Tak, skontaktujcie się ze mną — najlepiej telefonicznie, w ciągu jednego dnia roboczego.
+                  </span>
+                </label>
+
                 <button
                   type="submit"
                   className={`mt-6 flex h-[52px] w-full cursor-pointer items-center justify-center gap-2 rounded-full font-[JetBrains_Mono] font-light text-[10px] tracking-[0.16em] transition-colors duration-300 sm:text-[11px] ${
@@ -2299,7 +2349,7 @@ export default function Landing() {
                     <>
                       <Check className="h-3.5 w-3.5" />
 
- ZAPISANE — ODPISZEMY JUTRO
+ {contactMe ? "ZAPISANE — ODEZWIEMY SIĘ JUTRO" : "ZAPISANE — CZEKAMY NA TWOJE ZGŁOSZENIE"}
                     </>
                   ) : (
                     <>
