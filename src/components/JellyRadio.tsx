@@ -19,10 +19,6 @@ export interface JellyRadioProps {
   value?: string;
   /** Initial value when uncontrolled. Falls back to the first item. */
   defaultValue?: string;
-  /** Name for form association (single-item mode). */
-  name?: string;
-  /** Default checked state for single-item mode. */
-  defaultChecked?: boolean;
   /** Called on the commit, before the motion ends. */
   onChange?: (value: string, index: number) => void;
   /** Surface of an unchosen chip. */
@@ -58,7 +54,6 @@ export interface JellyRadioProps {
   /** Accessible name of the group. */
   ariaLabel?: string;
   className?: string;
-  children?: ReactNode;
 }
 
 const DEFAULT_ITEMS = ["Off", "Low", "Medium", "High", "Max"];
@@ -114,23 +109,7 @@ export default function JellyRadio({
   disabled = false,
   ariaLabel = "Options",
   className = "",
-  name,
-  defaultChecked,
-  children,
 }: JellyRadioProps) {
-  // Single-item mode: used as an individual radio-like button with children as label.
-  if (name != null || children != null) {
-    return (
-      <motion.button
-        role="radio"
-        aria-checked={value === String(defaultChecked)}
-        className={className}
-        onClick={() => onChange?.(String(defaultChecked), 0)}
-      >
-        {children}
-      </motion.button>
-    );
-  }
   const list: JellyRadioItem[] = items.map((it) =>
     typeof it === "string" ? { value: it, label: it } : it,
   );

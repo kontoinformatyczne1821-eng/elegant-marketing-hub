@@ -74,9 +74,6 @@ export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableC
 // ADVANCED COMPONENTS (Large bundle size - use sparingly)
 // ============================================================================
 
-// Content Sections
-export { Faq4, FaqItem } from "./faq-4"; // ~4KB - Two-column FAQ section
-
 // Complex Interactions
 export { ScrollArea, ScrollBar } from "./scroll-area"; // ~6KB - Custom scrollbars
 export { Drawer, DrawerPortal, DrawerOverlay, DrawerTrigger, DrawerClose, DrawerContent, DrawerHeader, DrawerFooter, DrawerTitle, DrawerDescription } from "./drawer"; // ~12KB - Bottom sheet drawer

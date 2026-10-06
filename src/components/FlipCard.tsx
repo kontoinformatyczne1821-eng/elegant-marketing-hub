@@ -40,8 +40,6 @@ export interface FlipCardProps {
   front?: ReactNode;
   /** Content of the back face. */
   back?: ReactNode;
-  /** Alias for front. */
-  children?: ReactNode;
   /** Controlled state: true shows the back. Omit it to let the card manage itself. */
   flipped?: boolean;
   /** Start on the back face. */
@@ -104,7 +102,6 @@ export interface FlipCardProps {
 const FlipCard = ({
   front = null,
   back = null,
-  children = null,
   flipped,
   defaultFlipped = false,
   onFlipChange,
@@ -371,7 +368,7 @@ const FlipCard = ({
       ) : null}
       <motion.div className="flip-card__rotor" style={reduce ? undefined : rotorStyle}>
         <div className="flip-card__face flip-card__face--front" aria-hidden={shown} inert={shown}>
-          {front ?? children}
+          {front}
           {glare ? <span className="flip-card__glare" aria-hidden="true" /> : null}
         </div>
         <div className="flip-card__face flip-card__face--back" aria-hidden={!shown} inert={!shown}>
