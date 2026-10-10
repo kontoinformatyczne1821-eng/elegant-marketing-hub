@@ -1071,9 +1071,20 @@ export default function Landing() {
 
       {/* boczny pasek nawigacji (LineSidebar) — otwiera go kliknięcie Q w nagłówku */}
       <div className="hidden min-[1640px]:block fixed left-3 top-1/2 z-40 -translate-y-1/2">
-        <motion.aside
-          aria-label="Nawigacja strony"
-          style={{
+      {/* parallax hero: wolniejsze płynięcie za schemem — dla głębi, nie dla gawędzi */}
+      <motion.div
+        aria-hidden="true"
+        style={{
+          y: useTransform(scrollYProgress, [0, 0.42], ["-6%", "6%"]),
+          scale: useTransform(scrollYProgress, [0, 0.42], [1.02, 0.98]),
+          filter: useTransform(scrollYProgress, [0, 0.42], ["blur(0px)", "blur(1px)"]),
+        }}
+        className="fixed inset-0 z-0 will-change-transform pointer-events-none"
+      />
+
+      <motion.aside
+        aria-label="Nawigacja strony"
+        style={{
             opacity: navFade,
             x: navShift,
             filter: navBlur,
@@ -1310,9 +1321,9 @@ export default function Landing() {
         <div className="relative z-10 mx-auto max-w-[1280px] px-6 lg:px-8 pointer-events-none">
           <div className="flex min-h-[calc(100svh-72px)] flex-col justify-center py-16 sm:py-24 lg:py-32">
             <motion.div
-              initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
+              initial={{ opacity: 0, y: 36, filter: "blur(14px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 1.35, ease: [0.22, 1, 0.36, 1] }}
             >
               <h1 className="font-[Cormorant_Garamond] font-light uppercase leading-[0.86] tracking-[0.01em] text-[clamp(26px,7.8vw,106px)]">
                 <span className="block text-white">Precision</span>
@@ -1326,15 +1337,15 @@ export default function Landing() {
                 className="mt-8 sm:mt-12 h-px w-full bg-white origin-left"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
-                transition={{ duration: 1.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 1.7, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
              />
 
 
               <motion.div
                 className="mt-6 sm:mt-10 flex flex-wrap items-center gap-3 sm:gap-4"
-                initial={{ opacity: 0, y: 14 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, delay: 0.6 }}
+                transition={{ duration: 1.05, delay: 0.7 }}
               >
                 <BtnPrimary onClick={() => go("contact")} className="h-[52px] px-8 text-[10px] sm:text-[11px] pointer-events-auto">
                   ZAMÓW DARMOWY AUDYT <ArrowRight className="h-3.5 w-3.5 opacity-60" />
@@ -1353,9 +1364,9 @@ export default function Landing() {
 
               <motion.div
                 className="mt-14 flex flex-wrap gap-x-10 gap-y-4 border-t border-white/10 pt-8"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.9, delay: 0.8 }}
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.05, delay: 0.95 }}
               >
                 {[
                   { v: <CountUp to={340} suffix="+" />
