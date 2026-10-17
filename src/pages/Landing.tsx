@@ -8,7 +8,7 @@ import GradualBlur from "@/components/GradualBlur";
 import LineSidebar from "@/components/LineSidebar";
 import QraftMark from "@/components/QraftMark";
 import GlowCursor from "@/components/GlowCursor";
-import PixelTrail from "@/components/PixelTrail";
+import AsciiTiles from "@/components/AsciiTiles";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import AeroShards from "@/components/AeroShards";
 import StarField from "@/components/StarField";
@@ -1246,147 +1246,12 @@ export default function Landing() {
         </div>
       )}
 
-      <section ref={cinemaRef} className="relative overflow-hidden">
-        {/* jedna duża fotografia gór — parallax przez całą sekcję */}
-        <div className="absolute inset-0">
-          <motion.div style={{ y: cinemaY }} className="absolute inset-0 scale-[1.35]">
-            <img
-              src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=2000&q=80&auto=format&fit=crop"
-              alt="Góra pod gwiazdami nocą"
-              className="h-full w-full object-cover grayscale contrast-110 brightness-[0.38]"
-           />
+      <section ref={cinemaRef} className="relative overflow-hidden min-h-[calc(100svh-72px)]">
+        {/* HERO: ASCII TILES — szklane kafle ze świecącymi znakami (AsciiTiles) */}
+        <motion.div style={{ y: cinemaY }} className="absolute inset-0 scale-[1.25]">
+          <AsciiTiles />
+        </motion.div>
 
-          </motion.div>
-
-          <motion.div
-            className="absolute inset-0"
-            style={{ background: "linear-gradient(to bottom, rgba(5,5,7,0.50) 0%, transparent 34%, transparent 76%, rgba(5,5,7,0.55) 91%, #050507 100%)" }}
-            animate={{ opacity: [0.55, 0.85, 0.55] }}
-            transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
-         />
-
-          <motion.div
-            className="absolute -left-1/4 top-1/3 h-[46vh] w-[160%] opacity-40"
-            style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.10), transparent 72%)", filter: "blur(30px)" }}
-            animate={{ x: ["-8%", "8%", "-8%"] }}
-            transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
-         />
-
-        </div>
-
-        <div className="absolute inset-0 bg-[radial-gradient(130%_100%_at_50%_6%,transparent_0%,rgba(5,5,7,0.30)_64%,rgba(5,5,7,0.88)_100%)]" />
-
-
-        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "88px 88px" }}/>
-
-
-        <div className="absolute inset-0">
-          <div className="absolute left-1/2 top-[-10%] h-[120%] w-px -translate-x-1/2 bg-white/90 shadow-[0_0_30px_5px_rgba(255,255,255,0.6),0_0_110px_24px_rgba(255,255,255,0.24)]" />
-
-
-          <motion.div
-            className="absolute left-1/2 top-0 h-full w-[420px] -translate-x-1/2"
-            style={{ background: "linear-gradient(to right, transparent, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.24) 50%, rgba(255,255,255,0.08) 60%, transparent)" }}
-            animate={{ opacity: [0.28, 0.8, 0.28] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-         />
-
-          <motion.div
-            className="absolute left-1/2 top-0 h-[32%] w-[680px] -translate-x-1/2"
-            style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.18), transparent)" }}
-            animate={{ y: ["0%", "212%"] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-         />
-
-        </div>
-
-        {/* pixelowy ślad kursora w hero — tylko dla myszy/trackpada */}
-        {finePointer && (
-          <div className="absolute inset-0 z-[5] hidden sm:block mix-blend-screen">
-            <PixelTrail
-              gridSize={80}
-              trailSize={0.09}
-              maxAge={520}
-              interpolate={5}
-              color="#ffffff"
-              gooeyFilter={{ id: "qraft-goo", strength: 2.4 }}
-              canvasProps={{ dpr: [1, 1.25] }}
-              style={{ touchAction: "auto" }}
-           />
-
-          </div>
-        )}
-
-        {/* content */}
-        <div className="relative z-10 mx-auto max-w-[1280px] px-6 lg:px-8 pointer-events-none">
-          <div className="flex min-h-[calc(100svh-72px)] flex-col justify-center py-16 sm:py-24 lg:py-32">
-            <motion.div
-              initial={{ opacity: 0, y: 36, filter: "blur(14px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 1.35, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <h1 className="font-[Cormorant_Garamond] font-light uppercase leading-[0.86] tracking-[0.01em] text-[clamp(26px,7.8vw,106px)]">
-                <span className="block text-white">Precision</span>
-                <span className="block text-white">Builds</span>
-                <span className="block text-transparent" style={{ WebkitTextStroke: "1.2px rgba(255,255,255,0.6)" }}>
-                  Brands
-                </span>
-              </h1>
-
-              <motion.div
-                className="mt-8 sm:mt-12 h-px w-full bg-white origin-left"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 1.7, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
-             />
-
-
-              <motion.div
-                className="mt-6 sm:mt-10 flex flex-wrap items-center gap-3 sm:gap-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.05, delay: 0.7 }}
-              >
-                <BtnPrimary onClick={() => go("contact")} className="h-[52px] px-8 text-[10px] sm:text-[11px] pointer-events-auto">
-                  ZAMÓW DARMOWY AUDYT <ArrowRight className="h-3.5 w-3.5 opacity-60" />
-
-
-                </BtnPrimary>
-                <BtnGhost onClick={() => go("services")} className="h-[52px] pl-2 pr-6 text-[10px] sm:text-[11px] pointer-events-auto">
-                  <span className="h-9 w-9 grid place-items-center rounded-full border border-white/15 transition-colors duration-300 group-hover:bg-white/10">
-                    <ArrowUpRight className="h-3.5 w-3.5" />
-
-
-                  </span>
-                  POLICZ KLIENTÓW
-                </BtnGhost>
-              </motion.div>
-
-              <motion.div
-                className="mt-14 flex flex-wrap gap-x-10 gap-y-4 border-t border-white/10 pt-8"
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.05, delay: 0.95 }}
-              >
-                {[
-                  { v: <CountUp to={340} suffix="+" />
-
-, l: "Zbudowanych" },
-                  { v: <CountUp to={4.9} decimals={1}/>
-, l: "Ocena" },
-                  { v: <CountUp to={14} suffix=" mies." />
-
-, l: "Średnio" },
-                ].map((s, i) => (
-                  <div key={i}>
-                    <div className="font-[Cormorant_Garamond] font-light text-[22px] sm:text-[26px] leading-none">{s.v}</div>
-                    <div className="mt-2 font-[JetBrains_Mono] font-light text-[9px] sm:text-[10px] tracking-[0.14em] text-white/55">{s.l}</div>
-                  </div>
-                ))}
-              </motion.div>
-            </motion.div>
-          </div>
-        </div>
         {/* dołek HERO: tło wygasa w czerń + wspólny rejestr 1px na granicy z SYSTEM */}
         <div
           aria-hidden="true"
